@@ -22,7 +22,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         },
       }),
     }),
-
+    BullModule.registerQueue({
+      name: 'indexing',
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
