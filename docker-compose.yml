@@ -1,12 +1,12 @@
 services:
-  web:
-    build: .
-    ports:
-      - "8000:3000" 
-    depends_on:
-      - redis
-      - postgres
-
+  # web:
+  #   build: .
+  #   ports:
+  #     - "8000:3000" 
+  #   depends_on:
+  #     - redis
+  #     - postgres
+    
   redis:
     image: "redis:alpine" 
     ports:
@@ -15,8 +15,8 @@ services:
   postgres:
     image: ankane/pgvector:latest
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: test
     ports:
       - "5432:5432"

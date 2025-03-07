@@ -11,7 +11,7 @@ import { AppService } from './app.service';
   imports: [
     BullModule.forRoot({
       connection: {
-        host: process.env.REDIS_HOST || 'redis',
+        host: process.env.REDIS_HOST || 'localhost',
         port: Number(process.env.REDIS_PORT) || 6379,
       },
     }),
@@ -20,10 +20,10 @@ import { AppService } from './app.service';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.POSTGRES_HOST || 'postgres',
+      host: process.env.POSTGRES_HOST || 'localhost',
       port: Number(process.env.POSTGRES_PORT) || 5432,
-      username: process.env.POSTGRES_USER || 'root',
-      password: process.env.POSTGRES_PASSWORD || 'root',
+      username: process.env.POSTGRES_USER || 'username',
+      password: process.env.POSTGRES_PASSWORD || 'password',
       database: process.env.POSTGRES_DB || 'test',
       entities: [Task],
       synchronize: true,
