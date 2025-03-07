@@ -8,6 +8,12 @@ import { TasksService } from './../src/tasks/tasks.service';
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
   const tasksServiceMock = {
+    createTask: (title: string, description: string) => ({
+      id: 1,
+      title,
+      description,
+      status: 'OPEN',
+    }),
     getAllTasks: () => [
       { id: 1, title: 'Test Task 1', description: 'Desc 1', status: 'OPEN' },
       { id: 2, title: 'Test Task 2', description: 'Desc 2', status: 'DONE' },
@@ -30,6 +36,15 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
+  // Generic Test
+  it('/ (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
+  });
+
+  // Test for /tasks
   it('/GET tasks', () => {
     return request(app.getHttpServer())
       .get('/tasks')
@@ -37,10 +52,19 @@ describe('AppController (e2e)', () => {
       .expect(tasksServiceMock.getAllTasks());
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  // Tests for CRUD operations
+  it('POST /tasks - create a new task', async () => {
+    const payload = { title: 'New Task', description: 'Task description' };
+    const response = await request(app.getHttpServer())
+      .post('/tasks')
+      .send(payload)
+      .expect(201);
+
+    expect(response.body).toEqual({
+      id: 1,
+      title: 'New Task',
+      description: 'Task description',
+      status: 'OPEN',
+    });
   });
 });
