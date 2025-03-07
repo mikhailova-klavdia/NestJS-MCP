@@ -5,6 +5,8 @@ import { Task } from './task.entity';
 import { TasksService } from './tasks/tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -41,7 +43,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     TypeOrmModule.forFeature([Task]),
   ],
-  controllers: [TasksController],
-  providers: [TasksService],
+  controllers: [AppController, TasksController],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}
