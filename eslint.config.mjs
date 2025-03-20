@@ -17,25 +17,34 @@ export default tseslint.config(
         ...globals.node,
         ...globals.jest,
       },
-      ecmaVersion: 5,
+      ecmaVersion: 'latest', 
       sourceType: 'module',
       parserOptions: {
-        projectService: true,
+        project: true, 
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
   {
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      "prettier/prettier": [
-        "error",
-          {
-            "endOfLine": "auto"
-        }
-      ]
+      '@typescript-eslint/no-explicit-any': 'off', 
+      '@typescript-eslint/no-floating-promises': 'warn', 
+      '@typescript-eslint/no-unsafe-argument': 'warn', 
+      '@typescript-eslint/no-unsafe-assignment': 'warn', 
+      '@typescript-eslint/no-unsafe-member-access': 'warn', 
+      '@typescript-eslint/no-unsafe-call': 'warn',
+      '@typescript-eslint/require-await': 'warn', 
+      '@typescript-eslint/no-unused-vars': 'warn',
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto', 
+          printWidth: 100, 
+          singleQuote: true, 
+          trailingComma: 'es5', 
+          semi: true,
+        },
+      ],
     },
   },
 );
