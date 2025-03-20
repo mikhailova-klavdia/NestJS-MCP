@@ -14,18 +14,22 @@ export class RagService {
 
   async retrieveAndGenerate(query: string): Promise<string> {
     // Step 1: Generate embedding for the query
+    console.log('embedding');
     const queryEmbedding = await this._embeddingService.embed(query);
 
     // Step 2: Retrieve relevant documents (you can implement a similarity search here)
+    console.log('retrieve documents');
     const documents = await this._documentService.getAllDocuments();
 
     // Step 3: Find the most relevant document (simple cosine similarity for baseline)
+    console.log('searching for similar docs');
     const relevantDocument = this.findMostRelevantDocument(
       documents,
       queryEmbedding,
     );
 
     // Step 4: Generate a response using the relevant document and the query
+    console.log('ask ollama');
     const response = await this._chatService.askOllama(
       `Based on the following document, answer the question: ${query}\n\nDocument: ${relevantDocument.content}`,
     );

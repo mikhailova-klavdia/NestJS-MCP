@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Task } from './tasks/task.entity';
+import { DocumentEntity } from './document/document.entity';
 
 @Module({
   imports: [
@@ -19,12 +20,12 @@ import { Task } from './tasks/task.entity';
         username: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         database: configService.get<string>('POSTGRES_DB'),
-        entities: [Task],
+        entities: [Task, DocumentEntity],
         synchronize: true,
       }),
     }),
 
-    TypeOrmModule.forFeature([Task]),
+    TypeOrmModule.forFeature([Task, DocumentEntity]),
   ],
   exports: [TypeOrmModule],
 })

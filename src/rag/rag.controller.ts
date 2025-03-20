@@ -8,6 +8,9 @@ export class RagController {
 
   @Post('query')
   async query(@Body('query') query: string): Promise<string> {
+    if (!query) {
+      throw new Error('Query parameter is required');
+    }
     return this.ragService.retrieveAndGenerate(query);
   }
 }

@@ -7,8 +7,12 @@ import { TasksController } from './tasks/tasks.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LangchainService } from './langchain/langchain.service';
 import { DataModule } from './data.module';
+import { RagModule } from './rag/rag.module';
+import { ChatService } from './chat/chat.service';
+import { DocumentService } from './document/document.service';
+import { EmbeddingService } from './embedding/embedding.service';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -30,8 +34,16 @@ import { DataModule } from './data.module';
       name: 'indexing',
     }),
     DataModule,
+    RagModule,
+    DocumentModule,
   ],
   controllers: [AppController, TasksController],
-  providers: [AppService, TasksService, LangchainService],
+  providers: [
+    AppService,
+    TasksService,
+    DocumentService,
+    ChatService,
+    EmbeddingService,
+  ],
 })
 export class AppModule {}

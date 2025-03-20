@@ -9,7 +9,7 @@ export class DocumentService {
   constructor(
     @InjectRepository(DocumentEntity)
     private readonly _documentRepository: Repository<DocumentEntity>,
-    private readonly _embeddingService: EmbeddingService
+    private readonly _embeddingService: EmbeddingService,
   ) {}
 
   async getAllDocuments(): Promise<DocumentEntity[]> {
@@ -23,5 +23,12 @@ export class DocumentService {
       }
     }
     return documents;
+  }
+
+  async saveDocument(title: string, content: string): Promise<DocumentEntity> {
+    const document = new DocumentEntity();
+    document.title = title;
+    document.content = content;
+    return this._documentRepository.save(document);
   }
 }
