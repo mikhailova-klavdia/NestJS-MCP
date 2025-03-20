@@ -13,10 +13,10 @@ export class ChatService {
     });
   }
 
-  async askOllama(prompt: string): Promise<AIMessageChunk> {
+  async askOllama(prompt: string): Promise<string> {
     try {
       const response = await this._chatOllama.invoke(prompt);
-      return response;
+      return response.text;
     } catch (error) {
       console.error('Error asking Ollama:', error);
       throw new Error('Failed to get response from Ollama');
