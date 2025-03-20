@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 import { TasksService } from './../src/tasks/tasks.service';
-import { Task } from 'src/task.entity';
+import { Task } from 'src/tasks/task.entity';
 import { NotFoundException } from '@nestjs/common';
 
 let tasksList: Task[] = [];
