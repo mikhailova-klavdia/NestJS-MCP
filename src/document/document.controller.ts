@@ -7,10 +7,12 @@ export class DocumentController {
 
   @Post()
   async createDocument(
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Body() body,
   ) {
+    let title = body.title;
+    let content = body.content;
     if (!title || !content) {
+      console.log(title, content)
       throw new BadRequestException('Title and content are required');
     }
     const document = await this.documentService.saveDocument(title, content);

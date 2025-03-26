@@ -1,4 +1,3 @@
-// src/rag/rag.controller.ts
 import { Controller, Post, Body } from '@nestjs/common';
 import { RagService } from './rag.service';
 
@@ -7,10 +6,15 @@ export class RagController {
   constructor(private readonly ragService: RagService) {}
 
   @Post('query')
-  async query(@Body('query') query: string): Promise<string> {
-    if (!query) {
+  async query(
+    @Body() body
+    ): Promise<string> {
+    if (!body.query) {
       throw new Error('Query parameter is required');
     }
-    return this.ragService.retrieveAndGenerate(query);
+
+    const answer = this.ragService.retrieveAndGenerate(body.query)
+
+    return answer;
   }
 }

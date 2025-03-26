@@ -15,8 +15,8 @@ services:
   postgres:
     image: ankane/pgvector:latest
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
       POSTGRES_DB: test
     ports:
       - "5432:5432"
