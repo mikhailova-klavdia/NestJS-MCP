@@ -11,7 +11,7 @@ export class DocumentService {
     @InjectRepository(DocumentEntity)
     private readonly _documentRepository: Repository<DocumentEntity>,
     private readonly _embeddingService: EmbeddingService,
-    private readonly _similarityService: SimilarityService,
+    private readonly _similarityService: SimilarityService
   ) {}
 
   async getAllDocuments(): Promise<DocumentEntity[]> {
@@ -38,17 +38,14 @@ export class DocumentService {
 
   findMostRelevantDocument(
     documents: DocumentEntity[],
-    queryEmbedding: number[],
+    queryEmbedding: number[]
   ): DocumentEntity | null {
     let maxSimilarity = -1;
     let relevantDocument: DocumentEntity | null = null;
 
     for (const doc of documents) {
       if (doc.embedding) {
-        const similarity = this._similarityService.cosineSimilarity(
-          queryEmbedding,
-          doc.embedding,
-        );
+        const similarity = this._similarityService.cosineSimilarity(queryEmbedding, doc.embedding);
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
           relevantDocument = doc;
@@ -61,10 +58,7 @@ export class DocumentService {
   }
 
   // find 5 relevant documents
-  findMostRelevantDocuments(
-    documents: DocumentEntity[],
-    queryEmbedding: number[],
-  ): any {
+  findMostRelevantDocuments(documents: DocumentEntity[], queryEmbedding: number[]): any {
     const relevantDocuments: {
       document: DocumentEntity;
       similarity: number;
@@ -73,10 +67,7 @@ export class DocumentService {
     for (const doc of documents) {
       if (!doc.embedding) continue;
 
-      const similarity = this._similarityService.cosineSimilarity(
-        queryEmbedding,
-        doc.embedding,
-      );
+      const similarity = this._similarityService.cosineSimilarity(queryEmbedding, doc.embedding);
 
       if (relevantDocuments.length < 5) {
         relevantDocuments.push({ document: doc, similarity });

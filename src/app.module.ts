@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Task } from './tasks/task.entity';
 import { TasksService } from './tasks/tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,6 +11,7 @@ import { ChatService } from './chat/chat.service';
 import { DocumentService } from './document/document.service';
 import { EmbeddingService } from './embedding/embedding.service';
 import { DocumentModule } from './document/document.module';
+import { CountryImporter } from './scripts/load-documents';
 
 @Module({
   imports: [
@@ -44,6 +43,7 @@ import { DocumentModule } from './document/document.module';
     DocumentService,
     ChatService,
     EmbeddingService,
+    CountryImporter,
   ],
 })
 export class AppModule {}

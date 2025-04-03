@@ -24,22 +24,22 @@ export class CountryImporter {
       const jsonPath = path.join('documents/country-by-capital-city.json');
       const countriesData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 
-      //saving the data
-      const documentsToSave = countriesData.map(async (item: any) => {
-        const capital = item.city || 'No capital specified';
+      let count = 0;
 
-        const doc = new DocumentEntity();
-        doc.title = item.country;
-        doc.content = `${capital} is the capital of ${item.country}`;
-        doc.embedding = await this._embeddingService.embed(doc.content);
+      for (const item of countriesData) {
+        if (item.country && item.city) {
+          const doc = new DocumentEntity();
+          doc.title = item.country;
+          doc.content = `${item.city} is the capital of ${item.country}`;
+          doc.embedding = await this._embeddingService.embed(doc.content);
+          count++;
 
-        return doc;
-      });
+          //console.log(doc);
+          await this._documentRepository.save(doc);
+        }
+      }
 
-      await this._documentRepository.save(documentsToSave);
-      console.log(`${documentsToSave.length} countries saved successfully`);
-
-      return { success: true, count: documentsToSave.length };
+      return { success: true, count: count };
     } catch (err) {
       console.error('Error during country import:', err);
       throw err;
