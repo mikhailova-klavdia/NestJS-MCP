@@ -1,0 +1,154 @@
+[
+  {
+    "name": "Pelmeni",
+    "country": "Russia"
+  },
+  {
+    "name": "Beef Stroganoff",
+    "country": "Russia"
+  },
+  {
+    "name": "Shchi",
+    "country": "Russia"
+  },
+  {
+    "name": "Seledka pod Shuboy",
+    "country": "Russia"
+  },
+  {
+    "name": "Okroshka",
+    "country": "Russia"
+  },
+  {
+    "name": "Pizza",
+    "country": "Italy"
+  },
+  {
+    "name": "Sushi",
+    "country": "Japan"
+  },
+  {
+    "name": "Tacos",
+    "country": "Mexico"
+  },
+  {
+    "name": "Couscous",
+    "country": "Morocco"
+  },
+  {
+    "name": "Hamburger",
+    "country": "Germany"
+  },
+  {
+    "name": "Poutine",
+    "country": "Canada"
+  },
+  {
+    "name": "Paella",
+    "country": "Spain"
+  },
+  {
+    "name": "Biryani",
+    "country": "India"
+  },
+  {
+    "name": "Pho",
+    "country": "Vietnam"
+  },
+  {
+    "name": "Kimchi",
+    "country": "South Korea"
+  },
+  {
+    "name": "Fish and Chips",
+    "country": "United Kingdom"
+  },
+  {
+    "name": "Croissant",
+    "country": "France"
+  },
+  {
+    "name": "Ramen",
+    "country": "Japan"
+  },
+  {
+    "name": "Pad Thai",
+    "country": "Thailand"
+  },
+  {
+    "name": "Goulash",
+    "country": "Hungary"
+  },
+  {
+    "name": "Peking Duck",
+    "country": "China"
+  },
+  {
+    "name": "Falafel",
+    "country": "Egypt"
+  },
+  {
+    "name": "Chicken Tikka Masala",
+    "country": "India"
+  },
+  {
+    "name": "Borscht",
+    "country": "Ukraine"
+  },
+  {
+    "name": "Pierogi",
+    "country": "Poland"
+  },
+  {
+    "name": "Baklava",
+    "country": "Turkey"
+  },
+  {
+    "name": "Pavlova",
+    "country": "New Zealand"
+  },
+  {
+    "name": "Bratwurst",
+    "country": "Germany"
+  },
+  {
+    "name": "Kebab",
+    "country": "Iran"
+  },
+  {
+    "name": "Bubble Tea",
+    "country": "Taiwan"
+  },
+  {
+    "name": "Pasta Carbonara",
+    "country": "Italy"
+  },
+  {
+    "name": "Samosa",
+    "country": "India"
+  },
+  {
+    "name": "Hummus",
+    "country": "Lebanon"
+  },
+  {
+    "name": "Miso Soup",
+    "country": "Japan"
+  },
+  {
+    "name": "Bánh Mì",
+    "country": "Vietnam"
+  },
+  {
+    "name": "Guacamole",
+    "country": "Mexico"
+  },
+  {
+    "name": "Fondue",
+    "country": "Switzerland"
+  },
+  {
+    "name": "Pulled Pork",
+    "country": "United States"
+  }
+]

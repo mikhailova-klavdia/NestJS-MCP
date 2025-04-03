@@ -32,6 +32,7 @@ export class DocumentService {
     const document = new DocumentEntity();
     document.title = title;
     document.content = content;
+    document.embedding = await this._embeddingService.embed(document.content);
     return this._documentRepository.save(document);
   }
 
@@ -59,7 +60,6 @@ export class DocumentService {
     return relevantDocument;
   }
 
-  
   // find 5 relevant documents
   findMostRelevantDocuments(
     documents: DocumentEntity[],
@@ -73,7 +73,10 @@ export class DocumentService {
     for (const doc of documents) {
       if (!doc.embedding) continue;
 
-      const similarity = this._similarityService.cosineSimilarity(queryEmbedding, doc.embedding);
+      const similarity = this._similarityService.cosineSimilarity(
+        queryEmbedding,
+        doc.embedding,
+      );
 
       if (relevantDocuments.length < 5) {
         relevantDocuments.push({ document: doc, similarity });
