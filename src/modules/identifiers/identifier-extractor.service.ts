@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as ts from 'typescript';
-import { EmbeddingService } from '../embedding/embedding.service';
+import { Injectable, Logger } from "@nestjs/common";
+import * as fs from "fs";
+import * as path from "path";
+import * as ts from "typescript";
+import { EmbeddingService } from "../embedding/embedding.service";
 
 @Injectable()
 export class IdentifierExtractorService {
@@ -18,7 +18,11 @@ export class IdentifierExtractorService {
    * @param files - (Optional) An accumulator array to hold the collected file paths.
    * @returns An array of file paths with the specified extension.
    */
-  private getAllFiles(dir: string, extension: string, files: string[] = []): string[] {
+  private getAllFiles(
+    dir: string,
+    extension: string,
+    files: string[] = []
+  ): string[] {
     const entries = fs.readdirSync(dir);
     for (const entry of entries) {
       const fullPath = path.join(dir, entry);
@@ -39,8 +43,13 @@ export class IdentifierExtractorService {
    * @returns An array of identifier strings found in the file.
    */
   private extractIdentifiersFromFile(filePath: string): string[] {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+    const content = fs.readFileSync(filePath, "utf8");
+    const sourceFile = ts.createSourceFile(
+      filePath,
+      content,
+      ts.ScriptTarget.Latest,
+      true
+    );
     const identifiers: string[] = [];
 
     const visit = (node: ts.Node) => {
@@ -63,36 +72,32 @@ export class IdentifierExtractorService {
   }
 
   /**
-   * Extracts identifiers from a single file, embeds each identifier using the EmbeddingService,
-   * and logs the embedding vectors.
+   * Scans the given folder recursively, reads all `.ts` files,
+   * extracts identifiers from each, and returns a list of identifier data.
    *
-   * @param filePath - The absolute path to the TypeScript file.
+   * @param folderPath - Absolute or relative path to the folder to scan.
+   * @returns An array of objects each containing an identifier's name and code context.
    */
-  async extractFromFile(filePath: string): Promise<void> {
-    const identifiers = this.extractIdentifiersFromFile(filePath);
-    this.logger.log(`Found ${identifiers.length} identifiers in ${filePath}`);
+  getIdentifiersFromFolder(
+    folderPath: string
+  ): { name: string }[] {
+    const tsFiles = this.getAllFiles(folderPath, ".ts");
+    this.logger.log(
+      `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
+    );
 
-    for (const identifier of identifiers) {
-      try {
-        const embedding = await this._embeddingService.embed(identifier);
-        this.logger.debug(`Embedding for "${identifier}": ${embedding}`);
-      } catch (err) {
-        this.logger.error(`Failed to embed "${identifier}":`, err);
-      }
-    }
-  }
-
-  /**
-   * Recursively processes all `.ts` files in a directory, extracting and embedding identifiers from each file.
-   *
-   * @param folderPath - The absolute path to the folder containing TypeScript files.
-   */
-  async extractFromFolder(folderPath: string): Promise<void> {
-    const tsFiles = this.getAllFiles(folderPath, '.ts');
-    this.logger.log(`Processing ${tsFiles.length} .ts files in folder: ${folderPath}`);
+    const results: { name: string }[] = [];
 
     for (const file of tsFiles) {
-      await this.extractFromFile(file);
+      const identifiers = this.extractIdentifiersFromFile(file);
+
+      for (const identifier of identifiers) {
+        results.push({
+          name: identifier,
+        });
+      }
     }
+
+    return results;
   }
 }
