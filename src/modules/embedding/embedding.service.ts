@@ -14,7 +14,7 @@ export class EmbeddingService {
   }
 
   async embed(text: string): Promise<number[]> {
-    this.logger.log(`Embedding text: ${text}`);
+    //this.logger.log(`Embedding text: ${text}`);
     if (!text || typeof text !== 'string') {
       throw new Error('Invalid input: text must be a non-empty string');
     }

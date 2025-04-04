@@ -87,6 +87,7 @@ export class IdentifierExtractorService {
     );
 
     const results: { name: string }[] = [];
+    let count = 0;
 
     for (const file of tsFiles) {
       const identifiers = this.extractIdentifiersFromFile(file);
@@ -96,7 +97,10 @@ export class IdentifierExtractorService {
           name: identifier,
         });
       }
+      this.logger.log(`Processed ${++count} / ${tsFiles.length} files`);
     }
+    
+    this.logger.log(`✅ Finished extracting ${results.length} identifiers from ${tsFiles.length} files.`);
 
     return results;
   }

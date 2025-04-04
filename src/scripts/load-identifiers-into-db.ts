@@ -30,7 +30,7 @@ export class IdentifierImporter {
         if (identifier.name) {
           const doc = new DocumentEntity();
           doc.title = identifier.name;
-          doc.content = `Identifier "${identifier.name}" found in the code base.`;
+          doc.content = identifier.name;
           doc.embedding = await this._embeddingService.embed(doc.content);
 
           documentsToSave.push(doc);
@@ -38,6 +38,7 @@ export class IdentifierImporter {
       }
 
       await this._documentRepository.save(documentsToSave);
+      console.log(`✅ Imported ${documentsToSave.length} identifiers into the database.`);
       return { success: true, count: documentsToSave.length };
     } catch (err) {
       console.error("Error during identifier import:", err);

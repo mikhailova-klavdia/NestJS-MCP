@@ -11,6 +11,8 @@ import { DocumentService } from "./modules/document/document.service";
 import { ChatService } from "./modules/chat/chat.service";
 import { EmbeddingService } from "./modules/embedding/embedding.service";
 import { CountryImporter } from "./scripts/load-documents";
+import { IdentifierImporter } from "./scripts/load-identifiers-into-db";
+import { IdentifierExtractorService } from "./modules/identifiers/identifier-extractor.service";
 
 @Module({
   imports: [
@@ -42,7 +44,9 @@ import { CountryImporter } from "./scripts/load-documents";
     DocumentService,
     ChatService,
     EmbeddingService,
+    IdentifierExtractorService,
     CountryImporter,
+    IdentifierImporter
   ],
 })
 export class AppModule {}
