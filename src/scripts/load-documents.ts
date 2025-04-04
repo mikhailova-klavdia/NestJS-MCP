@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DocumentEntity } from 'src/document/document.entity';
-import { EmbeddingService } from 'src/embedding/embedding.service';
+import { DocumentEntity } from 'src/modules/document/document.entity';
+import { EmbeddingService } from 'src/modules/embedding/embedding.service';
 
 @Injectable()
 export class CountryImporter {

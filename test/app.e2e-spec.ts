@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
-import { TasksService } from './../src/tasks/tasks.service';
-import { Task } from 'src/tasks/task.entity';
+import { TasksService } from '../src/modules/tasks/tasks.service';
+import { Task } from 'src/modules/tasks/task.entity';
 import { NotFoundException } from '@nestjs/common';
 
 let tasksList: Task[] = [];
