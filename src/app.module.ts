@@ -13,6 +13,7 @@ import { EmbeddingService } from "./modules/embedding/embedding.service";
 import { CountryImporter } from "./scripts/load-documents";
 import { IdentifierImporter } from "./scripts/load-identifiers-into-db";
 import { IdentifierExtractorService } from "./modules/identifiers/identifier-extractor.service";
+import { GitModule } from "./modules/git/git.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { IdentifierExtractorService } from "./modules/identifiers/identifier-ext
     RagModule,
     TasksModule,
     DocumentModule,
+    GitModule,
   ],
   controllers: [AppController],
   providers: [
@@ -46,7 +48,7 @@ import { IdentifierExtractorService } from "./modules/identifiers/identifier-ext
     EmbeddingService,
     IdentifierExtractorService,
     CountryImporter,
-    IdentifierImporter
+    IdentifierImporter,
   ],
 })
 export class AppModule {}
