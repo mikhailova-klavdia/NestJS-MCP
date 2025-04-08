@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EmbeddingService } from '../embedding/embedding.service';
+import { EmbeddingService } from '../git/embedding.service';
 import { DocumentEntity } from './document.entity';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
 

@@ -3,7 +3,7 @@ import { RagService } from './rag.service';
 import { RagController } from './rag.controller';
 import { DocumentService } from '../document/document.service';
 import { ChatService } from '../chat/chat.service';
-import { EmbeddingService } from '../embedding/embedding.service';
+import { EmbeddingService } from '../git/embedding.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DocumentEntity } from '../document/document.entity';
 import { SimilarityService } from './similarity.service';

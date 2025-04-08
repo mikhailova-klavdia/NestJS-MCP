@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DocumentService } from '../document/document.service';
 import { ChatService } from '../chat/chat.service';
-import { EmbeddingService } from '../embedding/embedding.service';
+import { EmbeddingService } from '../git/embedding.service';
 import { DocumentEntity } from 'src/modules/document/document.entity';
 import { title } from 'process';
 

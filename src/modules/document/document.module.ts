@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DocumentEntity } from './document.entity';
 import { DocumentService } from './document.service';
 import { DocumentController } from './document.controller';
-import { EmbeddingService } from 'src/modules/embedding/embedding.service';
+import { EmbeddingService } from 'src/modules/git/embedding.service';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
 
 @Module({

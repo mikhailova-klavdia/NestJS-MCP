@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DocumentEntity } from 'src/modules/document/document.entity';
-import { EmbeddingService } from 'src/modules/embedding/embedding.service';
+import { EmbeddingService } from 'src/modules/git/embedding.service';
 
 @Injectable()
 export class CountryImporter {

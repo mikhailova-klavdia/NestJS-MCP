@@ -1,18 +1,17 @@
-import { Module } from "@nestjs/common";
-import { BullModule } from "@nestjs/bullmq";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { DataModule } from "./data.module";
-import { RagModule } from "./modules/rag/rag.module";
-import { TasksModule } from "./modules/tasks/tasks.module";
-import { DocumentModule } from "./modules/document/document.module";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
-import { DocumentService } from "./modules/document/document.service";
-import { ChatService } from "./modules/chat/chat.service";
-import { EmbeddingService } from "./modules/embedding/embedding.service";
-import { CountryImporter } from "./scripts/load-documents";
-import { IdentifierImporter } from "./scripts/load-identifiers-into-db";
-import { GitModule } from "./modules/git/git.module";
+import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DataModule } from './data.module';
+import { RagModule } from './modules/rag/rag.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { DocumentModule } from './modules/document/document.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { DocumentService } from './modules/document/document.service';
+import { ChatService } from './modules/chat/chat.service';
+import { CountryImporter } from './scripts/load-documents';
+import { IdentifierImporter } from './scripts/load-identifiers-into-db';
+import { GitModule } from './modules/git/git.module';
 
 @Module({
   imports: [
@@ -25,13 +24,13 @@ import { GitModule } from "./modules/git/git.module";
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         connection: {
-          host: configService.get<string>("REDIS_HOST"),
-          port: configService.get<number>("REDIS_PORT") || 6379,
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT') || 6379,
         },
       }),
     }),
     BullModule.registerQueue({
-      name: "indexing",
+      name: 'indexing',
     }),
     DataModule,
     RagModule,
@@ -40,13 +39,6 @@ import { GitModule } from "./modules/git/git.module";
     GitModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    DocumentService,
-    ChatService,
-    EmbeddingService,
-    CountryImporter,
-    IdentifierImporter,
-  ],
+  providers: [AppService, DocumentService, ChatService, CountryImporter, IdentifierImporter],
 })
 export class AppModule {}

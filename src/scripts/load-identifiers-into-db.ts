@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DocumentEntity } from "src/modules/document/document.entity";
-import { EmbeddingService } from "src/modules/embedding/embedding.service";
+import { EmbeddingService } from "src/modules/git/embedding.service";
 import { IdentifierExtractorService } from "src/modules/git/identifier-extractor.service";
 
 @Injectable()
