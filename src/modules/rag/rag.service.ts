@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentService } from '../document/document.service';
-import { ChatService } from '../chat/chat.service';
 import { EmbeddingService } from '../git/embedding.service';
-import { DocumentEntity } from 'src/modules/document/document.entity';
-import { title } from 'process';
+import { IdentifierService } from '../identifiers/identifier.service';
 
 @Injectable()
 export class RagService {
   constructor(
-    private readonly _documentService: DocumentService,
-    private readonly _chatService: ChatService,
+    private readonly _identifierService: IdentifierService,
     private readonly _embeddingService: EmbeddingService
   ) {}
 
@@ -18,16 +14,18 @@ export class RagService {
     const queryEmbedding = await this._embeddingService.embed(query);
 
     // Step 2: Retrieve relevant documents (you can implement a similarity search here)
-    const documents = await this._documentService.getAllDocuments();
+    const identifiers = await this._identifierService.getAllIdentifiers();
 
     // Step 3: Find the most relevant document (simple cosine similarity for baseline)
-    const relevantDocuments = this._documentService.findMostRelevantDocuments(
-      documents,
+    const relevantIdentifier = this._identifierService.findTop5RelevantIdentifiers(
+      identifiers,
       queryEmbedding
     );
 
-    return relevantDocuments.map((doc) => ({
-      title: doc.document.title,
+    return relevantIdentifier.map((doc) => ({
+      title: doc.identifier.identifier,
+      filePath: doc.identifier.filePath,
+      codeSnippet: doc.identifier.codeSnippet,
       similarity: doc.similarity,
     }));
   }

@@ -7,8 +7,8 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatService } from './modules/chat/chat.service';
-import { IdentifierImporter } from './scripts/load-identifiers-into-db';
 import { GitModule } from './modules/git/git.module';
+import { IdentifierModule } from './modules/identifiers/identifier.module';
 
 @Module({
   imports: [
@@ -33,8 +33,9 @@ import { GitModule } from './modules/git/git.module';
     RagModule,
     TasksModule,
     GitModule,
+    IdentifierModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ChatService, IdentifierImporter],
+  providers: [AppService, ChatService],
 })
 export class AppModule {}
