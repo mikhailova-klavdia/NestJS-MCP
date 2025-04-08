@@ -16,7 +16,7 @@ async function bootstrap() {
     console.log('Country import completed:', result);
   } catch (error) {
     console.error('Failed to import countries:', error);
-  }*/
+  }
 
   //importing all identiers for code base
   const identifierImporter = app.get(IdentifierImporter);
@@ -25,7 +25,7 @@ async function bootstrap() {
     console.log('Identifier import completed:', result);
   } catch (error) {
     console.error('Failed to import identifier:', error);
-  }
+  }*/
 
   await app.listen(process.env.PORT ?? 3000);
 }
