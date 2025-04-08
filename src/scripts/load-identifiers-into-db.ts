@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DocumentEntity } from "src/modules/document/document.entity";
 import { EmbeddingService } from "src/modules/embedding/embedding.service";
-import { IdentifierExtractorService } from "src/modules/identifiers/identifier-extractor.service";
+import { IdentifierExtractorService } from "src/modules/git/identifier-extractor.service";
 
 @Injectable()
 export class IdentifierImporter {

@@ -12,7 +12,6 @@ import { ChatService } from "./modules/chat/chat.service";
 import { EmbeddingService } from "./modules/embedding/embedding.service";
 import { CountryImporter } from "./scripts/load-documents";
 import { IdentifierImporter } from "./scripts/load-identifiers-into-db";
-import { IdentifierExtractorService } from "./modules/identifiers/identifier-extractor.service";
 import { GitModule } from "./modules/git/git.module";
 
 @Module({
@@ -46,7 +45,6 @@ import { GitModule } from "./modules/git/git.module";
     DocumentService,
     ChatService,
     EmbeddingService,
-    IdentifierExtractorService,
     CountryImporter,
     IdentifierImporter,
   ],
