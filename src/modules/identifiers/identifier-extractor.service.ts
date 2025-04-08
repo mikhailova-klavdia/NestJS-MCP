@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { EmbeddingService } from './embedding.service';
+import { EmbeddingService } from '../git/embedding.service';
 
 @Injectable()
 export class IdentifierExtractorService {

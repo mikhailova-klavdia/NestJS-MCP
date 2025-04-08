@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { ProjectEntity } from './project.entity';
+import { ProjectEntity } from '../git/project.entity';
 
 @Entity()
 export class IdentifierEntity {

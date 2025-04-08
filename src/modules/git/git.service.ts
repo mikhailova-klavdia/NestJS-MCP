@@ -5,9 +5,9 @@ import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { ProjectEntity } from './project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IdentifierExtractorService } from './identifier-extractor.service';
-import { IdentifierEntity } from './identifier.entity';
 import { EmbeddingService } from './embedding.service';
+import { IdentifierExtractorService } from '../identifiers/identifier-extractor.service';
+import { IdentifierEntity } from '../identifiers/identifier.entity';
 
 @Injectable()
 export class GitService {
