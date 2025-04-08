@@ -4,12 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataModule } from './data.module';
 import { RagModule } from './modules/rag/rag.module';
 import { TasksModule } from './modules/tasks/tasks.module';
-import { DocumentModule } from './modules/document/document.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DocumentService } from './modules/document/document.service';
 import { ChatService } from './modules/chat/chat.service';
-import { CountryImporter } from './scripts/load-documents';
 import { IdentifierImporter } from './scripts/load-identifiers-into-db';
 import { GitModule } from './modules/git/git.module';
 
@@ -35,10 +32,9 @@ import { GitModule } from './modules/git/git.module';
     DataModule,
     RagModule,
     TasksModule,
-    DocumentModule,
     GitModule,
   ],
   controllers: [AppController],
-  providers: [AppService, DocumentService, ChatService, CountryImporter, IdentifierImporter],
+  providers: [AppService, ChatService, IdentifierImporter],
 })
 export class AppModule {}
