@@ -40,9 +40,8 @@ export class GitService {
     await git.clone(repoUrl, projectPath);
 
     // create and save the project entity
-    const project = this._projectRepo.create({
-      name: projectName,
-    });
+    const project = new ProjectEntity();
+    project.name = projectName;
 
     await this._projectRepo.save(project);
 
@@ -59,12 +58,12 @@ export class GitService {
       identifier.filePath = ident.filePath || '';
       identifier.codeSnippet = ident.codeSnippet || '';
       identifier.embedding = embedding;
-      identifier.projectId = project.id;
+      identifier.project = project;
 
       identifiersToSave.push(identifier);
     }
 
-    // 4. Save all identifiers in one batch
+    // save all identifiers in one batch
     await this._identifierRepo.save(identifiersToSave);
 
     return projectPath;

@@ -20,6 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get<string>('POSTGRES_DB'),
         entities: [],
         synchronize: true,
+        autoLoadEntities: true,
       }),
     }),
   ],

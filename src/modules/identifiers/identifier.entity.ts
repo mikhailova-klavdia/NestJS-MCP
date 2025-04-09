@@ -25,9 +25,6 @@ export class IdentifierEntity {
   @JoinColumn({ name: 'projectId' })
   project: ProjectEntity;
 
-  @Column()
-  projectId: string;
-
   @ManyToOne(() => IdentifierEntity, (identifier) => identifier.children, { nullable: true })
   @JoinColumn({ name: 'parentId' })
   parent: IdentifierEntity;
