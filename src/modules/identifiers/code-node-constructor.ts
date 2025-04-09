@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
 import { EmbeddingService } from "../git/embedding.service";
+import { ContextV1, EntryPoint } from "./code-node.entity";
 
 @Injectable()
 export class CodeNodeExtractorService {
@@ -55,14 +56,14 @@ export class CodeNodeExtractorService {
 
       if (ts.isIdentifier(node)) {
         // grab identifier context
-
-        console.log(node.getFullText());
-        this.getDeclarationType(node);
-        console.log("\n------------\n");
+        const nodeContext = this.getDeclarationType(node);
 
         identifiers.push({
           name: node.text,
-          context: node.parent ? ts.SyntaxKind[node.parent.kind] : "unknown",
+          context: {
+            declarationType: nodeContext.declarationType,
+            codeSnippet: nodeContext.codeSnippet,
+          },
           filePath,
         });
       }
@@ -74,7 +75,10 @@ export class CodeNodeExtractorService {
     return identifiers;
   }
 
-  private getDeclarationType(node: ts.Node): ts.Declaration | null {
+  private getDeclarationType(node: ts.Node): {
+    declarationType: ts.Declaration | null;
+    codeSnippet: string;
+  } {
     let currentNode: ts.Node | undefined = node;
 
     while (currentNode) {
@@ -93,13 +97,15 @@ export class CodeNodeExtractorService {
         ts.isTypeAliasDeclaration(currentNode) ||
         ts.isModuleDeclaration(currentNode)
       ) {
-        console.log(currentNode.getText());
-        return currentNode as ts.Declaration;
+        return {
+          declarationType: currentNode as ts.Declaration,
+          codeSnippet: currentNode.getFullText(),
+        };
       }
       currentNode = currentNode.parent;
     }
 
-    return null;
+    return { declarationType: null, codeSnippet: node.getFullText() };
   }
 
   /**
@@ -127,11 +133,29 @@ export class CodeNodeExtractorService {
 
     return results;
   }
+
+  private getClassEntryPoints(identifier: ts.Node): EntryPoint[] {
+    const entryPoints: EntryPoint[] = [];
+    // based on import statement find where the class is used
+    // and save the following for each entry point
+    //   codeSnippet: string;
+    //   filepath: string;
+    return entryPoints;
+  }
+
+  private getMethodEntryPoints(identifier: ts.Node): EntryPoint[] {
+    const entryPoints: EntryPoint[] = [];
+    // based on import statement find where a method Declaration is used
+    // and save the following for each entry point
+    //   codeSnippet: string;
+    //   filepath: string;
+    return entryPoints;
+  }
 }
 
 type ExtractedIdentifier = {
   name: string;
-  context?: string;
+  context?: ContextV1;
   filePath?: string;
   codeSnippet?: string;
 };

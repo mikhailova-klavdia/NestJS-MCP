@@ -34,7 +34,7 @@ export class GitService {
     const git = simpleGit();
 
     if (fs.existsSync(projectPath)) {
-      throw new Error(`Project folder "${projectName}" already exists.`);
+      fs.rmSync(projectPath, { recursive: true, force: true });
     }
 
     await git.clone(repoUrl, projectPath);
@@ -42,6 +42,7 @@ export class GitService {
     // create and save the project entity
     const project = new ProjectEntity();
     project.name = projectName;
+    project.repoUrl = repoUrl;
 
     await this._projectRepo.save(project);
 
