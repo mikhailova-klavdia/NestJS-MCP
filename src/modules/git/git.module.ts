@@ -3,14 +3,14 @@ import { GitController } from './git.controller';
 import { GitService } from './git.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmbeddingService } from './embedding.service';
-import { IdentifierExtractorService } from '../identifiers/identifier-extractor.service';
-import { CodeNodeEntity } from '../identifiers/identifier.entity';
+import { CodeNodeExtractorService } from '../identifiers/identifier-extractor.service';
+import { CodeNodeEntity } from '../identifiers/code-node.entity';
 import { ProjectEntity } from './project.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity])],
   controllers: [GitController],
-  providers: [GitService, IdentifierExtractorService, EmbeddingService],
-  exports: [IdentifierExtractorService, EmbeddingService],
+  providers: [GitService, CodeNodeExtractorService, EmbeddingService],
+  exports: [CodeNodeExtractorService, EmbeddingService],
 })
 export class GitModule {}

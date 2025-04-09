@@ -4,7 +4,7 @@ import { RagController } from './rag.controller';
 import { EmbeddingService } from '../git/embedding.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SimilarityService } from './similarity.service';
-import { CodeNodeEntity } from '../identifiers/identifier.entity';
+import { CodeNodeEntity } from '../identifiers/code-node.entity';
 import { IdentifierModule } from '../identifiers/identifier.module';
 
 @Module({

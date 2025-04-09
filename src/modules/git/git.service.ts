@@ -6,8 +6,8 @@ import { Repository } from 'typeorm';
 import { ProjectEntity } from './project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmbeddingService } from './embedding.service';
-import { IdentifierExtractorService } from '../identifiers/identifier-extractor.service';
-import { CodeNodeEntity } from '../identifiers/identifier.entity';
+import { CodeNodeExtractorService } from '../identifiers/identifier-extractor.service';
+import { CodeNodeEntity } from '../identifiers/code-node.entity';
 
 @Injectable()
 export class GitService {
@@ -20,7 +20,7 @@ export class GitService {
     @InjectRepository(CodeNodeEntity)
     private readonly _identifierRepo: Repository<CodeNodeEntity>,
 
-    private readonly _extractor: IdentifierExtractorService,
+    private readonly _extractor: CodeNodeExtractorService,
 
     private readonly _embeddingService: EmbeddingService
   ) {

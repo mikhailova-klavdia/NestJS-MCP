@@ -7,15 +7,32 @@ import {
 } from "typeorm";
 import { ProjectEntity } from "../git/project.entity";
 import {
+  ClassDeclaration,
+  ConstructorDeclaration,
   DeclarationStatement,
+  ExportAssignment,
   ExportDeclaration,
+  ExportSpecifier,
+  FunctionDeclaration,
   ImportDeclaration,
+  MethodDeclaration,
+  PropertyDeclaration,
+  VariableDeclaration,
+  VariableStatement,
 } from "typescript";
 
 export type ContextV1 = {
-  declarationType: ExportDeclaration | ImportDeclaration | DeclarationStatement;
+  declarationType:
+  | ClassDeclaration
+  | FunctionDeclaration
+  | VariableDeclaration
+  | ImportDeclaration
+  | ExportDeclaration
+  | MethodDeclaration
+  | PropertyDeclaration
+  | ConstructorDeclaration
   entryPoints: EntryPoint[];
-  importRequirements;
+  importRequirements : string;
 };
 
 export type EntryPoint = {

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmbeddingService } from '../git/embedding.service';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
-import { CodeNodeEntity } from './identifier.entity';
+import { CodeNodeEntity } from './code-node.entity';
 
 @Injectable()
 export class IdentifierService {

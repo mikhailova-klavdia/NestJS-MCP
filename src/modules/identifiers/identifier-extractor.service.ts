@@ -5,8 +5,8 @@ import * as ts from 'typescript';
 import { EmbeddingService } from '../git/embedding.service';
 
 @Injectable()
-export class IdentifierExtractorService {
-  private readonly logger = new Logger(IdentifierExtractorService.name);
+export class CodeNodeExtractorService {
+  private readonly logger = new Logger(CodeNodeExtractorService.name);
 
   constructor(private readonly _embeddingService: EmbeddingService) {}
 
