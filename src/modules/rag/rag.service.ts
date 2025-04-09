@@ -25,7 +25,6 @@ export class RagService {
     return relevantIdentifier.map((doc) => ({
       title: doc.identifier.identifier,
       filePath: doc.identifier.filePath,
-      codeSnippet: doc.identifier.codeSnippet,
       similarity: doc.similarity,
     }));
   }

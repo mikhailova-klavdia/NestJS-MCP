@@ -6,33 +6,13 @@ import {
   JoinColumn,
 } from "typeorm";
 import { ProjectEntity } from "../git/project.entity";
-import {
-  ClassDeclaration,
-  ConstructorDeclaration,
-  DeclarationStatement,
-  ExportAssignment,
-  ExportDeclaration,
-  ExportSpecifier,
-  FunctionDeclaration,
-  ImportDeclaration,
-  MethodDeclaration,
-  PropertyDeclaration,
-  VariableDeclaration,
-  VariableStatement,
-} from "typescript";
+import { Declaration } from "typescript";
 
 export type ContextV1 = {
-  declarationType:
-  | ClassDeclaration
-  | FunctionDeclaration
-  | VariableDeclaration
-  | ImportDeclaration
-  | ExportDeclaration
-  | MethodDeclaration
-  | PropertyDeclaration
-  | ConstructorDeclaration
+  declarationType: Declaration;
   entryPoints: EntryPoint[];
-  importRequirements : string;
+  importRequirements: string;
+  codeSnippet: string;
 };
 
 export type EntryPoint = {
@@ -50,9 +30,6 @@ export class CodeNodeEntity {
 
   @Column({ type: "jsonb" })
   context: ContextV1;
-
-  @Column("text")
-  codeSnippet: string;
 
   @Column()
   filePath: string;

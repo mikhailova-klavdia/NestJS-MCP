@@ -60,7 +60,6 @@ export class GitService {
           const entity = new CodeNodeEntity();
           entity.identifier = ident.name;
           entity.filePath = ident.filePath || '';
-          entity.codeSnippet = ident.codeSnippet || '';
           entity.embedding = embedding;
           entity.project = project;
           return entity;

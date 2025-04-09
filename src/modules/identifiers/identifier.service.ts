@@ -20,7 +20,7 @@ export class IdentifierService {
     // ensure each identifier has an embedding
     for (const ident of identifiers) {
       if (!ident.embedding) {
-        ident.embedding = await this._embeddingService.embed(ident.codeSnippet || ident.identifier);
+        ident.embedding = await this._embeddingService.embed(ident.identifier);
         await this._identifierRepository.save(ident);
       }
     }
@@ -31,7 +31,6 @@ export class IdentifierService {
   async saveIdentifier(identifier: string, codeSnippet: string): Promise<CodeNodeEntity> {
     const entity = new CodeNodeEntity();
     entity.identifier = identifier;
-    entity.codeSnippet = codeSnippet;
     entity.filePath = 'manual';
     entity.embedding = await this._embeddingService.embed(codeSnippet);
     return this._identifierRepository.save(entity);
