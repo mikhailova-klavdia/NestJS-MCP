@@ -12,11 +12,6 @@ export class CodeNodeExtractorService {
 
   /**
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
-   *
-   * @param dir - The root directory to search.
-   * @param extension - The file extension to filter by (e.g., '.ts').
-   * @param files - (Optional) An accumulator array to hold the collected file paths.
-   * @returns An array of file paths with the specified extension.
    */
   private getAllFiles(dir: string, extension: string, files: string[] = []): string[] {
     const entries = fs.readdirSync(dir);
@@ -34,9 +29,6 @@ export class CodeNodeExtractorService {
 
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
-   *
-   * @param filePath - The absolute path to the TypeScript file.
-   * @returns An array of identifier strings found in the file.
    */
   private extractIdentifiersFromFile(filePath: string): ExtractedIdentifier[] {
     const content = fs.readFileSync(filePath, 'utf8');
@@ -68,9 +60,6 @@ export class CodeNodeExtractorService {
   /**
    * Scans the given folder recursively, reads all `.ts` files,
    * extracts identifiers from each, and returns a list of identifier data.
-   *
-   * @param folderPath - Absolute or relative path to the folder to scan.
-   * @returns An array of objects each containing an identifier's name and code context.
    */
   getIdentifiersFromFolder(folderPath: string): ExtractedIdentifier[] {
     const tsFiles = this.getAllFiles(folderPath, '.ts');
