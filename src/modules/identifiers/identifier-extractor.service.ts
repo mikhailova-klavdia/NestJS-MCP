@@ -49,6 +49,7 @@ export class IdentifierExtractorService {
       }
 
       if (ts.isIdentifier(node)) {
+        // grab identifier context 
         identifiers.push({
           name: node.text,
           context: node.parent ? ts.SyntaxKind[node.parent.kind] : 'unknown',

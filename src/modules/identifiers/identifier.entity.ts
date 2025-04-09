@@ -1,37 +1,49 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { ProjectEntity } from '../git/project.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { ProjectEntity } from "../git/project.entity";
+import {
+  DeclarationStatement,
+  ExportDeclaration,
+  ImportDeclaration,
+} from "typescript";
+
+export type ContextV1 = {
+  declarationType: ExportDeclaration | ImportDeclaration | DeclarationStatement;
+  entryPoints: EntryPoint[];
+  importRequirements;
+};
+
+export type EntryPoint = {
+  codeSnippet: string;
+  filepath: string;
+};
 
 @Entity()
-export class IdentifierEntity {
-  @PrimaryGeneratedColumn('uuid')
+export class CodeNodeEntity {
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
   identifier: string;
 
-  @Column()
-  context: string;
+  @Column({ type: "jsonb" })
+  context: ContextV1;
 
-  @Column('text')
+  @Column("text")
   codeSnippet: string;
 
   @Column()
   filePath: string;
 
-  @Column('simple-array')
+  @Column("simple-array")
   embedding: number[];
 
   @ManyToOne(() => ProjectEntity)
-  @JoinColumn({ name: 'projectId' })
+  @JoinColumn({ name: "projectId" })
   project: ProjectEntity;
-
-  @ManyToOne(() => IdentifierEntity, (identifier) => identifier.children, { nullable: true })
-  @JoinColumn({ name: 'parentId' })
-  parent: IdentifierEntity;
-
-  @Column({ nullable: true })
-  parentId: string;
-
-  @OneToMany(() => IdentifierEntity, (identifier) => identifier.parent)
-  children: IdentifierEntity[];
 }

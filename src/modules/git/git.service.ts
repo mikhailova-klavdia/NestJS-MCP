@@ -7,7 +7,7 @@ import { ProjectEntity } from './project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmbeddingService } from './embedding.service';
 import { IdentifierExtractorService } from '../identifiers/identifier-extractor.service';
-import { IdentifierEntity } from '../identifiers/identifier.entity';
+import { CodeNodeEntity } from '../identifiers/identifier.entity';
 
 @Injectable()
 export class GitService {
@@ -17,8 +17,8 @@ export class GitService {
     @InjectRepository(ProjectEntity)
     private readonly _projectRepo: Repository<ProjectEntity>,
 
-    @InjectRepository(IdentifierEntity)
-    private readonly _identifierRepo: Repository<IdentifierEntity>,
+    @InjectRepository(CodeNodeEntity)
+    private readonly _identifierRepo: Repository<CodeNodeEntity>,
 
     private readonly _extractor: IdentifierExtractorService,
 
@@ -47,7 +47,7 @@ export class GitService {
 
     // get identifiers from files cloned
     const rawIdentifiers = this._extractor.getIdentifiersFromFolder(projectPath);
-    const identifiersToSave: IdentifierEntity[] = [];
+    const identifiersToSave: CodeNodeEntity[] = [];
 
     const batchSize = 50;
 
@@ -57,9 +57,8 @@ export class GitService {
       const embeddedBatch = await Promise.all(
         batch.map(async (ident) => {
           const embedding = await this._embeddingService.embed(ident.name);
-          const entity = new IdentifierEntity();
+          const entity = new CodeNodeEntity();
           entity.identifier = ident.name;
-          entity.context = ident.context || 'unknown';
           entity.filePath = ident.filePath || '';
           entity.codeSnippet = ident.codeSnippet || '';
           entity.embedding = embedding;

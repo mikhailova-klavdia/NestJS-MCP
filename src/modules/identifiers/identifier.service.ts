@@ -3,18 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmbeddingService } from '../git/embedding.service';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
-import { IdentifierEntity } from './identifier.entity';
+import { CodeNodeEntity } from './identifier.entity';
 
 @Injectable()
 export class IdentifierService {
   constructor(
-    @InjectRepository(IdentifierEntity)
-    private readonly _identifierRepository: Repository<IdentifierEntity>,
+    @InjectRepository(CodeNodeEntity)
+    private readonly _identifierRepository: Repository<CodeNodeEntity>,
     private readonly _embeddingService: EmbeddingService,
     private readonly _similarityService: SimilarityService
   ) {}
 
-  async getAllIdentifiers(): Promise<IdentifierEntity[]> {
+  async getAllIdentifiers(): Promise<CodeNodeEntity[]> {
     const identifiers = await this._identifierRepository.find();
 
     // ensure each identifier has an embedding
@@ -28,22 +28,21 @@ export class IdentifierService {
     return identifiers;
   }
 
-  async saveIdentifier(identifier: string, codeSnippet: string): Promise<IdentifierEntity> {
-    const entity = new IdentifierEntity();
+  async saveIdentifier(identifier: string, codeSnippet: string): Promise<CodeNodeEntity> {
+    const entity = new CodeNodeEntity();
     entity.identifier = identifier;
     entity.codeSnippet = codeSnippet;
-    entity.context = 'manual';
     entity.filePath = 'manual';
     entity.embedding = await this._embeddingService.embed(codeSnippet);
     return this._identifierRepository.save(entity);
   }
 
   findMostRelevantIdentifier(
-    identifiers: IdentifierEntity[],
+    identifiers: CodeNodeEntity[],
     queryEmbedding: number[]
-  ): IdentifierEntity | null {
+  ): CodeNodeEntity | null {
     let maxSimilarity = -1;
-    let relevant: IdentifierEntity | null = null;
+    let relevant: CodeNodeEntity | null = null;
 
     for (const ident of identifiers) {
       if (ident.embedding) {
@@ -62,10 +61,10 @@ export class IdentifierService {
   }
 
   findTop5RelevantIdentifiers(
-    identifiers: IdentifierEntity[],
+    identifiers: CodeNodeEntity[],
     queryEmbedding: number[]
-  ): { identifier: IdentifierEntity; similarity: number }[] {
-    const relevant: { identifier: IdentifierEntity; similarity: number }[] = [];
+  ): { identifier: CodeNodeEntity; similarity: number }[] {
+    const relevant: { identifier: CodeNodeEntity; similarity: number }[] = [];
 
     for (const ident of identifiers) {
       if (!ident.embedding) continue;
