@@ -49,18 +49,30 @@ export class GitService {
     const rawIdentifiers = this._extractor.getIdentifiersFromFolder(projectPath);
     const identifiersToSave: IdentifierEntity[] = [];
 
-    for (const ident of rawIdentifiers) {
-      const embedding = await this._embeddingService.embed(ident.name);
+    const batchSize = 50;
 
-      const identifier = new IdentifierEntity();
-      identifier.identifier = ident.name;
-      identifier.context = ident.context || 'unknown';
-      identifier.filePath = ident.filePath || '';
-      identifier.codeSnippet = ident.codeSnippet || '';
-      identifier.embedding = embedding;
-      identifier.project = project;
+    for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
+      const batch = rawIdentifiers.slice(i, i + batchSize);
 
-      identifiersToSave.push(identifier);
+      const embeddedBatch = await Promise.all(
+        batch.map(async (ident) => {
+          const embedding = await this._embeddingService.embed(ident.name);
+          const entity = new IdentifierEntity();
+          entity.identifier = ident.name;
+          entity.context = ident.context || 'unknown';
+          entity.filePath = ident.filePath || '';
+          entity.codeSnippet = ident.codeSnippet || '';
+          entity.embedding = embedding;
+          entity.project = project;
+          return entity;
+        })
+      );
+
+      identifiersToSave.push(...embeddedBatch);
+
+      console.log(
+        `🔄 Processed ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+      );
     }
 
     // save all identifiers in one batch
