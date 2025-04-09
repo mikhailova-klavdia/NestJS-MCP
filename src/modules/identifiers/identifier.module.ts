@@ -4,7 +4,7 @@ import { EmbeddingService } from 'src/modules/git/embedding.service';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
 import { CodeNodeEntity } from './code-node.entity';
 import { IdentifierService } from './identifier.service';
-import { CodeNodeExtractorService } from './identifier-extractor.service';
+import { CodeNodeExtractorService } from './code-node-constructor';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CodeNodeEntity])],
