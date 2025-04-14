@@ -26,6 +26,7 @@ export class RagService {
       title: doc.identifier.identifier,
       filePath: doc.identifier.filePath,
       similarity: doc.similarity,
+      codeSnipet: doc.identifier.context.codeSnippet,
     }));
   }
 }

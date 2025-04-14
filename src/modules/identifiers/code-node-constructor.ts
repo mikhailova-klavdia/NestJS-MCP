@@ -47,9 +47,10 @@ export class CodeNodeExtractorService {
           context: {
             declarationType: nodeContext.declarationType,
             codeSnippet: nodeContext.codeSnippet,
+            entryPoints: entryPoints,
+            importRequirements: null,
           },
           filePath,
-          entryPoints: entryPoints,
         });
       }
 
@@ -61,7 +62,7 @@ export class CodeNodeExtractorService {
   }
 
   private getDeclarationType(node: ts.Node): {
-    declarationType: ts.Declaration | null;
+    declarationType: string;
     codeSnippet: string;
   } {
     let currentNode: ts.Node | undefined = node;
@@ -83,14 +84,14 @@ export class CodeNodeExtractorService {
         ts.isModuleDeclaration(currentNode)
       ) {
         return {
-          declarationType: currentNode as ts.Declaration,
+          declarationType: ts.SyntaxKind[currentNode.kind],
           codeSnippet: currentNode.getFullText(),
         };
       }
       currentNode = currentNode.parent;
     }
 
-    return { declarationType: null, codeSnippet: node.getFullText() };
+    return { declarationType: "unknown", codeSnippet: node.getFullText() };
   }
 
   /**

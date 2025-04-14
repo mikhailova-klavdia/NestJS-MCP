@@ -63,6 +63,11 @@ export class GitService {
           entity.filePath = ident.filePath || '';
           entity.embedding = embedding;
           entity.project = project;
+          entity.context = ident.context || {
+            declarationType: null,
+            codeSnippet: '',
+            entryPoints: [],
+          };
           return entity;
         })
       );

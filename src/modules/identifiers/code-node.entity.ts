@@ -9,7 +9,7 @@ import { ProjectEntity } from "../git/project.entity";
 import { Declaration } from "typescript";
 
 export type ContextV1 = {
-  declarationType: Declaration | null;
+  declarationType: Declaration | string | null;
   entryPoints?: EntryPoint[] | null;
   importRequirements?: string | null;
   codeSnippet: string;
