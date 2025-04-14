@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { EmbeddingService } from '../git/embedding.service';
+import { EmbedConfig } from '../../embedding-config';
 import { IdentifierService } from '../identifiers/identifier.service';
 
 @Injectable()
 export class RagService {
   constructor(
     private readonly _identifierService: IdentifierService,
-    private readonly _embeddingService: EmbeddingService
+    private readonly _embeddingService: EmbedConfig
   ) {}
 
   async retrieveAndGenerate(query: string): Promise<any> {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EmbeddingService } from '../git/embedding.service';
+import { EmbedConfig } from '../../embedding-config';
 import { SimilarityService } from 'src/modules/rag/similarity.service';
 import { CodeNodeEntity } from './code-node.entity';
 
@@ -10,7 +10,7 @@ export class IdentifierService {
   constructor(
     @InjectRepository(CodeNodeEntity)
     private readonly _identifierRepository: Repository<CodeNodeEntity>,
-    private readonly _embeddingService: EmbeddingService,
+    private readonly _embeddingService: EmbedConfig,
     private readonly _similarityService: SimilarityService
   ) {}
 

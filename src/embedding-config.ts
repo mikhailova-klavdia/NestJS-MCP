@@ -1,9 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { OllamaEmbeddings } from '@langchain/ollama';
 
-@Injectable()
-export class EmbeddingService {
-  private readonly logger = new Logger(EmbeddingService.name);
+export class EmbedConfig {
   private embeddings: OllamaEmbeddings;
 
   constructor() {
@@ -14,7 +11,6 @@ export class EmbeddingService {
   }
 
   async embed(text: string): Promise<number[]> {
-    //this.logger.log(`Embedding text: ${text}`);
     if (!text || typeof text !== 'string') {
       throw new Error('Invalid input: text must be a non-empty string');
     }

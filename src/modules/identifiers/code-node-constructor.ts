@@ -2,15 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { EmbeddingService } from '../git/embedding.service';
-import { ContextV1, EntryPoint } from './code-node.entity';
+import { ContextV1 } from './code-node.entity';
 
 @Injectable()
 export class CodeNodeExtractorService {
   private readonly logger = new Logger(CodeNodeExtractorService.name);
-
-  constructor(private readonly _embeddingService: EmbeddingService) {}
-
   /**
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
    */
@@ -119,24 +115,6 @@ export class CodeNodeExtractorService {
     );
 
     return results;
-  }
-
-  private getClassEntryPoints(identifier: ts.Node): EntryPoint[] {
-    const entryPoints: EntryPoint[] = [];
-    // based on import statement find where the class is used
-    // and save the following for each entry point
-    //   codeSnippet: string;
-    //   filepath: string;
-    return entryPoints;
-  }
-
-  private getMethodEntryPoints(identifier: ts.Node): EntryPoint[] {
-    const entryPoints: EntryPoint[] = [];
-    // based on import statement find where a method Declaration is used
-    // and save the following for each entry point
-    //   codeSnippet: string;
-    //   filepath: string;
-    return entryPoints;
   }
 }
 

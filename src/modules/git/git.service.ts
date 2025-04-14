@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { ProjectEntity } from './project.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmbeddingService } from './embedding.service';
+import { EmbedConfig } from '../../embedding-config';
 import { CodeNodeExtractorService } from '../identifiers/code-node-constructor';
 import { CodeNodeEntity } from '../identifiers/code-node.entity';
 
@@ -22,7 +22,7 @@ export class GitService {
 
     private readonly _extractor: CodeNodeExtractorService,
 
-    private readonly _embeddingService: EmbeddingService
+    private readonly _embeddingService: EmbedConfig
   ) {
     if (!fs.existsSync(this._basePath)) {
       fs.mkdirSync(this._basePath, { recursive: true });
