@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { ContextV1 } from './code-node.entity';
+import { ContextV1, EntryPoint } from './code-node.entity';
 
 @Injectable()
 export class CodeNodeExtractorService {
@@ -27,7 +27,7 @@ export class CodeNodeExtractorService {
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
-  private extractIdentifiersFromFile(filePath: string): ExtractedIdentifier[] {
+  private extractIdentifiersFromFile(filePath: string, folderPath: string): ExtractedIdentifier[] {
     const content = fs.readFileSync(filePath, 'utf8');
     const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
     const identifiers: ExtractedIdentifier[] = [];
@@ -40,6 +40,7 @@ export class CodeNodeExtractorService {
       if (ts.isIdentifier(node)) {
         // grab identifier context
         const nodeContext = this.getDeclarationType(node);
+        const entryPoints = this.findEntryPoints(node.text, folderPath, filePath);
 
         identifiers.push({
           name: node.text,
@@ -48,6 +49,7 @@ export class CodeNodeExtractorService {
             codeSnippet: nodeContext.codeSnippet,
           },
           filePath,
+          entryPoints: entryPoints,
         });
       }
 
@@ -105,7 +107,7 @@ export class CodeNodeExtractorService {
     let count = 0;
 
     for (const file of tsFiles) {
-      const identifiers = this.extractIdentifiersFromFile(file);
+      const identifiers = this.extractIdentifiersFromFile(file, folderPath);
       results.push(...identifiers);
       this.logger.log(`Processed ${++count} / ${tsFiles.length} files`);
     }
@@ -116,6 +118,68 @@ export class CodeNodeExtractorService {
 
     return results;
   }
+
+  findEntryPoints(
+    identifier: string,
+    folderPath: string,
+    identifierDeclationFile: string
+  ): EntryPoint[] {
+    const entryPoints: EntryPoint[] = [];
+    const files = this.getAllFiles(folderPath, 'ts');
+
+    files.forEach((file) => {
+      const content = fs.readFileSync(file, 'utf8');
+      const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+
+      // skip the file in which the method/file is originally declared
+      if (file === identifierDeclationFile) {
+        return;
+      }
+
+      // traverse the AST to look for an import of the given identifier.
+      let found = false;
+      const visit = (node: ts.Node) => {
+        if (found) {
+          return;
+        }
+        if (ts.isImportDeclaration(node)) {
+          const importClause = node.importClause;
+          if (importClause) {
+            // check whether the file gets imported
+            if (importClause.name && importClause.name.text === identifier) {
+              found = true;
+              entryPoints.push({
+                codeSnippet: node.getFullText(),
+                filepath: file,
+              });
+              return;
+            }
+            // check for named imports like import { Item } from
+            if (importClause.namedBindings && ts.isNamedImports(importClause.namedBindings)) {
+              const elements = importClause.namedBindings.elements;
+              for (const element of elements) {
+                if (element.name.text === identifier) {
+                  found = true;
+                  entryPoints.push({
+                    // add the full file content for the code snippet
+                    codeSnippet: content,
+                    filepath: file,
+                  });
+                  return;
+                }
+              }
+            }
+          }
+        }
+        ts.forEachChild(node, visit);
+      };
+
+      visit(sourceFile);
+    });
+
+    this.logger.log(`Found ${entryPoints.length} entry point(s) for identifier "${identifier}"`);
+    return entryPoints;
+  }
 }
 
 type ExtractedIdentifier = {
@@ -123,4 +187,5 @@ type ExtractedIdentifier = {
   context?: ContextV1;
   filePath?: string;
   codeSnippet?: string;
+  entryPoints?: EntryPoint[];
 };
