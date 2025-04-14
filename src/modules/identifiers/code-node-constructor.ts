@@ -1,9 +1,9 @@
-import { Injectable, Logger } from "@nestjs/common";
-import * as fs from "fs";
-import * as path from "path";
-import * as ts from "typescript";
-import { EmbeddingService } from "../git/embedding.service";
-import { ContextV1, EntryPoint } from "./code-node.entity";
+import { Injectable, Logger } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as ts from 'typescript';
+import { EmbeddingService } from '../git/embedding.service';
+import { ContextV1, EntryPoint } from './code-node.entity';
 
 @Injectable()
 export class CodeNodeExtractorService {
@@ -14,11 +14,7 @@ export class CodeNodeExtractorService {
   /**
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
    */
-  private getAllFiles(
-    dir: string,
-    extension: string,
-    files: string[] = []
-  ): string[] {
+  private getAllFiles(dir: string, extension: string, files: string[] = []): string[] {
     const entries = fs.readdirSync(dir);
     for (const entry of entries) {
       const fullPath = path.join(dir, entry);
@@ -36,21 +32,12 @@ export class CodeNodeExtractorService {
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
   private extractIdentifiersFromFile(filePath: string): ExtractedIdentifier[] {
-    const content = fs.readFileSync(filePath, "utf8");
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      content,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const content = fs.readFileSync(filePath, 'utf8');
+    const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
     const identifiers: ExtractedIdentifier[] = [];
 
     const visit = (node: ts.Node) => {
-      if (
-        ts.isImportDeclaration(node) ||
-        ts.isImportClause(node) ||
-        ts.isImportSpecifier(node)
-      ) {
+      if (ts.isImportDeclaration(node) || ts.isImportClause(node) || ts.isImportSpecifier(node)) {
         return;
       }
 
@@ -113,7 +100,7 @@ export class CodeNodeExtractorService {
    * extracts identifiers from each, and returns a list of identifier data.
    */
   getIdentifiersFromFolder(folderPath: string): ExtractedIdentifier[] {
-    const tsFiles = this.getAllFiles(folderPath, ".ts");
+    const tsFiles = this.getAllFiles(folderPath, '.ts');
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
