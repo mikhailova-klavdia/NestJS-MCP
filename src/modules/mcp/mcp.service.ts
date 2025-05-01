@@ -15,11 +15,11 @@ export class McpService implements OnModuleInit {
 
     this.server.tool(
       'echo',
-      z.object({ text: z.string() }),
+      'Echoes back the provided text.',
+      { text: z.string() },
       async ({ text }) => {
         return { content: [{ type: 'text', text: `You said: ${text}` }] };
-      },
-      { description: 'Echoes back the provided text.' },
+      }
     );
 
     const transport = new StdioServerTransport();
