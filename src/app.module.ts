@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { ChatService } from './modules/chat/chat.service';
 import { GitModule } from './modules/git/git.module';
 import { IdentifierModule } from './modules/identifiers/identifier.module';
+import { McpModule } from './modules/mcp/mcp.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { IdentifierModule } from './modules/identifiers/identifier.module';
     TasksModule,
     GitModule,
     IdentifierModule,
+    McpModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatService],

@@ -25,6 +25,7 @@
     "@langchain/langgraph": "^0.2.57",
     "@langchain/ollama": "^0.2.0",
     "@langchain/openai": "^0.4.5",
+    "@modelcontextprotocol/sdk": "^1.10.2",
     "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",
