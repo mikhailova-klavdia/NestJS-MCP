@@ -14,8 +14,9 @@ export class GitController {
     }
 
     try {
-      const path = await this.gitService.cloneRepository(repoUrl, projectName);
-      return { message: 'Repository cloned successfully', path };
+      const { project, path } = await this.gitService.cloneRepository(body.repoUrl, body.projectName);
+      await this.gitService.processRepository(project, path);
+      return { message: 'Repository cloned & processed successfully', path };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
