@@ -29,7 +29,11 @@ export class GitService {
     }
   }
 
-  async cloneRepository(repoUrl: string, projectName: string) {
+  async cloneRepository(
+    repoUrl: string, 
+    projectName: string,
+    sshKey?: string
+  ) {
     const projectPath = path.join(this._basePath, projectName);
     const git = simpleGit();
 
@@ -37,7 +41,22 @@ export class GitService {
       fs.rmSync(projectPath, { recursive: true, force: true });
     }
 
+    // if an sshKey is provided, use it for authentication
+    let keyPath: string | undefined;
+    if (sshKey) {
+      fs.mkdirSync(path.dirname(projectPath), { recursive: true });
+      keyPath = path.join(this._basePath, `${projectName}_id_rsa`);
+      fs.writeFileSync(keyPath, sshKey, { mode: 0o600 });
+      process.env.GIT_SSH_COMMAND = `ssh -i ${keyPath} -o StrictHostKeyChecking=no`;
+    }
+
     await git.clone(repoUrl, projectPath);
+
+    // cleanup env and temp key 
+    if (keyPath) {
+      delete process.env.GIT_SSH_COMMAND;
+      fs.unlinkSync(keyPath);
+    }
 
     // create and save the project entity
     const project = new ProjectEntity();

@@ -6,7 +6,7 @@ export class GitController {
   constructor(private readonly gitService: GitService) {}
 
   @Post('clone')
-  async cloneRepo(@Body() body: { repoUrl: string; projectName: string }) {
+  async cloneRepo(@Body() body: CloneDto) {
     const { repoUrl, projectName } = body;
 
     if (!repoUrl || !projectName) {
@@ -21,4 +21,10 @@ export class GitController {
       throw new BadRequestException(err.message);
     }
   }
+}
+
+class CloneDto {
+  repoUrl: string;
+  projectName: string;
+  sshKey?: string;
 }
