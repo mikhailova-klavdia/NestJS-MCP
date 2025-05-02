@@ -10,6 +10,11 @@ async function bootstrap() {
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
+
+  app.setGlobalPrefix('api', {
+    exclude: ['sse','messages','mcp'],
+  });
+  
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

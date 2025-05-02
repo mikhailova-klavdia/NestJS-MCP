@@ -1,11 +1,35 @@
 import { Module } from '@nestjs/common';
-import { McpService } from './mcp.service';
 import { GitModule } from '../git/git.module';
-import { McpController } from './mcp.controller';
+import {
+  McpTransportType,
+  McpModule as RekogMcpModule,
+} from '@rekog/mcp-nest';
+import { EchoTool } from './tools/echo.tool';
+import { CloneRepositoryTool } from './tools/clone-repo.tool';
+import { GreetingTool } from './tools/greetings.tool';
 
 @Module({
-  providers: [McpService],
-  imports: [GitModule],
-  controllers: [McpController],
+  providers: [GreetingTool, EchoTool, CloneRepositoryTool],
+  imports: [RekogMcpModule.forRoot({
+    name: 'mcp-server',
+    version: '1.0.0',
+    transport: [McpTransportType.STREAMABLE_HTTP],
+    streamableHttp: {
+      enableJsonResponse: true,
+      sessionIdGenerator: () => crypto.randomUUID(),
+      statelessMode: false,
+    },
+    mcpEndpoint: "mcp",
+    capabilities: {
+      tools: {
+        name: 'echo',
+        description: 'Echoes back the given input',
+        params: [{ name: 'message', schema: { type: 'string' } }],
+        result: { schema: { type: 'string' } }
+      },
+    },
+  }),
+  GitModule],
+  controllers: [],
 })
 export class McpModule {}
