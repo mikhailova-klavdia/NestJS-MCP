@@ -24,3 +24,28 @@ after that send read notification
   "method": "notifications/initialized"
 }
 ```
+
+to list all tools 
+```
+{
+  "jsonrpc":"2.0",
+  "id":2,
+  "method":"tools/list",
+  "params":{}
+}
+```
+
+to call the hello world command:
+```
+{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+        "name": "hello-world",
+        "arguments": {
+            "name": "Alice"
+        }
+    }
+}
+```

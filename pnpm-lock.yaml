@@ -44,6 +44,9 @@ importers:
       '@nestjs/typeorm':
         specifier: ^11.0.0
         version: 11.0.0(@nestjs/common@11.1.0(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.22(ioredis@5.6.1)(mysql2@3.14.1)(pg@8.15.6)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.11.24)(@types/node@22.15.3)(typescript@5.8.3)))
+      '@rekog/mcp-nest':
+        specifier: ^1.5.0
+        version: 1.5.0(@modelcontextprotocol/sdk@1.11.0)(@nestjs/common@11.1.0(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)(express@5.1.0)(reflect-metadata@0.2.2)
       bullmq:
         specifier: ^5.41.7
         version: 5.52.1
@@ -62,9 +65,6 @@ importers:
       pg:
         specifier: ^8.13.3
         version: 8.15.6
-      reflect-metadata:
-        specifier: ^0.2.2
-        version: 0.2.2
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
@@ -74,6 +74,9 @@ importers:
       typeorm:
         specifier: ^0.3.21
         version: 0.3.22(ioredis@5.6.1)(mysql2@3.14.1)(pg@8.15.6)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.11.24)(@types/node@22.15.3)(typescript@5.8.3))
+      zod:
+        specifier: ^3.24.3
+        version: 3.24.3
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0
@@ -126,6 +129,9 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -1380,6 +1386,15 @@ packages:
     resolution: {integrity: sha512-uh6W7sb55hl7D6vsAeA+V2p5JnlAqzhqFyF0VcJkKZXkgnFcVG9PziERRHQfPLfNGx1C292a4JqbWzhR8L4R1g==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@rekog/mcp-nest@1.5.0':
+    resolution: {integrity: sha512-cbVv8tasNrWo0UX4SIuAaspUkMEEzhsZewv2oelftd0RnfnIsnuA5dSZ1jeBvdKuXsEOOJOc9amtzq9JLtqaJA==}
+    peerDependencies:
+      '@modelcontextprotocol/sdk': '>=1.10.0'
+      '@nestjs/common': '>=9.0.0'
+      '@nestjs/core': '>=9.0.0'
+      express: '>=4.0.0'
+      reflect-metadata: '>=0.1.14'
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -5658,6 +5673,15 @@ snapshots:
   '@playwright/test@1.52.0':
     dependencies:
       playwright: 1.52.0
+
+  '@rekog/mcp-nest@1.5.0(@modelcontextprotocol/sdk@1.11.0)(@nestjs/common@11.1.0(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)(express@5.1.0)(reflect-metadata@0.2.2)':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.11.0
+      '@nestjs/common': 11.1.0(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core': 11.1.0(@nestjs/common@11.1.0(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.0)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      express: 5.1.0
+      path-to-regexp: 8.2.0
+      reflect-metadata: 0.2.2
 
   '@sec-ant/readable-stream@0.4.1': {}
 
