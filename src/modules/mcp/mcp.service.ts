@@ -1,12 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { GitService } from '../git/git.service';
 
 @Injectable()
 export class McpService implements OnModuleInit {
   private server: McpServer;
+  public transport: StreamableHTTPServerTransport;
 
   constructor(private readonly _gitService: GitService) {}
 
@@ -55,8 +57,12 @@ export class McpService implements OnModuleInit {
       },
     );
 
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-    console.log('NestJS MCP Server started.');
+    this.transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => crypto.randomUUID(),
+      enableJsonResponse: true,
+    });
+
+    await this.server.connect(this.transport);
+    console.log('MCP server is running');
   }
 }
