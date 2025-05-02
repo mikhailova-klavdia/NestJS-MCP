@@ -16,7 +16,6 @@ import { McpModule } from "./modules/mcp/mcp.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST,

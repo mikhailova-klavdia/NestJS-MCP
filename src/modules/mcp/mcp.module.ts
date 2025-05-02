@@ -4,30 +4,21 @@ import {
   McpTransportType,
   McpModule as RekogMcpModule,
 } from '@rekog/mcp-nest';
-import { EchoTool } from './tools/echo.tool';
-import { CloneRepositoryTool } from './tools/clone-repo.tool';
-import { GreetingTool } from './tools/greetings.tool';
+import { McpToolsModule } from './tools/tool.module';
 
 @Module({
-  providers: [GreetingTool, EchoTool, CloneRepositoryTool],
+  providers: [McpToolsModule],
+
   imports: [RekogMcpModule.forRoot({
     name: 'mcp-server',
     version: '1.0.0',
     transport: [McpTransportType.STREAMABLE_HTTP],
     streamableHttp: {
       enableJsonResponse: true,
-      sessionIdGenerator: () => crypto.randomUUID(),
+      sessionIdGenerator: () => "1",//() => crypto.randomUUID(),
       statelessMode: false,
     },
     mcpEndpoint: "mcp",
-    capabilities: {
-      tools: {
-        name: 'echo',
-        description: 'Echoes back the given input',
-        params: [{ name: 'message', schema: { type: 'string' } }],
-        result: { schema: { type: 'string' } }
-      },
-    },
   }),
   GitModule],
   controllers: [],

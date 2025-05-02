@@ -6,17 +6,12 @@ import { z } from 'zod';
 export class EchoTool {
   @Tool({
     name: 'echo',
-    description: 'Echoes back the provided text.',
-    parameters: z.object({ text: z.string() }),
+    description: 'Echoes back the given input string',
+    parameters: z.object({
+      message: z.string(),
+    }),
   })
-  async run(
-    params: { text: string },
-    context: Context,
-  ) {
-    return {
-      content: [
-        { type: 'text', text: `You said: ${params.text}` },
-      ],
-    };
+  async run({ message }: { message: string }, context: Context) {
+    return message;
   }
 }

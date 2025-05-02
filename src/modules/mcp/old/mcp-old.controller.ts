@@ -3,8 +3,8 @@ import { Request, Response } from 'express';
 import { McpService } from './mcp.service';
 
 @Controller('mcp')
-export class McpController {
-  private readonly _logger = new Logger(McpController.name);
+export class McpOldController {
+  private readonly _logger = new Logger(McpOldController.name);
 
   constructor(private readonly _mcp: McpService) {}
 
