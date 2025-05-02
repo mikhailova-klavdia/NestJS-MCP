@@ -11,6 +11,6 @@ import { ProjectEntity } from './project.entity';
   imports: [TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity])],
   controllers: [GitController],
   providers: [GitService, CodeNodeExtractorService, EmbedConfig],
-  exports: [CodeNodeExtractorService, EmbedConfig],
+  exports: [CodeNodeExtractorService, GitService],
 })
 export class GitModule {}

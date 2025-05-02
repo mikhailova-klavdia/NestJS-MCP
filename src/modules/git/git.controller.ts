@@ -1,6 +1,12 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { GitService } from './git.service';
 
+class CloneDto {
+  repoUrl: string;
+  projectName: string;
+  sshKey?: string;
+}
+
 @Controller('git')
 export class GitController {
   constructor(private readonly gitService: GitService) {}
@@ -23,8 +29,3 @@ export class GitController {
   }
 }
 
-class CloneDto {
-  repoUrl: string;
-  projectName: string;
-  sshKey?: string;
-}

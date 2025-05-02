@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { GitService } from '../git/git.service';
 
@@ -18,33 +18,32 @@ export class McpService implements OnModuleInit {
 
     this.server.tool(
       'echo',
-      'Echoes back the provided text.',
-      { text: z.string() },
-      async ({ text }) => {
-        return { content: [{ type: 'text', text: `You said: ${text}` }] };
-      }
+      {
+        inputSchema: { text: z.string() },
+        description: 'Echoes back the provided text.',
+      },
+      async ({ text }) => ({
+        content: [{ type: 'text', text: `You said: ${text}` }],
+      })
     );
 
     // tool for cloning a git repository
     this.server.tool(
       'cloneRepository',
-      'Clones a Git repo (optionally via SSH key) and extracts code identifiers',
       {
-        repoUrl:      z.string().url(),
-        projectName:  z.string().min(1),
-        sshKey:       z.string().optional(),
+        inputSchema: {
+          repoUrl:     z.string().url(),
+          projectName: z.string().min(1),
+          sshKey:      z.string().optional(),
+        },
+        description:
+          'Clones a Git repo (optionally via SSH key) and extracts code identifiers',
       },
       async ({ repoUrl, projectName, sshKey }) => {
-        // clone + optional SSH
         const { project, path } = await this._gitService.cloneRepository(
-          repoUrl,
-          projectName,
-          sshKey,
+          repoUrl, projectName, sshKey,
         );
-        
-        // extract & embed identifiers
         await this._gitService.processRepository(project, path);
-
         return {
           content: [
             {
