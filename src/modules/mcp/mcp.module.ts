@@ -10,13 +10,18 @@ import { GreetingTool } from "./tools/greetings.tool";
     RekogMcpModule.forRoot({
       name: "mcp-server",
       version: "1.0.0",
-      transport: [McpTransportType.STREAMABLE_HTTP],
+      transport: [
+        McpTransportType.STREAMABLE_HTTP,
+        McpTransportType.SSE,
+      ],
+      
       streamableHttp: {
         enableJsonResponse: true,
         sessionIdGenerator: () => "1", //() => crypto.randomUUID(),
         statelessMode: false,
       },
-      mcpEndpoint: "mcp",
+      
+
     }),
     GitModule,
   ],
