@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Tool } from '@rekog/mcp-nest';
+import { Tool, Context } from '@rekog/mcp-nest';
+import { z } from 'zod';
 import { RagService } from 'src/modules/rag/rag.service';
 
 @Injectable()
@@ -8,15 +9,33 @@ export class RagTool {
 
   @Tool({
     name: 'rag',
-    description: "RAG tool for retrieving related identifiers",
+    description: 'RAG tool for retrieving related identifiers',
+    parameters: z.object({
+      name: z.string().nonempty(),
+      projectId: z.string().uuid(),
+      topN: z.number().int().positive().default(5),
+      minSimilarity: z.number().min(0).max(1).default(0.0),
+    }),
   })
   async retrieveRelatedIdentifiers(
-    { name },
+    { name, projectId, topN, minSimilarity }: {
+      name: string;
+      projectId: string;
+      topN?: number;
+      minSimilarity?: number;
+    },
+    context: Context
   ) {
-    // eun your RAG query
-    const results = await this._rag.retrieveAndGenerate(name);
+    // run the RAG query 
+    const results = await this._rag.retrieveAndGenerate(
+      name,
+      projectId,
+      topN,
+      minSimilarity
+    );
 
-    // format each result as a text block
+
+    // report progress
     const content = results.map((doc) => ({
       type: 'text' as const,
       text: [
@@ -27,7 +46,6 @@ export class RagTool {
       ].join('\n'),
     }));
 
-    // return the MCP‐compatible payload
     return { content };
   }
 }

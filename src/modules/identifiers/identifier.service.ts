@@ -62,9 +62,10 @@ export class IdentifierService {
     return relevant;
   }
 
-  findTop5RelevantIdentifiers(
+  findTopNRelevantIdentifiers(
     identifiers: CodeNodeEntity[],
-    queryEmbedding: number[]
+    queryEmbedding: number[],
+    n: number = 5
   ): { identifier: CodeNodeEntity; similarity: number }[] {
     const relevant: { identifier: CodeNodeEntity; similarity: number }[] = [];
 
@@ -76,7 +77,7 @@ export class IdentifierService {
         ident.embedding
       );
 
-      if (relevant.length < 5) {
+      if (relevant.length < n) {
         relevant.push({ identifier: ident, similarity });
         relevant.sort((a, b) => a.similarity - b.similarity);
         continue;
