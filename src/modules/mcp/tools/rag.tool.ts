@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Tool, Context } from '@rekog/mcp-nest';
+import { Tool } from '@rekog/mcp-nest';
 import { RagService } from 'src/modules/rag/rag.service';
 
 @Injectable()
-export class GreetingTool {
+export class RagTool {
   constructor(private readonly _rag: RagService) {}
 
   @Tool({
@@ -13,10 +13,10 @@ export class GreetingTool {
   async retrieveRelatedIdentifiers(
     { name },
   ) {
-    // 1. Run your RAG query
+    // eun your RAG query
     const results = await this._rag.retrieveAndGenerate(name);
 
-    // 2. Format each result as a text block
+    // format each result as a text block
     const content = results.map((doc) => ({
       type: 'text' as const,
       text: [
@@ -27,7 +27,7 @@ export class GreetingTool {
       ].join('\n'),
     }));
 
-    // 3. Return the MCP‐compatible payload
+    // return the MCP‐compatible payload
     return { content };
   }
 }
