@@ -1,9 +1,8 @@
 import { Module } from "@nestjs/common";
 import { BullModule } from "@nestjs/bullmq";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigModule } from "@nestjs/config";
 import { DataModule } from "./data.module";
 import { RagModule } from "./modules/rag/rag.module";
-import { TasksModule } from "./modules/tasks/tasks.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ChatService } from "./modules/chat/chat.service";
@@ -27,7 +26,6 @@ import { McpModule } from "./modules/mcp/mcp.module";
     }),
     DataModule,
     RagModule,
-    TasksModule,
     GitModule,
     IdentifierModule,
     McpModule,
