@@ -4,6 +4,7 @@ import { McpTransportType, McpModule as RekogMcpModule } from "@rekog/mcp-nest";
 import { EchoTool } from "./tools/echo.tool";
 import { GreetingTool } from "./tools/greetings.tool";
 import { RagTool } from "./tools/rag.tool";
+import { RagModule } from "../rag/rag.module";
 
 @Module({
   providers: [EchoTool, GreetingTool, RagTool],
@@ -25,6 +26,7 @@ import { RagTool } from "./tools/rag.tool";
 
     }),
     GitModule,
+    RagModule,
   ],
 })
 export class McpModule {}
