@@ -3,7 +3,7 @@ import { simpleGit } from "simple-git";
 import * as path from "path";
 import * as fs from "fs";
 import { Repository } from "typeorm";
-import { ProjectEntity } from "./project.entity";
+import { ProjectEntity } from "../project/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
 import { CodeNodeExtractorService } from "../identifiers/code-node-constructor";

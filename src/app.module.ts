@@ -29,6 +29,7 @@ import { McpModule } from "./modules/mcp/mcp.module";
     GitModule,
     IdentifierModule,
     McpModule,
+    AppModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatService],
