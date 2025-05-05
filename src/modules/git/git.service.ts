@@ -64,6 +64,7 @@ export class GitService {
     const project = new ProjectEntity();
     project.name = projectName;
     project.repoUrl = repoUrl;
+    project.localPath = projectPath;
 
     await this._projectRepo.save(project);
     return { project, path: projectPath };
@@ -188,6 +189,7 @@ export class GitService {
 
     const hookId: number = reponse.data.id;
     project.webhookId = hookId;
+    project.webhookSecret = secret;
     return this._projectRepo.save(project);
   }
 
@@ -219,4 +221,6 @@ export class GitService {
     project.webhookId = null;
     await this._projectRepo.save(project);
   }
+
+  // TODO: implement a webhook handler method to process incoming webhooks
 }

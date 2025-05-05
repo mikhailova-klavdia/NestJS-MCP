@@ -40,7 +40,6 @@ export class GitController {
     }
   }
 
-  /** Create a GitHub webhook and save its ID */
   @Post(":projectId/webhook")
   async createWebhook(
     @Param("projectId") projectId: string,
@@ -57,7 +56,6 @@ export class GitController {
     );
   }
 
-  /** Update that webhook on GitHub */
   @Patch(":projectId/webhook")
   async updateWebhook(
     @Param("projectId") projectId: string,
@@ -74,7 +72,6 @@ export class GitController {
     );
   }
 
-  /** Delete the GitHub webhook */
   @Delete(":projectId/webhook")
   async deleteWebhook(@Param("projectId") projectId: string) {
     await this.gitService.deleteWebhook(projectId);
