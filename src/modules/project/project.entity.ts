@@ -13,4 +13,7 @@ export class ProjectEntity {
 
   @Column({ nullable: true })
   repoUrl: string;
+
+  @Column({ nullable: true })
+  webhookId?: number | null;
 }

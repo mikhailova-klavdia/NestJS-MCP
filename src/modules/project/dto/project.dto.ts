@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsUrl, isNumber, IsNumber } from 'class-validator';
 
 export class ProjectDto {
   @IsString()
@@ -11,5 +11,8 @@ export class ProjectDto {
   @IsOptional()
   @IsUrl()
   readonly repoUrl?: string;
+
+  @IsNumber()
+  readonly webhookId: number;
 }
 

@@ -1,4 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { simpleGit } from "simple-git";
 import * as path from "path";
 import * as fs from "fs";
@@ -8,10 +12,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
 import { CodeNodeExtractorService } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/code-node.entity";
+import axios from "axios";
 
 @Injectable()
 export class GitService {
   private readonly _basePath = "documents/";
+  private readonly githubToken = process.env.GITHUB_TOKEN;
 
   constructor(
     @InjectRepository(ProjectEntity)
@@ -29,11 +35,7 @@ export class GitService {
     }
   }
 
-  async cloneRepository(
-    repoUrl: string, 
-    projectName: string,
-    sshKey?: string
-  ) {
+  async cloneRepository(repoUrl: string, projectName: string, sshKey?: string) {
     const projectPath = path.join(this._basePath, projectName);
     const git = simpleGit();
 
@@ -52,7 +54,7 @@ export class GitService {
 
     await git.clone(repoUrl, projectPath);
 
-    // cleanup env and temp key 
+    // cleanup env and temp key
     if (keyPath) {
       delete process.env.GIT_SSH_COMMAND;
       fs.unlinkSync(keyPath);
@@ -106,5 +108,115 @@ export class GitService {
     await this._identifierRepo.save(identifiersToSave);
 
     return projectPath;
+  }
+
+  async updateWebhook(
+    projectId: string,
+    callbackUrl: string,
+    secret?: string,
+    events: string[] = ["push"]
+  ): Promise<ProjectEntity> {
+    const project = await this._projectRepo.findOne({where: { id: projectId }});
+    if (!project || !project.webhookId) {
+      throw new NotFoundException(
+        `No webhook registered for project ${projectId}`
+      );
+    }
+
+    const match = project.repoUrl.match(
+      /github\.com[:/](.+?)\/(.+?)(?:\.git)?$/
+    );
+    const [, owner, repo] = match!;
+
+    await axios.patch(
+      `https://api.github.com/repos/${owner}/${repo}/hooks/${project.webhookId}`,
+      {
+        config: {
+          url: callbackUrl,
+          content_type: "json",
+          ...(secret ? { secret } : {}),
+        },
+        events,
+        active: true,
+      },
+      {
+        headers: {
+          Authorization: `token ${this.githubToken}`,
+          "User-Agent": "your-app-name",
+        },
+      }
+    );
+
+    return project;
+  }
+
+  async createWebhook(
+    projectId: string,
+    callbackUrl: string,
+    secret?: string,
+    events: string[] = ["push"]
+  ): Promise<ProjectEntity> {
+    const project = await this._projectRepo.findOne({
+      where: { id: projectId },
+    });
+    if (!project) throw new NotFoundException(`Project ${projectId} not found`);
+
+    const match = project.repoUrl.match(
+      /github\.com[:/](.+?)\/(.+?)(?:\.git)?$/
+    );
+    const [, owner, repo] = match!;
+
+    // create a webhook on GitHub
+    const reponse = await axios.patch(
+      `https://api.github.com/repos/${owner}/${repo}/hooks/${project.webhookId}`,
+      {
+        config: {
+          url: callbackUrl,
+          content_type: "json",
+          ...(secret ? { secret } : {}),
+        },
+        events,
+        active: true,
+      },
+      {
+        headers: {
+          Authorization: `token ${this.githubToken}`,
+          "User-Agent": "your-app-name",
+        },
+      }
+    );
+
+    const hookId: number = reponse.data.id;
+    project.webhookId = hookId;
+    return this._projectRepo.save(project);
+  }
+
+  async deleteWebhook(projectId: string): Promise<void> {
+    const project = await this._projectRepo.findOne({
+      where: { id: projectId },
+    });
+    if (!project || !project.webhookId) {
+      throw new NotFoundException(
+        `No webhook registered for project ${projectId}`
+      );
+    }
+
+    const match = project.repoUrl.match(
+      /github\.com[:/](.+?)\/(.+?)(?:\.git)?$/
+    );
+    const [, owner, repo] = match!;
+
+    await axios.delete(
+      `https://api.github.com/repos/${owner}/${repo}/hooks/${project.webhookId}`,
+      {
+        headers: {
+          Authorization: `token ${this.githubToken}`,
+          "User-Agent": "your-app-name",
+        },
+      }
+    );
+
+    project.webhookId = null;
+    await this._projectRepo.save(project);
   }
 }
