@@ -10,7 +10,7 @@ import {
     HttpStatus,
   } from '@nestjs/common';
   import { ProjectService } from './project.service';
-  import { ProjectDto } from './project.dto';
+  import { ProjectDto } from './dto/project.dto';
   
   @Controller('projects')
   export class ProjectController {
