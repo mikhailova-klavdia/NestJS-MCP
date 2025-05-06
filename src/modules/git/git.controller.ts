@@ -7,12 +7,7 @@ import {
   Param,
 } from "@nestjs/common";
 import { GitService } from "./git.service";
-
-class CloneDto {
-  repoUrl: string;
-  projectName: string;
-  sshKey?: string;
-}
+import { CloneDto } from "./dto/git.dto";
 
 @Controller("git")
 export class GitController {
