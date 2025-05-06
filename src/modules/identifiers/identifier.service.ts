@@ -92,7 +92,7 @@ export class IdentifierService {
     return relevant.sort((a, b) => b.similarity - a.similarity);
   }
 
-  async getIdentifiersByProject(projectId: string): Promise<CodeNodeEntity[]> {
+  async getIdentifiersByProject(projectId: number): Promise<CodeNodeEntity[]> {
     const nodes = await this._identifierRepository.find({
       where: { project: { id: projectId } },
     });

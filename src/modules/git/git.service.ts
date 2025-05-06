@@ -110,7 +110,7 @@ export class GitService {
     return projectPath;
   }
 
-  async pollProject(projectId: string) {
+  async pollProject(projectId: number) {
     const project = await this._projectRepo.findOneBy({ id: projectId });
     if (!project) {
       throw new NotFoundException("Project not found");

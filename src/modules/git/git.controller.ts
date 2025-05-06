@@ -34,7 +34,7 @@ export class GitController {
   }
 
   @Patch(":projectId/poll")
-  async pollProject(@Param("projectId") projectId: string) {
+  async pollProject(@Param("projectId") projectId: number) {
     await this.gitService.pollProject(projectId);
     return { message: `Project ${projectId} polled successfully` };
   }

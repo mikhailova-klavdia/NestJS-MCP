@@ -2,7 +2,6 @@ import {
   IsString,
   IsOptional,
   IsUrl,
-  IsNumber,
 } from "class-validator";
 
 export class ProjectDto {

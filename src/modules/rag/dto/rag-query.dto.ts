@@ -1,12 +1,12 @@
-import { IsString, IsUUID, IsOptional, IsInt, Min, Max } from 'class-validator';
+import { IsString, IsOptional, IsInt, Min, Max, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class RagQueryDto {
   @IsString()
   query: string;
 
-  @IsUUID()
-  projectId: string;
+  @IsNumber()
+  projectId: number;
 
   @IsOptional()
   @Type(() => Number)

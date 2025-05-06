@@ -20,7 +20,7 @@ export class RagTool {
   async retrieveRelatedIdentifiers(
     { name, projectId, topN, minSimilarity }: {
       name: string;
-      projectId: string;
+      projectId: number;
       topN?: number;
       minSimilarity?: number;
     },

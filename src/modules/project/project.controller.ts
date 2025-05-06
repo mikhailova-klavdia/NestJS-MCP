@@ -27,13 +27,13 @@ import {
     }
   
     @Get(':id')
-    findOne(@Param('id') id: string) {
+    findOne(@Param('id') id: number) {
       return this.projects.findOne(id);
     }
   
     @Patch(':id')
     update(
-      @Param('id') id: string,
+      @Param('id') id: number,
       @Body() dto: Partial<ProjectDto>,
     ) {
       return this.projects.update(id, dto);
@@ -41,7 +41,7 @@ import {
   
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    delete(@Param('id') id: string) {
+    delete(@Param('id') id: number) {
       return this.projects.delete(id);
     }
   }

@@ -11,7 +11,7 @@ export class RagService {
 
   async retrieveAndGenerate(
     query: string,
-    projectId: string,
+    projectId: number,
     topN: number = 5,
     minSimilarity: number = 0.0
   ): Promise<any> {

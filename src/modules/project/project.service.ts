@@ -20,19 +20,19 @@ export class ProjectService {
     return this.repo.find();
   }
 
-  async findOne(ProjectId: string): Promise<ProjectEntity> {
+  async findOne(ProjectId: number): Promise<ProjectEntity> {
     const project = await this.repo.findOne({ where: { id: ProjectId } });
     if (!project) throw new NotFoundException(`Project ${ProjectId} not found`);
     return project;
   }
 
-  async update(id: string, dto: Partial<ProjectDto>): Promise<ProjectEntity> {
+  async update(id: number, dto: Partial<ProjectDto>): Promise<ProjectEntity> {
     const project = await this.findOne(id);
     Object.assign(project, dto);
     return this.repo.save(project);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     const project = await this.findOne(id);
     await this.repo.remove(project);
   }
