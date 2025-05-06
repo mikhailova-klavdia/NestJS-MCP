@@ -14,12 +14,6 @@ export class ProjectEntity {
   @Column({ nullable: true })
   repoUrl: string;
 
-  @Column({ type: "int", nullable: true })
-  webhookId: number | null;
-
-  @Column({ nullable: true })
-  webhookSecret?: string;
-
   @Column({ nullable: true })
   localPath?: string;
 

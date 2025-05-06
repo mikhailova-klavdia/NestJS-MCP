@@ -3,12 +3,8 @@ import {
   Post,
   Body,
   BadRequestException,
-  Param,
-  Patch,
-  Delete,
 } from "@nestjs/common";
 import { GitService } from "./git.service";
-import { WebhookDto } from "./dto/webhook.dto";
 
 class CloneDto {
   repoUrl: string;
@@ -38,43 +34,5 @@ export class GitController {
     } catch (err) {
       throw new BadRequestException(err.message);
     }
-  }
-
-  @Post(":projectId/webhook")
-  async createWebhook(
-    @Param("projectId") projectId: string,
-    @Body() dto: WebhookDto
-  ) {
-    if (!dto.callbackUrl) {
-      throw new BadRequestException("callbackUrl is required");
-    }
-    return this.gitService.createWebhook(
-      projectId,
-      dto.callbackUrl,
-      dto.secret,
-      dto.events
-    );
-  }
-
-  @Patch(":projectId/webhook")
-  async updateWebhook(
-    @Param("projectId") projectId: string,
-    @Body() dto: WebhookDto
-  ) {
-    if (!dto.callbackUrl) {
-      throw new BadRequestException("callbackUrl is required");
-    }
-    return this.gitService.updateWebhook(
-      projectId,
-      dto.callbackUrl,
-      dto.secret,
-      dto.events
-    );
-  }
-
-  @Delete(":projectId/webhook")
-  async deleteWebhook(@Param("projectId") projectId: string) {
-    await this.gitService.deleteWebhook(projectId);
-    return { message: "Webhook removed from GitHub and database" };
   }
 }

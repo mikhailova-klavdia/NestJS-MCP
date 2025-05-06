@@ -17,12 +17,6 @@ export class ProjectDto {
   @IsUrl()
   readonly repoUrl?: string;
 
-  @IsNumber()
-  readonly webhookId: number;
-
-  @IsString()
-  webhookSecret?: string;
-
   @IsString()
   localPath?: string;
 }
