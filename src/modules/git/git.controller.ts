@@ -32,7 +32,7 @@ export class GitController {
         body.projectName
       );
       await this.gitService.processRepository(project, path);
-      return { message: "Repository cloned & processed successfully", path };
+      return { message: "Repository cloned & processed successfully", project };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
