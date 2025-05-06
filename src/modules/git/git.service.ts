@@ -112,7 +112,12 @@ export class GitService {
     return projectPath;
   }
 
-  async pollProject(project: ProjectEntity) {
+  async pollProject(projectId: string) {
+    const project = await this._projectRepo.findOneBy({ id: projectId });
+    if (!project) {
+      throw new NotFoundException("Project not found");
+    }
+    
     if (!project.localPath) {
       throw new BadRequestException("No local clone");
     }

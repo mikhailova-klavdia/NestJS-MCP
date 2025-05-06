@@ -3,6 +3,8 @@ import {
   Post,
   Body,
   BadRequestException,
+  Patch,
+  Param,
 } from "@nestjs/common";
 import { GitService } from "./git.service";
 
@@ -34,5 +36,11 @@ export class GitController {
     } catch (err) {
       throw new BadRequestException(err.message);
     }
+  }
+
+  @Patch(':projectId/poll') 
+  async pollProject(@Param("projectId") projectId: string) {
+    await this.gitService.pollProject(projectId);
+    return { message: `Project ${projectId} polled successfully` };
   }
 }
