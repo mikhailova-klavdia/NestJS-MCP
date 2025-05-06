@@ -6,7 +6,6 @@ services:
 
   postgres:
     image: ankane/pgvector:latest
-    hostname: "postgres"
     networks:
       - overlay
     environment:

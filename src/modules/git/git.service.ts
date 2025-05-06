@@ -75,7 +75,7 @@ export class GitService {
       this._extractor.getIdentifiersFromFolder(projectPath);
     const identifiersToSave: CodeNodeEntity[] = [];
 
-    const batchSize = 100;
+    const batchSize = 50;
 
     for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
       const batch = rawIdentifiers.slice(i, i + batchSize);
