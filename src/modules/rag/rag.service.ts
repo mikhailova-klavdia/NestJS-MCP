@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { EmbedConfig } from "../../embedding-config";
 import { IdentifierService } from "../identifiers/identifier.service";
 
 @Injectable()
 export class RagService {
+  private readonly _logger = new Logger(RagService.name);
   constructor(
     private readonly _identifierService: IdentifierService,
     private readonly _embeddingConfig: EmbedConfig
@@ -15,6 +16,8 @@ export class RagService {
     topN: number = 5,
     minSimilarity: number = 0.0
   ): Promise<any> {
+    const startTime = process.hrtime();
+
     // Step 1: Generate embedding for the query
     const queryEmbedding = await this._embeddingConfig.embed(query);
 
@@ -30,7 +33,7 @@ export class RagService {
         topN
       );
 
-    return relevantIdentifier
+    const results = relevantIdentifier
       .filter((r) => r.similarity >= minSimilarity)
       .map((doc) => ({
         title: doc.identifier.identifier,
@@ -38,5 +41,11 @@ export class RagService {
         similarity: doc.similarity,
         context: doc.identifier.context,
       }));
+
+    const [sec, ns] = process.hrtime(startTime);
+    const elapsedMs = sec * 1e3 + ns / 1e6;
+    this._logger.log(`retrieveAndGenerate latency: ${elapsedMs.toFixed(2)}ms`);
+
+    return results;
   }
 }
