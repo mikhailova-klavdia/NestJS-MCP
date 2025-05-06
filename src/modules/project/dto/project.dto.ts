@@ -2,7 +2,6 @@ import {
   IsString,
   IsOptional,
   IsUrl,
-  isNumber,
   IsNumber,
 } from "class-validator";
 
