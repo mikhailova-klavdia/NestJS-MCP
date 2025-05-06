@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-import { ProjectEntity } from "../git/project.entity";
+import { ProjectEntity } from "../project/project.entity";
 import { Declaration } from "typescript";
 
 export type ContextV1 = {

@@ -1,19 +1,14 @@
 services:
-  # web:
-  #   build: .
-  #   ports:
-  #     - "8000:3000" 
-  #   depends_on:
-  #     - redis
-  #     - postgres
-    
   redis:
-    image: "redis:alpine" 
+    image: redis:alpine
     ports:
       - "6379:6379"
-  
+
   postgres:
     image: ankane/pgvector:latest
+    hostname: "postgres"
+    networks:
+      - overlay
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root

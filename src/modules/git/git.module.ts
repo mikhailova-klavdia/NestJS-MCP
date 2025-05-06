@@ -5,12 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmbedConfig } from '../../embedding-config';
 import { CodeNodeExtractorService } from '../identifiers/code-node-constructor';
 import { CodeNodeEntity } from '../identifiers/code-node.entity';
-import { ProjectEntity } from './project.entity';
+import { ProjectEntity } from '../project/project.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity])],
   controllers: [GitController],
   providers: [GitService, CodeNodeExtractorService, EmbedConfig],
-  exports: [CodeNodeExtractorService, EmbedConfig],
+  exports: [CodeNodeExtractorService, GitService],
 })
 export class GitModule {}

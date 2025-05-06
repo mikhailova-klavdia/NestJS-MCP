@@ -11,6 +11,6 @@ import { IdentifierModule } from '../identifiers/identifier.module';
   imports: [TypeOrmModule.forFeature([CodeNodeEntity]), IdentifierModule],
   controllers: [RagController],
   providers: [RagService, EmbedConfig, SimilarityService],
-  exports: [SimilarityService],
+  exports: [SimilarityService, RagService],
 })
 export class RagModule {}
