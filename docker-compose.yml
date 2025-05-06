@@ -15,8 +15,6 @@ services:
       POSTGRES_DB: test
     ports:
       - "5432:5432"
-    networks:
-      - overlay
   
   pgadmin:
     container_name: pgadmin
