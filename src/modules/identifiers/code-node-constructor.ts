@@ -91,7 +91,10 @@ export class CodeNodeExtractorService {
       currentNode = currentNode.parent;
     }
 
-    return { declarationType: "unknown", codeSnippet: node.getFullText() };
+    return {
+      declarationType: ts.SyntaxKind[node.kind],
+      codeSnippet: node.getFullText(),
+    };
   }
 
   /**

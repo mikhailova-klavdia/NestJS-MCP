@@ -20,3 +20,28 @@ services:
       POSTGRES_DB: test
     ports:
       - "5432:5432"
+    networks:
+      - overlay
+  
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5051}:80"
+    networks:
+      - overlay
+    restart: unless-stopped
+
+networks:
+  overlay:
+
+volumes:
+  postgres_data_vol:
+  redis_data:
+  minio-data:
+  pgadmin:
