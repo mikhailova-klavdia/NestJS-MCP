@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { simpleGit } from "simple-git";
+import { simpleGit, DiffResult } from "simple-git";
 import * as path from "path";
 import * as fs from "fs";
 import { Repository } from "typeorm";
@@ -53,7 +53,7 @@ export class GitService {
     }
 
     await git.clone(repoUrl, projectPath);
-
+    const initialSha = (await simpleGit(projectPath).revparse(["HEAD"])).trim();
     // cleanup env and temp key
     if (keyPath) {
       delete process.env.GIT_SSH_COMMAND;
@@ -65,6 +65,7 @@ export class GitService {
     project.name = projectName;
     project.repoUrl = repoUrl;
     project.localPath = projectPath;
+    project.lastProcessedCommit = initialSha;
 
     await this._projectRepo.save(project);
     return { project, path: projectPath };
@@ -117,7 +118,9 @@ export class GitService {
     secret?: string,
     events: string[] = ["push"]
   ): Promise<ProjectEntity> {
-    const project = await this._projectRepo.findOne({where: { id: projectId }});
+    const project = await this._projectRepo.findOne({
+      where: { id: projectId },
+    });
     if (!project || !project.webhookId) {
       throw new NotFoundException(
         `No webhook registered for project ${projectId}`
@@ -222,9 +225,77 @@ export class GitService {
     await this._projectRepo.save(project);
   }
 
-  // TODO: implement a webhook handler method to process incoming webhooks
-  // git fetch instead 
-  // git pull 
+  async pollProject(project: ProjectEntity) {
+    if (!project.localPath) {
+      throw new BadRequestException("No local clone");
+    }
+    const git = simpleGit(project.localPath);
 
-  // index - update 
+    await git.fetch("origin", "main");
+
+    const remoteHead = (await git.revparse(["origin/main"])).trim();
+
+    if (remoteHead === project.lastProcessedCommit) {
+      return;
+    }
+
+    // get the diff between the last processed commit and the remote head
+    const diff: DiffResult = await git.diffSummary([
+      `${project.lastProcessedCommit}..${remoteHead}`,
+    ]);
+
+    for (const file of diff.files) {
+      const relPath = file.file;
+      const absPath = path.join(project.localPath, relPath);
+
+      // delete identifiers if the file was changed or deleted
+      await this._identifierRepo
+        .createQueryBuilder()
+        .delete()
+        .where("projectId = :pid", { pid: project.id })
+        .andWhere("filePath = :file", { file: relPath })
+        .execute();
+
+      await this._identifierRepo.delete({ project, filePath: relPath });
+
+      const rawIdentifiers = this._extractor.getIdentifiersFromFolder(absPath);
+      // …and save back into the database
+      const identifiersToSave: CodeNodeEntity[] = [];
+
+      const batchSize = 50;
+
+      for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
+        const batch = rawIdentifiers.slice(i, i + batchSize);
+
+        const embeddedBatch = await Promise.all(
+          batch.map(async (ident) => {
+            const embedding = await this._embeddingService.embed(ident.name);
+            const entity = new CodeNodeEntity();
+            entity.identifier = ident.name;
+            entity.filePath = ident.filePath || "";
+            entity.embedding = embedding;
+            entity.project = project;
+            entity.context = ident.context || {
+              declarationType: null,
+              codeSnippet: "",
+              entryPoints: [],
+            };
+            return entity;
+          })
+        );
+
+        identifiersToSave.push(...embeddedBatch);
+
+        console.log(
+          `🔄 Processed ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+        );
+      }
+
+      // save all identifiers in one batch
+      await this._identifierRepo.save(identifiersToSave);
+    }
+
+    project.lastProcessedCommit = remoteHead;
+    await this._projectRepo.save(project);
+  }
 }

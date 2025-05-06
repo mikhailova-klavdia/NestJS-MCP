@@ -22,4 +22,7 @@ export class ProjectEntity {
 
   @Column({ nullable: true })
   localPath?: string;
+
+  @Column({ type: "varchar", length: 40, nullable: true })
+  lastProcessedCommit?: string;
 }
