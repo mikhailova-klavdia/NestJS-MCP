@@ -21,7 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         entities: [],
         synchronize: true,
         autoLoadEntities: true,
-        dropSchema: true,
+        //dropSchema: true,
       }),
     }),
   ],

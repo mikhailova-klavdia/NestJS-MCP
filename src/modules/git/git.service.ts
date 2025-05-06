@@ -12,12 +12,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
 import { CodeNodeExtractorService } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/code-node.entity";
-import axios from "axios";
 
 @Injectable()
 export class GitService {
   private readonly _basePath = "documents/";
-  private readonly githubToken = process.env.GITHUB_TOKEN;
 
   constructor(
     @InjectRepository(ProjectEntity)
@@ -77,7 +75,7 @@ export class GitService {
       this._extractor.getIdentifiersFromFolder(projectPath);
     const identifiersToSave: CodeNodeEntity[] = [];
 
-    const batchSize = 50;
+    const batchSize = 100;
 
     for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
       const batch = rawIdentifiers.slice(i, i + batchSize);
@@ -135,6 +133,8 @@ export class GitService {
     const diff: DiffResult = await git.diffSummary([
       `${project.lastProcessedCommit}..${remoteHead}`,
     ]);
+
+    console.log("Differences:", diff);
 
     for (const file of diff.files) {
       const relPath = file.file;

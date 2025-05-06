@@ -1,17 +1,9 @@
 services:
-  # web:
-  #   build: .
-  #   ports:
-  #     - "8000:3000" 
-  #   depends_on:
-  #     - redis
-  #     - postgres
-    
   redis:
-    image: "redis:alpine" 
+    image: redis:alpine
     ports:
       - "6379:6379"
-  
+
   postgres:
     image: ankane/pgvector:latest
     environment:
@@ -20,3 +12,19 @@ services:
       POSTGRES_DB: test
     ports:
       - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+  pgadmin_data:
