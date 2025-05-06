@@ -11,6 +11,14 @@ export class CodeNodeExtractorService {
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
    */
   private getAllFiles(dir: string, extension: string, files: string[] = []): string[] {
+    // if a file gets passed, return the file path
+    if (fs.existsSync(dir) && fs.statSync(dir).isFile()) {
+      if (dir.endsWith(extension)) {
+        files.push(dir);
+      }
+      return files;
+    }
+
     const entries = fs.readdirSync(dir);
     for (const entry of entries) {
       const fullPath = path.join(dir, entry);
