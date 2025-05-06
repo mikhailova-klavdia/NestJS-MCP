@@ -6,6 +6,9 @@ services:
 
   postgres:
     image: ankane/pgvector:latest
+    hostname: "postgres"
+    networks:
+      - overlay
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
