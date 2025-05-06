@@ -46,6 +46,6 @@ export class RagService {
     const elapsedMs = sec * 1e3 + ns / 1e6;
     this._logger.log(`retrieveAndGenerate latency: ${elapsedMs.toFixed(2)}ms`);
 
-    return results;
+    return {time: elapsedMs, results};
   }
 }
