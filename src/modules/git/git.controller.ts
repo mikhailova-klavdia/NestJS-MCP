@@ -8,10 +8,15 @@ import {
 } from "@nestjs/common";
 import { GitService } from "./git.service";
 import { CloneDto } from "./dto/git.dto";
+import { Queue } from 'bullmq';
+import { InjectQueue } from "@nestjs/bullmq";
 
 @Controller("git")
 export class GitController {
-  constructor(private readonly gitService: GitService) {}
+  constructor(
+    private readonly gitService: GitService,
+    @InjectQueue('indexing') private readonly indexQueue: Queue,
+  ) {}
 
   @Post("clone")
   async cloneRepo(@Body() body: CloneDto) {
@@ -22,11 +27,10 @@ export class GitController {
     }
 
     try {
-      const { project, path } = await this.gitService.cloneRepository(
+      const project = await this.gitService.cloneRepository(
         body.repoUrl,
         body.projectName
       );
-      await this.gitService.processRepository(project, path);
       return { message: "Repository cloned & processed successfully", project };
     } catch (err) {
       throw new BadRequestException(err.message);

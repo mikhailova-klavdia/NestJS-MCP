@@ -22,7 +22,7 @@ import { McpModule } from "./modules/mcp/mcp.module";
       },
     }),
     BullModule.registerQueue({
-      name: "indexing",
+      name: "code-indexing",
     }),
     DataModule,
     RagModule,

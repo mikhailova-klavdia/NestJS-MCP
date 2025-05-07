@@ -66,7 +66,9 @@ export class GitService {
     project.lastProcessedCommit = initialSha;
 
     await this._projectRepo.save(project);
-    return { project, path: projectPath };
+
+    await this.processRepository(project, projectPath);
+    return project;
   }
 
   async processRepository(project: ProjectEntity, projectPath: string) {
@@ -115,7 +117,7 @@ export class GitService {
     if (!project) {
       throw new NotFoundException("Project not found");
     }
-    
+
     if (!project.localPath) {
       throw new BadRequestException("No local clone");
     }
