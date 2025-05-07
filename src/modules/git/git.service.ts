@@ -66,15 +66,13 @@ export class GitService {
     project.lastProcessedCommit = initialSha;
 
     await this._projectRepo.save(project);
-
-    await this.processRepository(project, projectPath);
     return project;
   }
 
-  async processRepository(project: ProjectEntity, projectPath: string) {
+  async processRepository(project: ProjectEntity) {
     // get identifiers from files cloned
     const rawIdentifiers =
-      this._extractor.getIdentifiersFromFolder(projectPath);
+      this._extractor.getIdentifiersFromFolder(project.localPath);
     const identifiersToSave: CodeNodeEntity[] = [];
 
     const batchSize = 50;
@@ -109,7 +107,7 @@ export class GitService {
     // save all identifiers in one batch
     await this._identifierRepo.save(identifiersToSave);
 
-    return projectPath;
+    return project;
   }
 
   async pollProject(projectId: number) {
@@ -191,5 +189,13 @@ export class GitService {
 
     project.lastProcessedCommit = remoteHead;
     await this._projectRepo.save(project);
+  }
+
+  async findProjectById(id: number): Promise<ProjectEntity> {
+    const project = await this._projectRepo.findOneBy({ id });
+    if (!project) {
+      throw new NotFoundException(`Project #${id} not found`);
+    }
+    return project;
   }
 }

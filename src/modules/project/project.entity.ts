@@ -14,8 +14,8 @@ export class ProjectEntity {
   @Column({ nullable: true })
   repoUrl: string;
 
-  @Column({ nullable: true })
-  localPath?: string;
+  @Column()
+  localPath: string;
 
   @Column({ type: "varchar", length: 40, nullable: true })
   lastProcessedCommit?: string;

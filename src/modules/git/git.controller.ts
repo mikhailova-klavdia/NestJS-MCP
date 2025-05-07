@@ -8,14 +8,14 @@ import {
 } from "@nestjs/common";
 import { GitService } from "./git.service";
 import { CloneDto } from "./dto/git.dto";
-import { Queue } from 'bullmq';
+import { Queue } from "bullmq";
 import { InjectQueue } from "@nestjs/bullmq";
 
 @Controller("git")
 export class GitController {
   constructor(
-    private readonly gitService: GitService,
-    @InjectQueue('indexing') private readonly indexQueue: Queue,
+    private readonly _gitService: GitService,
+    @InjectQueue("indexing") private readonly indexQueue: Queue
   ) {}
 
   @Post("clone")
@@ -27,11 +27,17 @@ export class GitController {
     }
 
     try {
-      const project = await this.gitService.cloneRepository(
+      const project = await this._gitService.cloneRepository(
         body.repoUrl,
         body.projectName
       );
-      return { message: "Repository cloned & processed successfully", project };
+
+      await this.indexQueue.add("index", { projectId: project.id });
+      
+      return {
+        message: "Repository cloned & processed successfully",
+        project,
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }
@@ -39,7 +45,7 @@ export class GitController {
 
   @Patch(":projectId/poll")
   async pollProject(@Param("projectId") projectId: number) {
-    await this.gitService.pollProject(projectId);
+    await this._gitService.pollProject(projectId);
     return { message: `Project ${projectId} polled successfully` };
   }
 }

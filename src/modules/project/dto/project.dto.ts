@@ -17,5 +17,5 @@ export class ProjectDto {
   readonly repoUrl?: string;
 
   @IsString()
-  localPath?: string;
+  localPath: string;
 }
