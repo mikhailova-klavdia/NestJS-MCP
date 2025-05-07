@@ -15,7 +15,7 @@ import { InjectQueue } from "@nestjs/bullmq";
 export class GitController {
   constructor(
     private readonly _gitService: GitService,
-    @InjectQueue("code-indexing") private readonly indexQueue: Queue
+    @InjectQueue("code-indexing") private readonly _indexQueue: Queue
   ) {}
 
   @Post("clone")
@@ -32,7 +32,7 @@ export class GitController {
         body.projectName
       );
 
-      await this.indexQueue.add("index", { projectId: project.id });
+      await this._indexQueue.add("index", { projectId: project.id });
       
       return {
         message: "Repository cloned & processed successfully",
