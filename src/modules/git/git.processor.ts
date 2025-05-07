@@ -4,7 +4,9 @@ import { Injectable, Logger } from "@nestjs/common";
 import { GitService } from "./git.service";
 
 @Injectable()
-@Processor("code-indexing")
+@Processor("code-indexing", {
+  lockDuration: 1000 * 60 * 5, // 5 minutes
+})
 export class GitProcessor extends WorkerHost {
   private readonly _logger = new Logger(GitProcessor.name);
 
