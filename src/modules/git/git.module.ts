@@ -6,11 +6,16 @@ import { EmbedConfig } from '../../embedding-config';
 import { CodeNodeExtractorService } from '../identifiers/code-node-constructor';
 import { CodeNodeEntity } from '../identifiers/code-node.entity';
 import { ProjectEntity } from '../project/project.entity';
+import { GitProcessor } from './git.processor';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity])],
+  imports: [
+    BullModule.registerQueue({ name: "code-indexing" }),
+    TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity])
+  ],
   controllers: [GitController],
-  providers: [GitService, CodeNodeExtractorService, EmbedConfig],
+  providers: [GitService, CodeNodeExtractorService, EmbedConfig, GitProcessor],
   exports: [CodeNodeExtractorService, GitService],
 })
 export class GitModule {}

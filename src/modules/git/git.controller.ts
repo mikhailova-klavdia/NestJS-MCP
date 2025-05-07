@@ -15,7 +15,7 @@ import { InjectQueue } from "@nestjs/bullmq";
 export class GitController {
   constructor(
     private readonly _gitService: GitService,
-    @InjectQueue("indexing") private readonly indexQueue: Queue
+    @InjectQueue("code-indexing") private readonly indexQueue: Queue
   ) {}
 
   @Post("clone")
