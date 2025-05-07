@@ -1,7 +1,7 @@
 import { Processor, WorkerHost, OnWorkerEvent } from "@nestjs/bullmq";
 import { Job } from "bullmq";
 import { Injectable, Logger } from "@nestjs/common";
-import { GitService } from "./git.service";
+import { GitService } from "../git.service";
 
 @Injectable()
 @Processor("code-indexing", {
