@@ -6,8 +6,8 @@ import { EntryPoint } from './entities/code-node.entity';
 import { ExtractedIdentifier } from 'src/utils/types';
 
 @Injectable()
-export class CodeNodeExtractorService {
-  private readonly logger = new Logger(CodeNodeExtractorService.name);
+export class CodeNodeExtractor {
+  private readonly logger = new Logger(CodeNodeExtractor.name);
   /**
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
    */

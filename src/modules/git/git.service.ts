@@ -11,7 +11,7 @@ import { ProjectEntity } from "../project/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
 import {
-  CodeNodeExtractorService,
+  CodeNodeExtractor,
   ExtractedIdentifier,
 } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
@@ -29,7 +29,7 @@ export class GitService {
     @InjectRepository(CodeNodeEntity)
     private readonly _identifierRepo: Repository<CodeNodeEntity>,
 
-    private readonly _extractor: CodeNodeExtractorService,
+    private readonly _extractor: CodeNodeExtractor,
 
     private readonly _embeddingService: EmbedConfig,
 

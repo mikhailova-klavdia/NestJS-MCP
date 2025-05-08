@@ -3,12 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmbedConfig } from 'src/embedding-config';
 import { CodeNodeEntity } from './entities/code-node.entity';
 import { IdentifierService } from './identifier.service';
-import { CodeNodeExtractorService } from './code-node-constructor';
+import { CodeNodeExtractor } from './code-node-constructor';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CodeNodeEntity])],
   controllers: [],
-  providers: [IdentifierService, EmbedConfig, CodeNodeExtractorService],
-  exports: [IdentifierService, EmbedConfig, CodeNodeExtractorService],
+  providers: [IdentifierService, EmbedConfig, CodeNodeExtractor],
+  exports: [IdentifierService, EmbedConfig, CodeNodeExtractor],
 })
 export class IdentifierModule {}
