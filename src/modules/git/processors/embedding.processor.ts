@@ -3,7 +3,7 @@ import { Job } from "bullmq";
 import { Injectable, Logger } from "@nestjs/common";
 import { GitService } from "../git.service";
 import { ProjectEntity } from "src/modules/project/project.entity";
-import { ExtractedIdentifier } from "src/modules/identifiers/code-node-constructor";
+import { ExtractedIdentifier } from "src/utils/types";
 
 @Injectable()
 @Processor("code-embedding", {

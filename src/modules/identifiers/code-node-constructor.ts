@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as ts from "typescript";
 import { EntryPoint } from "./entities/code-node.entity";
-import { ExtractedIdentifier } from "src/utils/types";
+import { ExtractedEdge, ExtractedIdentifier } from "src/utils/types";
 
 @Injectable()
 export class CodeNodeExtractor {

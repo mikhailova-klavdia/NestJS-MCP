@@ -12,11 +12,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
 import {
   CodeNodeExtractor,
-  ExtractedIdentifier,
 } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
+import { ExtractedIdentifier } from "src/utils/types";
 
 @Injectable()
 export class GitService {
