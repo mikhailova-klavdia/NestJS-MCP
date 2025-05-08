@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { EmbedConfig } from "../../embedding-config";
-import { SimilarityService } from "src/modules/rag/similarity.service";
+import { cosineSimilarity } from "src/utils/similarity.util";
 import { CodeNodeEntity } from "./code-node.entity";
 
 @Injectable()
@@ -10,8 +10,7 @@ export class IdentifierService {
   constructor(
     @InjectRepository(CodeNodeEntity)
     private readonly _identifierRepository: Repository<CodeNodeEntity>,
-    private readonly _embeddingService: EmbedConfig,
-    private readonly _similarityService: SimilarityService
+    private readonly _embeddingService: EmbedConfig
   ) {}
 
   async getAllIdentifiers(): Promise<CodeNodeEntity[]> {
@@ -48,10 +47,7 @@ export class IdentifierService {
 
     for (const ident of identifiers) {
       if (ident.embedding) {
-        const similarity = this._similarityService.cosineSimilarity(
-          queryEmbedding,
-          ident.embedding
-        );
+        const similarity = cosineSimilarity(queryEmbedding, ident.embedding);
         if (similarity > maxSimilarity) {
           maxSimilarity = similarity;
           relevant = ident;
@@ -72,10 +68,7 @@ export class IdentifierService {
     for (const ident of identifiers) {
       if (!ident.embedding) continue;
 
-      const similarity = this._similarityService.cosineSimilarity(
-        queryEmbedding,
-        ident.embedding
-      );
+      const similarity = cosineSimilarity(queryEmbedding, ident.embedding);
 
       if (relevant.length < n) {
         relevant.push({ identifier: ident, similarity });
