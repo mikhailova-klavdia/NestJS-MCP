@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as ts from 'typescript';
-import { EntryPoint } from './entities/code-node.entity';
-import { ExtractedIdentifier } from 'src/utils/types';
+import { Injectable, Logger } from "@nestjs/common";
+import * as fs from "fs";
+import * as path from "path";
+import * as ts from "typescript";
+import { EntryPoint } from "./entities/code-node.entity";
+import { ExtractedIdentifier } from "src/utils/types";
 
 @Injectable()
 export class CodeNodeExtractor {
@@ -11,7 +11,11 @@ export class CodeNodeExtractor {
   /**
    * Recursively collects all files with the specified extension from a directory and its subdirectories.
    */
-  private getAllFiles(dir: string, extension: string, files: string[] = []): string[] {
+  private getAllFiles(
+    dir: string,
+    extension: string,
+    files: string[] = []
+  ): string[] {
     // if a file gets passed, return the file path
     if (fs.existsSync(dir) && fs.statSync(dir).isFile()) {
       if (dir.endsWith(extension)) {
@@ -36,20 +40,36 @@ export class CodeNodeExtractor {
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
-  private extractIdentifiersFromFile(filePath: string, folderPath: string): ExtractedIdentifier[] {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+  private extractIdentifiersFromFile(
+    filePath: string,
+    folderPath: string
+  ): ExtractedIdentifier[] {
+    const content = fs.readFileSync(filePath, "utf8");
+    const sourceFile = ts.createSourceFile(
+      filePath,
+      content,
+      ts.ScriptTarget.Latest,
+      true
+    );
     const identifiers: ExtractedIdentifier[] = [];
 
     const visit = (node: ts.Node) => {
-      if (ts.isImportDeclaration(node) || ts.isImportClause(node) || ts.isImportSpecifier(node)) {
+      if (
+        ts.isImportDeclaration(node) ||
+        ts.isImportClause(node) ||
+        ts.isImportSpecifier(node)
+      ) {
         return;
       }
 
       if (ts.isIdentifier(node)) {
         // grab identifier context
         const nodeContext = this.getDeclarationType(node);
-        const entryPoints = this.findEntryPoints(node.text, folderPath, filePath);
+        const entryPoints = this.findEntryPoints(
+          node.text,
+          folderPath,
+          filePath
+        );
 
         identifiers.push({
           name: node.text,
@@ -111,7 +131,7 @@ export class CodeNodeExtractor {
    * extracts identifiers from each, and returns a list of identifier data.
    */
   getIdentifiersFromFolder(folderPath: string): ExtractedIdentifier[] {
-    const tsFiles = this.getAllFiles(folderPath, '.ts');
+    const tsFiles = this.getAllFiles(folderPath, ".ts");
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
@@ -138,11 +158,16 @@ export class CodeNodeExtractor {
     identifierDeclationFile: string
   ): EntryPoint[] {
     const entryPoints: EntryPoint[] = [];
-    const files = this.getAllFiles(folderPath, 'ts');
+    const files = this.getAllFiles(folderPath, "ts");
 
     files.forEach((file) => {
-      const content = fs.readFileSync(file, 'utf8');
-      const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
+      const content = fs.readFileSync(file, "utf8");
+      const sourceFile = ts.createSourceFile(
+        file,
+        content,
+        ts.ScriptTarget.Latest,
+        true
+      );
 
       // skip the file in which the method/file is originally declared
       if (file === identifierDeclationFile) {
@@ -168,7 +193,10 @@ export class CodeNodeExtractor {
               return;
             }
             // check for named imports like import { Item } from
-            if (importClause.namedBindings && ts.isNamedImports(importClause.namedBindings)) {
+            if (
+              importClause.namedBindings &&
+              ts.isNamedImports(importClause.namedBindings)
+            ) {
               const elements = importClause.namedBindings.elements;
               for (const element of elements) {
                 if (element.name.text === identifier) {
@@ -190,8 +218,9 @@ export class CodeNodeExtractor {
       visit(sourceFile);
     });
 
-    this.logger.log(`Found ${entryPoints.length} entry point(s) for identifier "${identifier}"`);
+    this.logger.log(
+      `Found ${entryPoints.length} entry point(s) for identifier "${identifier}"`
+    );
     return entryPoints;
   }
 }
-
