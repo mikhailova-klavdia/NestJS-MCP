@@ -156,9 +156,7 @@ export class GitService {
       await this._identifierRepo.delete({ project, filePath: relPath });
 
       const { identifiers, edges} = this._extractor.getIdentifiersFromFolder(absPath);
-      // …and save back into the database
-      const identifiersToSave: CodeNodeEntity[] = [];
-
+      
       const batchSize = 50;
 
       for (let i = 0; i < identifiers.length; i += batchSize) {
@@ -174,9 +172,6 @@ export class GitService {
           `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
         );
       }
-
-      // save all identifiers in one batch
-      await this._identifierRepo.save(identifiersToSave);
     }
 
     project.lastProcessedCommit = remoteHead;
