@@ -1,6 +1,10 @@
 import { EntryPoint } from "./types";
 import * as fs from "fs";
 import * as ts from "typescript";
+import { getAllFiles } from "./files";
+import { Logger } from "@nestjs/common";
+
+const logger = new Logger("ImportFinder");
 
 export function findEntryPoints(
   identifier: string,
@@ -8,7 +12,7 @@ export function findEntryPoints(
   identifierDeclationFile: string
 ): EntryPoint[] {
   const entryPoints: EntryPoint[] = [];
-  const files = this.getAllFiles(folderPath, "ts");
+  const files = getAllFiles(folderPath, "ts");
 
   files.forEach((file) => {
     const content = fs.readFileSync(file, "utf8");
@@ -68,7 +72,7 @@ export function findEntryPoints(
     visit(sourceFile);
   });
 
-  this.logger.log(
+  logger.log(
     `Found ${entryPoints.length} entry point(s) for identifier "${identifier}"`
   );
   return entryPoints;
