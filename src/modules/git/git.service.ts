@@ -14,6 +14,7 @@ import { CodeNodeExtractor } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
+import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 
 @Injectable()
 export class GitService {
@@ -26,12 +27,18 @@ export class GitService {
     @InjectRepository(CodeNodeEntity)
     private readonly _identifierRepo: Repository<CodeNodeEntity>,
 
+    @InjectRepository(CodeEdgeEntity)
+    private readonly _edgeRepo: Repository<CodeEdgeEntity>,
+
     private readonly _extractor: CodeNodeExtractor,
 
     private readonly _embeddingService: EmbedConfig,
 
     @InjectQueue("code-embedding")
-    private readonly embeddingQueue: Queue
+    private readonly _embeddingQueue: Queue,
+
+    @InjectQueue("edge-save")
+    private readonly _edgeQueue: Queue
   ) {
     if (!fs.existsSync(this._basePath)) {
       fs.mkdirSync(this._basePath, { recursive: true });
@@ -76,29 +83,48 @@ export class GitService {
 
   async processRepository(project: ProjectEntity) {
     // get identifiers from files cloned
-    const { identifiers, edges} = this._extractor.getIdentifiersFromFolder(
+    const { identifiers, edges } = this._extractor.getIdentifiersFromFolder(
       project.localPath
     );
+
+    console.log(edges);
     const batchSize = 50;
 
     for (let i = 0; i < identifiers.length; i += batchSize) {
       const batch = identifiers.slice(i, i + batchSize);
 
-      await this.embeddingQueue.add(
+      await this._embeddingQueue.add(
         "batch",
         { batch, project },
         { removeOnComplete: true }
       );
 
       console.log(
-        `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
+        `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length} identifiers`
+      );
+    }
+
+    for (let i = 0; i < edges.length; i += batchSize) {
+      const batch = edges.slice(i, i + batchSize);
+
+      await this._edgeQueue.add(
+        "save-edge-batch",
+        { batch },
+        { removeOnComplete: true }
+      );
+
+      console.log(
+        `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length} edges`
       );
     }
 
     return project;
   }
 
-  async processBatchOfCodeNodes(batch: CodeNodeEntity[], project: ProjectEntity) {
+  async processBatchOfCodeNodes(
+    batch: CodeNodeEntity[],
+    project: ProjectEntity
+  ) {
     const embeddedBatch = await Promise.all(
       batch.map(async (codeNode) => {
         const embedding = await this._embeddingService.embed(
@@ -113,6 +139,10 @@ export class GitService {
     );
 
     await this._identifierRepo.save(embeddedBatch);
+  }
+
+  async saveBatchOfEdges(batch: CodeEdgeEntity[]) {
+    await this._edgeRepo.save(batch);
   }
 
   async pollProject(projectId: number) {
@@ -155,14 +185,15 @@ export class GitService {
 
       await this._identifierRepo.delete({ project, filePath: relPath });
 
-      const { identifiers, edges} = this._extractor.getIdentifiersFromFolder(absPath);
-      
+      const { identifiers, edges } =
+        this._extractor.getIdentifiersFromFolder(absPath);
+
       const batchSize = 50;
 
       for (let i = 0; i < identifiers.length; i += batchSize) {
         const batch = identifiers.slice(i, i + batchSize);
 
-        await this.embeddingQueue.add(
+        await this._embeddingQueue.add(
           "batch",
           { batch, project },
           { removeOnComplete: true }

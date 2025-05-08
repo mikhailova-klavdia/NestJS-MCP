@@ -9,14 +9,16 @@ import { ProjectEntity } from "../project/project.entity";
 import { GitProcessor } from "./processors/code-indexing.processor";
 import { BullModule } from "@nestjs/bullmq";
 import { EmbeddingProcessor } from "./processors/embedding.processor";
+import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 
 @Module({
   imports: [
     BullModule.registerQueue(
       { name: "code-indexing" },
-      { name: "code-embedding" }
+      { name: "code-embedding" },
+      { name: "edge-save" }
     ),
-    TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity]),
+    TypeOrmModule.forFeature([ProjectEntity, CodeNodeEntity, CodeEdgeEntity]),
   ],
   controllers: [GitController],
   providers: [
