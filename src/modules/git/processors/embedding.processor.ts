@@ -3,7 +3,7 @@ import { Job } from "bullmq";
 import { Injectable, Logger } from "@nestjs/common";
 import { GitService } from "../git.service";
 import { ProjectEntity } from "src/modules/project/project.entity";
-import { ExtractedIdentifier } from "src/utils/types";
+import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 
 @Injectable()
 @Processor("code-embedding", {
@@ -16,7 +16,7 @@ export class EmbeddingProcessor extends WorkerHost {
     super();
   }
 
-  async process(job: Job<{ batch: ExtractedIdentifier[]; project: ProjectEntity }>) {
+  async process(job: Job<{ batch: CodeNodeEntity[]; project: ProjectEntity }>) {
     this._logger.log(`🔄 Processing batch of ${job.data.batch.length} identifiers`);
     await this._gitService.processBatch(job.data.batch, job.data.project);
   }

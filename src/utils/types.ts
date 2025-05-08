@@ -1,13 +1,5 @@
 import { Declaration } from "typescript";
 
-export type ExtractedIdentifier = {
-  identifier: string;
-  context?: ContextV1;
-  filePath?: string;
-  codeSnippet?: string;
-  entryPoints?: EntryPoint[];
-};
-
 export type ContextV1 = {
   declarationType: Declaration | string | null;
   entryPoints?: EntryPoint[] | null;

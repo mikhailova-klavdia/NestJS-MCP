@@ -10,13 +10,10 @@ import { Repository } from "typeorm";
 import { ProjectEntity } from "../project/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
-import {
-  CodeNodeExtractor,
-} from "../identifiers/code-node-constructor";
+import { CodeNodeExtractor } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
-import { ExtractedIdentifier } from "src/utils/types";
 
 @Injectable()
 export class GitService {
@@ -101,21 +98,17 @@ export class GitService {
     return project;
   }
 
-  async processBatch(batch: ExtractedIdentifier[], project: ProjectEntity) {
+  async processBatch(batch: CodeNodeEntity[], project: ProjectEntity) {
     const embeddedBatch = await Promise.all(
-      batch.map(async (ident) => {
-        const embedding = await this._embeddingService.embed(ident.identifier);
-        const entity = new CodeNodeEntity();
-        entity.identifier = ident.identifier;
-        entity.filePath = ident.filePath || "";
-        entity.embedding = embedding;
-        entity.project = project;
-        entity.context = ident.context || {
-          declarationType: null,
-          codeSnippet: "",
-          entryPoints: [],
-        };
-        return entity;
+      batch.map(async (codeNode) => {
+        const embedding = await this._embeddingService.embed(
+          codeNode.identifier
+        );
+
+        codeNode.embedding = embedding;
+        codeNode.project = project;
+
+        return codeNode;
       })
     );
 

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import * as fs from "fs";
 import * as ts from "typescript";
-import { ExtractedIdentifier } from "src/utils/types";
 import { getAllFiles } from "src/utils/files";
 import { findEntryPoints } from "src/utils/import-finder";
+import { CodeNodeEntity } from "./entities/code-node.entity";
 
 @Injectable()
 export class CodeNodeExtractor {
@@ -14,7 +14,7 @@ export class CodeNodeExtractor {
   private extractIdentifiersFromFile(
     filePath: string,
     folderPath: string
-  ): ExtractedIdentifier[] {
+  ): CodeNodeEntity[] {
     const content = fs.readFileSync(filePath, "utf8");
     const sourceFile = ts.createSourceFile(
       filePath,
@@ -22,7 +22,7 @@ export class CodeNodeExtractor {
       ts.ScriptTarget.Latest,
       true
     );
-    const identifiers: ExtractedIdentifier[] = [];
+    const identifiers: CodeNodeEntity[] = [];
 
     const visit = (node: ts.Node) => {
       if (
@@ -33,25 +33,10 @@ export class CodeNodeExtractor {
         return;
       }
 
-      if (ts.isIdentifier(node)) {
-        // grab identifier context
-        const nodeContext = this.getDeclarationType(node);
-        const entryPoints = findEntryPoints(
-          node.text,
-          folderPath,
-          filePath
-        );
+      const codeNode = this.handleIdentifier(node, folderPath, filePath)
 
-        identifiers.push({
-          identifier: node.text,
-          context: {
-            declarationType: nodeContext.declarationType,
-            codeSnippet: nodeContext.codeSnippet,
-            entryPoints: entryPoints,
-            importRequirements: null,
-          },
-          filePath,
-        });
+      if (codeNode) {
+        identifiers.push(codeNode)
       }
 
       ts.forEachChild(node, visit);
@@ -59,6 +44,30 @@ export class CodeNodeExtractor {
 
     visit(sourceFile);
     return identifiers;
+  }
+
+  private handleIdentifier(
+    node: ts.Node,
+    folderPath: string,
+    filePath: string
+  ) {
+    if (ts.isIdentifier(node)) {
+      const codeNode = new CodeNodeEntity();
+      // grab identifier context
+      const nodeContext = this.getDeclarationType(node);
+      const entryPoints = findEntryPoints(node.text, folderPath, filePath);
+
+      codeNode.identifier = node.text;
+      codeNode.context = {
+        declarationType: nodeContext.declarationType,
+        codeSnippet: nodeContext.codeSnippet,
+        entryPoints: entryPoints,
+        importRequirements: null,
+      };
+      codeNode.filePath = filePath;
+
+      return codeNode
+    }
   }
 
   private getDeclarationType(node: ts.Node): {
@@ -101,13 +110,13 @@ export class CodeNodeExtractor {
    * Scans the given folder recursively, reads all `.ts` files,
    * extracts identifiers from each, and returns a list of identifier data.
    */
-  getIdentifiersFromFolder(folderPath: string): ExtractedIdentifier[] {
+  getIdentifiersFromFolder(folderPath: string): CodeNodeEntity[] {
     const tsFiles = getAllFiles(folderPath, ".ts");
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
 
-    const results: ExtractedIdentifier[] = [];
+    const results: CodeNodeEntity[] = [];
     let count = 0;
 
     for (const file of tsFiles) {
