@@ -12,8 +12,6 @@ export type EntryPoint = {
   filepath: string;
 };
 
-export interface ExtractedEdge {
-  sourceId: string;
-  targetId: string;
-  relType: "IMPORTS" | "CALLS" | "EXTENDS" | "IMPLEMENTS";
+export enum RelationshipType {
+  PARAMETER = "PARAMETER"
 }

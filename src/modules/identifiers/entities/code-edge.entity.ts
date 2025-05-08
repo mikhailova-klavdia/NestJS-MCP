@@ -1,17 +1,15 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
 import { CodeNodeEntity } from "./code-node.entity";
+import { RelationshipType } from "src/utils/types";
 
 @Entity()
 export class CodeEdgeEntity {
-  @PrimaryColumn()
-  sourceId: string;
-
-  @PrimaryColumn()
-  targetId: string;
-
-  @PrimaryColumn()
-  relType: string;
-
+  @PrimaryColumn({
+    type: 'enum',
+    enum: RelationshipType,
+  })
+  relType: RelationshipType;
+  
   @ManyToOne(() => CodeNodeEntity)
   @JoinColumn({ name: "sourceId" })
   source: CodeNodeEntity;
