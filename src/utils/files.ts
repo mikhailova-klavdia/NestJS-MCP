@@ -19,7 +19,7 @@ export function getAllFiles(
     const fullPath = path.join(dir, entry);
     const stat = fs.statSync(fullPath);
     if (stat.isDirectory()) {
-      this.getAllFiles(fullPath, extension, files);
+      getAllFiles(fullPath, extension, files);
     } else if (fullPath.endsWith(extension)) {
       files.push(fullPath);
     }

@@ -1,42 +1,13 @@
 import { Injectable, Logger } from "@nestjs/common";
 import * as fs from "fs";
-import * as path from "path";
 import * as ts from "typescript";
 import { EntryPoint } from "./entities/code-node.entity";
 import { ExtractedIdentifier } from "src/utils/types";
+import { getAllFiles } from "src/utils/files";
 
 @Injectable()
 export class CodeNodeExtractor {
   private readonly logger = new Logger(CodeNodeExtractor.name);
-  /**
-   * Recursively collects all files with the specified extension from a directory and its subdirectories.
-   */
-  private getAllFiles(
-    dir: string,
-    extension: string,
-    files: string[] = []
-  ): string[] {
-    // if a file gets passed, return the file path
-    if (fs.existsSync(dir) && fs.statSync(dir).isFile()) {
-      if (dir.endsWith(extension)) {
-        files.push(dir);
-      }
-      return files;
-    }
-
-    const entries = fs.readdirSync(dir);
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry);
-      const stat = fs.statSync(fullPath);
-      if (stat.isDirectory()) {
-        this.getAllFiles(fullPath, extension, files);
-      } else if (fullPath.endsWith(extension)) {
-        files.push(fullPath);
-      }
-    }
-    return files;
-  }
-
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
@@ -131,7 +102,7 @@ export class CodeNodeExtractor {
    * extracts identifiers from each, and returns a list of identifier data.
    */
   getIdentifiersFromFolder(folderPath: string): ExtractedIdentifier[] {
-    const tsFiles = this.getAllFiles(folderPath, ".ts");
+    const tsFiles = getAllFiles(folderPath, ".ts");
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
@@ -158,7 +129,7 @@ export class CodeNodeExtractor {
     identifierDeclationFile: string
   ): EntryPoint[] {
     const entryPoints: EntryPoint[] = [];
-    const files = this.getAllFiles(folderPath, "ts");
+    const files = getAllFiles(folderPath, "ts");
 
     files.forEach((file) => {
       const content = fs.readFileSync(file, "utf8");
