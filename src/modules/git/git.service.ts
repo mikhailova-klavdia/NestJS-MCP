@@ -98,7 +98,7 @@ export class GitService {
     return project;
   }
 
-  async processBatch(batch: CodeNodeEntity[], project: ProjectEntity) {
+  async processBatchOfCodeNodes(batch: CodeNodeEntity[], project: ProjectEntity) {
     const embeddedBatch = await Promise.all(
       batch.map(async (codeNode) => {
         const embedding = await this._embeddingService.embed(

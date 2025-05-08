@@ -18,7 +18,7 @@ export class EmbeddingProcessor extends WorkerHost {
 
   async process(job: Job<{ batch: CodeNodeEntity[]; project: ProjectEntity }>) {
     this._logger.log(`🔄 Processing batch of ${job.data.batch.length} identifiers`);
-    await this._gitService.processBatch(job.data.batch, job.data.project);
+    await this._gitService.processBatchOfCodeNodes(job.data.batch, job.data.project);
   }
 
   @OnWorkerEvent("completed")
