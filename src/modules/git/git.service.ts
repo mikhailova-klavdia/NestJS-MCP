@@ -10,8 +10,13 @@ import { Repository } from "typeorm";
 import { ProjectEntity } from "../project/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
-import { CodeNodeExtractorService } from "../identifiers/code-node-constructor";
+import {
+  CodeNodeExtractorService,
+  ExtractedIdentifier,
+} from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/code-node.entity";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 
 @Injectable()
 export class GitService {
@@ -26,7 +31,10 @@ export class GitService {
 
     private readonly _extractor: CodeNodeExtractorService,
 
-    private readonly _embeddingService: EmbedConfig
+    private readonly _embeddingService: EmbedConfig,
+
+    @InjectQueue("code-embedding")
+    private readonly embeddingQueue: Queue
   ) {
     if (!fs.existsSync(this._basePath)) {
       fs.mkdirSync(this._basePath, { recursive: true });
@@ -71,8 +79,9 @@ export class GitService {
 
   async processRepository(project: ProjectEntity) {
     // get identifiers from files cloned
-    const rawIdentifiers =
-      this._extractor.getIdentifiersFromFolder(project.localPath);
+    const rawIdentifiers = this._extractor.getIdentifiersFromFolder(
+      project.localPath
+    );
     const identifiersToSave: CodeNodeEntity[] = [];
 
     const batchSize = 50;
@@ -80,34 +89,39 @@ export class GitService {
     for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
       const batch = rawIdentifiers.slice(i, i + batchSize);
 
-      const embeddedBatch = await Promise.all(
-        batch.map(async (ident) => {
-          const embedding = await this._embeddingService.embed(ident.name);
-          const entity = new CodeNodeEntity();
-          entity.identifier = ident.name;
-          entity.filePath = ident.filePath || "";
-          entity.embedding = embedding;
-          entity.project = project;
-          entity.context = ident.context || {
-            declarationType: null,
-            codeSnippet: "",
-            entryPoints: [],
-          };
-          return entity;
-        })
+      await this.embeddingQueue.add(
+        "batch",
+        { batch, project },
+        { removeOnComplete: true }
       );
-
-      identifiersToSave.push(...embeddedBatch);
 
       console.log(
         `🔄 Processed ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
       );
     }
 
-    // save all identifiers in one batch
-    await this._identifierRepo.save(identifiersToSave);
-
     return project;
+  }
+
+  async processBatch(batch: ExtractedIdentifier[], project: ProjectEntity) {
+    const embeddedBatch = await Promise.all(
+      batch.map(async (ident) => {
+        const embedding = await this._embeddingService.embed(ident.name);
+        const entity = new CodeNodeEntity();
+        entity.identifier = ident.name;
+        entity.filePath = ident.filePath || "";
+        entity.embedding = embedding;
+        entity.project = project;
+        entity.context = ident.context || {
+          declarationType: null,
+          codeSnippet: "",
+          entryPoints: [],
+        };
+        return entity;
+      })
+    );
+
+    await this._identifierRepo.save(embeddedBatch);
   }
 
   async pollProject(projectId: number) {

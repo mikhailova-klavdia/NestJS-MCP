@@ -21,9 +21,7 @@ import { McpModule } from "./modules/mcp/mcp.module";
         port: Number(process.env.REDIS_PORT) || 6379,
       },
     }),
-    BullModule.registerQueue(
-      { name: "code-indexing"},
-  ),
+    BullModule.registerQueue({ name: "code-indexing" }),
     DataModule,
     RagModule,
     GitModule,

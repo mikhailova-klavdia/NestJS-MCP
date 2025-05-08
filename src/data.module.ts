@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       synchronize: true,
-      dropSchema: false,
+      dropSchema: true,
     }),
 
   ],

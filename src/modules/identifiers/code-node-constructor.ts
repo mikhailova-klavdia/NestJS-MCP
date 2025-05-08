@@ -194,7 +194,7 @@ export class CodeNodeExtractorService {
   }
 }
 
-type ExtractedIdentifier = {
+export type ExtractedIdentifier = {
   name: string;
   context?: ContextV1;
   filePath?: string;

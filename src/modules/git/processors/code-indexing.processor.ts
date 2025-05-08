@@ -20,7 +20,7 @@ export class GitProcessor extends WorkerHost {
 
     const project = await this._gitService.findProjectById(projectId);
     await this._gitService.processRepository(project);
-    
+
     this._logger.log(`✅ Finished indexing for project ${projectId}`);
   }
 
