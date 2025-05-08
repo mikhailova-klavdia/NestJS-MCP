@@ -23,6 +23,7 @@ export function handleFunctionDeclaration(
           folderPath,
           filePath
         );
+
         if (paramIdentifier) {
           const edge = new CodeEdgeEntity();
           edge.relType = RelationshipType.PARAMETER;

@@ -45,9 +45,9 @@ export class CodeNodeExtractor {
       }
 
       if (extractedEdges) {
-        extractedEdges.push(...extractedEdges);
+        edges.push(...extractedEdges);
       }
-
+      
       ts.forEachChild(node, visit);
     };
 
