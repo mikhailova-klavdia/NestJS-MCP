@@ -14,7 +14,7 @@ import {
   CodeNodeExtractorService,
   ExtractedIdentifier,
 } from "../identifiers/code-node-constructor";
-import { CodeNodeEntity } from "../identifiers/code-node.entity";
+import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
 

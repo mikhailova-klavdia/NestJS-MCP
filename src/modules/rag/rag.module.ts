@@ -3,7 +3,7 @@ import { RagService } from './rag.service';
 import { RagController } from './rag.controller';
 import { EmbedConfig } from '../../embedding-config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CodeNodeEntity } from '../identifiers/code-node.entity';
+import { CodeNodeEntity } from '../identifiers/entities/code-node.entity';
 import { IdentifierModule } from '../identifiers/identifier.module';
 
 @Module({

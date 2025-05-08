@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { ContextV1, EntryPoint } from './code-node.entity';
+import { EntryPoint } from './entities/code-node.entity';
+import { ExtractedIdentifier } from 'src/utils/types';
 
 @Injectable()
 export class CodeNodeExtractorService {
@@ -194,10 +195,3 @@ export class CodeNodeExtractorService {
   }
 }
 
-export type ExtractedIdentifier = {
-  name: string;
-  context?: ContextV1;
-  filePath?: string;
-  codeSnippet?: string;
-  entryPoints?: EntryPoint[];
-};
