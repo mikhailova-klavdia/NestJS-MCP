@@ -19,3 +19,9 @@ export type EntryPoint = {
   codeSnippet: string;
   filepath: string;
 };
+
+export interface ExtractedEdge {
+  sourceId: string;
+  targetId: string;
+  relType: "IMPORTS" | "CALLS" | "EXTENDS" | "IMPLEMENTS";
+}
