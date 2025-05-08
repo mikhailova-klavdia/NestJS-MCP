@@ -82,8 +82,6 @@ export class GitService {
     const rawIdentifiers = this._extractor.getIdentifiersFromFolder(
       project.localPath
     );
-    const identifiersToSave: CodeNodeEntity[] = [];
-
     const batchSize = 50;
 
     for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
@@ -96,7 +94,7 @@ export class GitService {
       );
 
       console.log(
-        `🔄 Processed ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+        `🔄 Enqueued ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
       );
     }
 
