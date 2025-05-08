@@ -39,7 +39,7 @@ export class CodeNodeExtractor {
         const entryPoints = findEntryPoints(node.text, folderPath, filePath);
 
         identifiers.push({
-          name: node.text,
+          identifier: node.text,
           context: {
             declarationType: nodeContext.declarationType,
             codeSnippet: nodeContext.codeSnippet,

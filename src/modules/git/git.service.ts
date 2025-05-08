@@ -104,9 +104,9 @@ export class GitService {
   async processBatch(batch: ExtractedIdentifier[], project: ProjectEntity) {
     const embeddedBatch = await Promise.all(
       batch.map(async (ident) => {
-        const embedding = await this._embeddingService.embed(ident.name);
+        const embedding = await this._embeddingService.embed(ident.identifier);
         const entity = new CodeNodeEntity();
-        entity.identifier = ident.name;
+        entity.identifier = ident.identifier;
         entity.filePath = ident.filePath || "";
         entity.embedding = embedding;
         entity.project = project;
@@ -171,27 +171,14 @@ export class GitService {
       for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
         const batch = rawIdentifiers.slice(i, i + batchSize);
 
-        const embeddedBatch = await Promise.all(
-          batch.map(async (ident) => {
-            const embedding = await this._embeddingService.embed(ident.name);
-            const entity = new CodeNodeEntity();
-            entity.identifier = ident.name;
-            entity.filePath = ident.filePath || "";
-            entity.embedding = embedding;
-            entity.project = project;
-            entity.context = ident.context || {
-              declarationType: null,
-              codeSnippet: "",
-              entryPoints: [],
-            };
-            return entity;
-          })
+        await this.embeddingQueue.add(
+          "batch",
+          { batch, project },
+          { removeOnComplete: true }
         );
 
-        identifiersToSave.push(...embeddedBatch);
-
         console.log(
-          `🔄 Processed ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+          `🔄 Enqueued ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
         );
       }
 

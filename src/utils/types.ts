@@ -1,7 +1,7 @@
 import { Declaration } from "typescript";
 
 export type ExtractedIdentifier = {
-  name: string;
+  identifier: string;
   context?: ContextV1;
   filePath?: string;
   codeSnippet?: string;
