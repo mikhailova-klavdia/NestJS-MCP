@@ -76,13 +76,13 @@ export class GitService {
 
   async processRepository(project: ProjectEntity) {
     // get identifiers from files cloned
-    const rawIdentifiers = this._extractor.getIdentifiersFromFolder(
+    const { identifiers, edges} = this._extractor.getIdentifiersFromFolder(
       project.localPath
     );
     const batchSize = 50;
 
-    for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
-      const batch = rawIdentifiers.slice(i, i + batchSize);
+    for (let i = 0; i < identifiers.length; i += batchSize) {
+      const batch = identifiers.slice(i, i + batchSize);
 
       await this.embeddingQueue.add(
         "batch",
@@ -91,7 +91,7 @@ export class GitService {
       );
 
       console.log(
-        `🔄 Enqueued ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+        `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
       );
     }
 
@@ -155,14 +155,14 @@ export class GitService {
 
       await this._identifierRepo.delete({ project, filePath: relPath });
 
-      const rawIdentifiers = this._extractor.getIdentifiersFromFolder(absPath);
+      const { identifiers, edges} = this._extractor.getIdentifiersFromFolder(absPath);
       // …and save back into the database
       const identifiersToSave: CodeNodeEntity[] = [];
 
       const batchSize = 50;
 
-      for (let i = 0; i < rawIdentifiers.length; i += batchSize) {
-        const batch = rawIdentifiers.slice(i, i + batchSize);
+      for (let i = 0; i < identifiers.length; i += batchSize) {
+        const batch = identifiers.slice(i, i + batchSize);
 
         await this.embeddingQueue.add(
           "batch",
@@ -171,7 +171,7 @@ export class GitService {
         );
 
         console.log(
-          `🔄 Enqueued ${Math.min(i + batchSize, rawIdentifiers.length)} / ${rawIdentifiers.length}`
+          `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
         );
       }
 

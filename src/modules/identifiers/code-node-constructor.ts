@@ -3,11 +3,9 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
-import {
-  handleFunctionDeclaration,
-  handleIdentifier,
-} from "./code-node-handler";
+import { handleFunctionDeclaration } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
+import { CodeGraph } from "src/utils/types";
 
 @Injectable()
 export class CodeNodeExtractor {
@@ -18,7 +16,7 @@ export class CodeNodeExtractor {
   private extractIdentifiersFromFile(
     filePath: string,
     folderPath: string
-  ): { identifiers: CodeNodeEntity[]; edges: CodeEdgeEntity[] } {
+  ): CodeGraph {
     const content = fs.readFileSync(filePath, "utf8");
     const sourceFile = ts.createSourceFile(
       filePath,
@@ -61,25 +59,33 @@ export class CodeNodeExtractor {
    * Scans the given folder recursively, reads all `.ts` files,
    * extracts identifiers from each, and returns a list of identifier data.
    */
-  getIdentifiersFromFolder(folderPath: string): CodeNodeEntity[] {
+  getIdentifiersFromFolder(folderPath: string): CodeGraph {
     const tsFiles = getAllFiles(folderPath, ".ts");
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
 
-    const results: CodeNodeEntity[] = [];
+    const identifiers: CodeNodeEntity[] = [];
+    const edges: CodeEdgeEntity[] = [];
+
     let count = 0;
 
     for (const file of tsFiles) {
-      const { identifiers, edges } = this.extractIdentifiersFromFile(file, folderPath);
-      results.push(...identifiers);
+      // pull out each file’s nodes + edges
+      const { identifiers: fileIds, edges: fileEdges } =
+        this.extractIdentifiersFromFile(file, folderPath);
+
+      // merge into our accumulators
+      identifiers.push(...fileIds);
+      edges.push(...fileEdges);
+
       this.logger.log(`Processed ${++count} / ${tsFiles.length} files`);
     }
 
     this.logger.log(
-      `✅ Finished extracting ${results.length} identifiers from ${tsFiles.length} files.`
+      `✅ Finished extracting ${identifiers.length} identifiers from ${tsFiles.length} files.`
     );
 
-    return results;
+    return { identifiers, edges };
   }
 }

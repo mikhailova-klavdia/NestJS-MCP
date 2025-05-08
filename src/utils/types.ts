@@ -1,3 +1,5 @@
+import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
+import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import { Declaration } from "typescript";
 
 export type ContextV1 = {
@@ -14,4 +16,9 @@ export type EntryPoint = {
 
 export enum RelationshipType {
   PARAMETER = "PARAMETER"
+}
+
+export type CodeGraph = {
+  identifiers: CodeNodeEntity[];
+  edges: CodeEdgeEntity[];
 }
