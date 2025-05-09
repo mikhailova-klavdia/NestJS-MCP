@@ -4,7 +4,7 @@ import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
 
-export function handleFunctionDeclaration(
+export function handleClassDeclaration(
   node: ts.Node,
   folderPath: string,
   filePath: string
@@ -12,10 +12,73 @@ export function handleFunctionDeclaration(
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
 
-  if (ts.isFunctionDeclaration(node) && node.name) {
-    const identifier = handleIdentifier(node.name, folderPath, filePath);
-    if (identifier) {
-      extractedIdentifiers.push(identifier);
+  if (ts.isClassDeclaration(node) && node.name) {
+    const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
+
+    if (classIdentifier) {
+      extractedIdentifiers.push(classIdentifier);
+
+      node.members.forEach((member) => {
+        // METHOD handling
+        const {
+          extractedIdentifiers: extractedMethodIdentifiers,
+          extractedEdges: extractedMethodEdges,
+        } = handleFunctionAndMethodDeclaration(
+          member,
+          folderPath,
+          filePath,
+          classIdentifier
+        );
+        extractedIdentifiers.push(...extractedMethodIdentifiers);
+        extractedEdges.push(...extractedMethodEdges);
+        // PROPERTY handling
+        if (ts.isPropertyDeclaration(member) && member.name) {
+          const property = handleIdentifier(member.name, folderPath, filePath);
+          if (property) {
+            extractedIdentifiers.push(property);
+            const edge = new CodeEdgeEntity();
+            edge.source = classIdentifier;
+            edge.target = property;
+            edge.relType = RelationshipType.PROPERTY;
+            extractedEdges.push(edge);
+          }
+        }
+      });
+    }
+  }
+
+  return { extractedIdentifiers, extractedEdges };
+}
+
+export function handleFunctionAndMethodDeclaration(
+  node: ts.Node,
+  folderPath: string,
+  filePath: string,
+  source?: CodeNodeEntity
+) {
+  const extractedIdentifiers: CodeNodeEntity[] = [];
+  const extractedEdges: CodeEdgeEntity[] = [];
+
+  if (
+    (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) &&
+    node.name
+  ) {
+    const functionIdentifier = handleIdentifier(
+      node.name,
+      folderPath,
+      filePath
+    );
+    if (functionIdentifier) {
+      extractedIdentifiers.push(functionIdentifier);
+
+      if (source) {
+        const edge = new CodeEdgeEntity();
+        edge.relType = RelationshipType.CLASS_METHOD;
+        edge.source = source;
+        edge.target = functionIdentifier;
+
+        extractedEdges.push(edge);
+      }
 
       node.parameters.forEach((param) => {
         const paramIdentifier = handleIdentifier(
@@ -27,7 +90,7 @@ export function handleFunctionDeclaration(
         if (paramIdentifier) {
           const edge = new CodeEdgeEntity();
           edge.relType = RelationshipType.PARAMETER;
-          edge.source = identifier;
+          edge.source = functionIdentifier;
           edge.target = paramIdentifier;
 
           extractedIdentifiers.push(paramIdentifier);

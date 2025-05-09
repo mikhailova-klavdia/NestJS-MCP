@@ -15,10 +15,12 @@ export type EntryPoint = {
 };
 
 export enum RelationshipType {
-  PARAMETER = "PARAMETER"
+  PARAMETER = "PARAMETER",
+  CLASS_METHOD = "CLASS_METHOD",
+  PROPERTY = "PROPERTY",
 }
 
 export type CodeGraph = {
   identifiers: CodeNodeEntity[];
   edges: CodeEdgeEntity[];
-}
+};

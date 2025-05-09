@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
-import { handleFunctionDeclaration } from "./code-node-handler";
+import { handleFunctionAndMethodDeclaration } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
 
@@ -38,7 +38,7 @@ export class CodeNodeExtractor {
 
       //const codeNode = handleIdentifier(node, folderPath, filePath)
       const { extractedIdentifiers, extractedEdges } =
-        handleFunctionDeclaration(node, folderPath, filePath);
+        handleFunctionAndMethodDeclaration(node, folderPath, filePath);
 
       if (extractedIdentifiers) {
         identifiers.push(...extractedIdentifiers);
