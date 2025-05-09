@@ -4,7 +4,7 @@ import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
 
-export function handleClassAndInterfaceDeclaration(
+export function handleClassAndInterfaceAndEnumDeclaration(
   node: ts.Node,
   folderPath: string,
   filePath: string
@@ -13,7 +13,9 @@ export function handleClassAndInterfaceDeclaration(
   const extractedEdges: CodeEdgeEntity[] = [];
 
   if (
-    (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
+    (ts.isClassDeclaration(node) ||
+      ts.isInterfaceDeclaration(node) ||
+      ts.isEnumDeclaration(node)) &&
     node.name
   ) {
     const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
@@ -34,6 +36,7 @@ export function handleClassAndInterfaceDeclaration(
         );
         extractedIdentifiers.push(...extractedMethodIdentifiers);
         extractedEdges.push(...extractedMethodEdges);
+
         // PROPERTY handling
         if (
           (ts.isPropertyDeclaration(member) ||
@@ -48,6 +51,19 @@ export function handleClassAndInterfaceDeclaration(
             edge.target = property;
             edge.relType = RelationshipType.PROPERTY;
             extractedEdges.push(edge);
+          }
+        }
+
+        // ENUM MEMBER
+        if (ts.isEnumMember(member)) {
+          const enumMember = handleIdentifier(member.name, folderPath, filePath) 
+          if (enumMember) {
+            extractedIdentifiers.push(enumMember) 
+            const edge = new CodeEdgeEntity();
+            edge.source = classIdentifier;
+            edge.target = enumMember;
+            edge.relType = RelationshipType.ENUM_MEMBER
+            extractedEdges.push(edge)
           }
         }
       });
@@ -82,7 +98,7 @@ export function handleFunctionAndMethodDeclaration(
 
       if (source) {
         const edge = new CodeEdgeEntity();
-        edge.relType = RelationshipType.CLASS_METHOD;
+        edge.relType = RelationshipType.METHOD;
         edge.source = source;
         edge.target = functionIdentifier;
 

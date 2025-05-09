@@ -16,8 +16,9 @@ export type EntryPoint = {
 
 export enum RelationshipType {
   PARAMETER = "PARAMETER",
-  CLASS_METHOD = "CLASS_METHOD",
+  METHOD = "METHOD",
   PROPERTY = "PROPERTY",
+  ENUM_MEMBER = "ENUM_MEMBER",
 }
 
 export type CodeGraph = {
