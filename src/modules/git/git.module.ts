@@ -6,10 +6,11 @@ import { EmbedConfig } from "../../embedding-config";
 import { CodeNodeExtractor } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { ProjectEntity } from "../project/project.entity";
-import { GitProcessor } from "./processors/code-indexing.processor";
 import { BullModule } from "@nestjs/bullmq";
 import { EmbeddingProcessor } from "./processors/embedding.processor";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
+import { EdgeSaveProcessor } from "./processors/save-edge.processor";
+import { GitProcessor } from "./processors/git.processor";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
     EmbedConfig,
     GitProcessor,
     EmbeddingProcessor,
+    EdgeSaveProcessor,
   ],
   exports: [CodeNodeExtractor, GitService],
 })
