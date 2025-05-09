@@ -4,7 +4,7 @@ import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import {
-  handleClassDeclaration,
+  handleClassAndInterfaceDeclaration,
   handleFunctionAndMethodDeclaration,
 } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
@@ -40,8 +40,8 @@ export class CodeNodeExtractor {
       }
 
       // Class declarations
-      if (ts.isClassDeclaration(node)) {
-        const { extractedIdentifiers, extractedEdges } = handleClassDeclaration(
+      if (ts.isClassDeclaration(node)|| ts.isInterfaceDeclaration(node)) {
+        const { extractedIdentifiers, extractedEdges } = handleClassAndInterfaceDeclaration(
           node,
           folderPath,
           filePath

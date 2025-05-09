@@ -4,7 +4,7 @@ import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
 
-export function handleClassDeclaration(
+export function handleClassAndInterfaceDeclaration(
   node: ts.Node,
   folderPath: string,
   filePath: string
@@ -12,7 +12,10 @@ export function handleClassDeclaration(
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
 
-  if (ts.isClassDeclaration(node) && node.name) {
+  if (
+    (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
+    node.name
+  ) {
     const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
     if (classIdentifier) {
@@ -32,7 +35,11 @@ export function handleClassDeclaration(
         extractedIdentifiers.push(...extractedMethodIdentifiers);
         extractedEdges.push(...extractedMethodEdges);
         // PROPERTY handling
-        if (ts.isPropertyDeclaration(member) && member.name) {
+        if (
+          (ts.isPropertyDeclaration(member) ||
+            ts.isPropertySignature(member)) &&
+          member.name
+        ) {
           const property = handleIdentifier(member.name, folderPath, filePath);
           if (property) {
             extractedIdentifiers.push(property);
@@ -60,7 +67,9 @@ export function handleFunctionAndMethodDeclaration(
   const extractedEdges: CodeEdgeEntity[] = [];
 
   if (
-    (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) &&
+    (ts.isFunctionDeclaration(node) ||
+      ts.isMethodDeclaration(node) ||
+      ts.isMethodSignature(node)) &&
     node.name
   ) {
     const functionIdentifier = handleIdentifier(
