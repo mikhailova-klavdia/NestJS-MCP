@@ -40,7 +40,7 @@ export class CodeNodeExtractor {
       }
 
       // Class declarations
-      if (ts.isClassDeclaration(node)|| ts.isInterfaceDeclaration(node)) {
+      if (ts.isClassDeclaration(node)|| ts.isInterfaceDeclaration(node) || ts.isEnumDeclaration(node)) {
         const { extractedIdentifiers, extractedEdges } = handleClassAndInterfaceAndEnumDeclaration(
           node,
           folderPath,
