@@ -3,7 +3,10 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
-import { handleFunctionAndMethodDeclaration } from "./code-node-handler";
+import {
+  handleClassDeclaration,
+  handleFunctionAndMethodDeclaration,
+} from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
 
@@ -36,18 +39,24 @@ export class CodeNodeExtractor {
         return;
       }
 
-      //const codeNode = handleIdentifier(node, folderPath, filePath)
-      const { extractedIdentifiers, extractedEdges } =
-        handleFunctionAndMethodDeclaration(node, folderPath, filePath);
-
-      if (extractedIdentifiers) {
+      // Class declarations
+      if (ts.isClassDeclaration(node)) {
+        const { extractedIdentifiers, extractedEdges } = handleClassDeclaration(
+          node,
+          folderPath,
+          filePath
+        );
         identifiers.push(...extractedIdentifiers);
-      }
-
-      if (extractedEdges) {
         edges.push(...extractedEdges);
       }
-      
+      // Functions / Methods
+      else if (ts.isFunctionDeclaration(node)) {
+        const { extractedIdentifiers, extractedEdges } =
+          handleFunctionAndMethodDeclaration(node, folderPath, filePath);
+        identifiers.push(...extractedIdentifiers);
+        edges.push(...extractedEdges);
+      }
+
       ts.forEachChild(node, visit);
     };
 
