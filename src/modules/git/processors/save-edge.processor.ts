@@ -14,8 +14,12 @@ export class EdgeSaveProcessor extends WorkerHost {
   }
 
   async process(job: Job<{ batch: CodeEdgeEntity[] }>) {
-    this._logger.log(`💾 Saving batch of ${job.data.batch.length} edges…`);
-    await this._gitService.saveBatchOfEdges(job.data.batch);
+    try {
+      this._logger.log(`💾 Saving batch of ${job.data.batch.length} edges…`);
+      await this._gitService.saveBatchOfEdges(job.data.batch);
+    } catch (err) {
+      this._logger.error(err);
+    }
   }
 
   @OnWorkerEvent("completed")

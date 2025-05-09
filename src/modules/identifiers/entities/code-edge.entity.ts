@@ -4,6 +4,7 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
+  Column,
 } from "typeorm";
 import { CodeNodeEntity } from "./code-node.entity";
 import { RelationshipType } from "src/utils/types";
@@ -13,7 +14,7 @@ export class CodeEdgeEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({
+  @Column({
     type: "enum",
     enum: RelationshipType,
   })
