@@ -87,7 +87,6 @@ export class GitService {
       project.localPath
     );
 
-    console.log(edges);
     const batchSize = 50;
 
     for (let i = 0; i < identifiers.length; i += batchSize) {
@@ -114,7 +113,7 @@ export class GitService {
       );
 
       console.log(
-        `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length} edges`
+        `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
       );
     }
 
