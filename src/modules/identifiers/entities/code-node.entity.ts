@@ -1,9 +1,9 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  PrimaryColumn,
 } from "typeorm";
 import { ProjectEntity } from "../../project/project.entity";
 import { Declaration } from "typescript";
@@ -22,7 +22,7 @@ export type EntryPoint = {
 
 @Entity()
 export class CodeNodeEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn("uuid")
   id: string;
 
   @Column()
@@ -34,10 +34,10 @@ export class CodeNodeEntity {
   @Column()
   filePath: string;
 
-  @Column("simple-array")
-  embedding: number[];
+  @Column("simple-array", { nullable: true })
+  embedding?: number[];
 
   @ManyToOne(() => ProjectEntity)
   @JoinColumn({ name: "projectId" })
-  project: ProjectEntity;
+  project?: ProjectEntity;
 }

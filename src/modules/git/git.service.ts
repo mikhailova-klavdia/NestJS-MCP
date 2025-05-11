@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Param,
 } from "@nestjs/common";
 import { simpleGit, DiffResult } from "simple-git";
 import * as path from "path";
@@ -13,7 +14,7 @@ import { EmbedConfig } from "../../embedding-config";
 import { CodeNodeExtractor } from "../identifiers/code-node-constructor";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import { InjectQueue } from "@nestjs/bullmq";
-import { Queue } from "bullmq";
+import { Job, Queue } from "bullmq";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 
 @Injectable()
@@ -25,7 +26,7 @@ export class GitService {
     private readonly _projectRepo: Repository<ProjectEntity>,
 
     @InjectRepository(CodeNodeEntity)
-    private readonly _identifierRepo: Repository<CodeNodeEntity>,
+    private readonly _nodeRepo: Repository<CodeNodeEntity>,
 
     @InjectRepository(CodeEdgeEntity)
     private readonly _edgeRepo: Repository<CodeEdgeEntity>,
@@ -83,15 +84,14 @@ export class GitService {
 
   async processRepository(project: ProjectEntity) {
     // get identifiers from files cloned
-    const { identifiers, edges } = this._extractor.getIdentifiersFromFolder(
-      project.localPath
-    );
+    const { identifiers, edges } =
+      await this._extractor.getIdentifiersFromFolder(project.localPath);
 
     const batchSize = 50;
 
     for (let i = 0; i < identifiers.length; i += batchSize) {
       const batch = identifiers.slice(i, i + batchSize);
-
+      await this._nodeRepo.save(batch);
       await this._embeddingQueue.add(
         "batch",
         { batch, project },
@@ -137,7 +137,7 @@ export class GitService {
       })
     );
 
-    await this._identifierRepo.save(embeddedBatch);
+    await this._nodeRepo.save(embeddedBatch);
   }
 
   async saveBatchOfEdges(batch: CodeEdgeEntity[]) {
@@ -175,14 +175,14 @@ export class GitService {
       const absPath = path.join(project.localPath, relPath);
 
       // delete identifiers if the file was changed or deleted
-      await this._identifierRepo
+      await this._nodeRepo
         .createQueryBuilder()
         .delete()
         .where("projectId = :pid", { pid: project.id })
         .andWhere("filePath = :file", { file: relPath })
         .execute();
 
-      await this._identifierRepo.delete({ project, filePath: relPath });
+      await this._nodeRepo.delete({ project, filePath: relPath });
 
       const { identifiers, edges } =
         this._extractor.getIdentifiersFromFolder(absPath);

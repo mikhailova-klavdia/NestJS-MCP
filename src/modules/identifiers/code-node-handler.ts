@@ -3,6 +3,7 @@ import { findEntryPoints } from "src/utils/import-finder";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
+import { v4 as uuidv4 } from "uuid";
 
 export function handleClassAndInterfaceAndEnumDeclaration(
   node: ts.Node,
@@ -139,6 +140,7 @@ export function handleIdentifier(
     const nodeContext = getDeclarationType(node);
     const entryPoints = findEntryPoints(node.text, folderPath, filePath);
 
+    codeNode.id = uuidv4()
     codeNode.identifier = node.text;
     codeNode.context = {
       declarationType: nodeContext.declarationType,
