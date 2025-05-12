@@ -37,7 +37,7 @@ export type GraphResponse = {
   edges: GraphEdgePayload[];
 };
 
-type GraphNeighbor = {
+export type GraphNeighbor = {
   relType: RelationshipType;
   node: GraphNodePayload;
 };

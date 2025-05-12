@@ -5,7 +5,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
-import { CodeGraph, GraphEdgePayload, GraphNodePayload, GraphResponse } from "src/utils/types";
+import {
+  CodeGraph,
+  GraphEdgePayload,
+  GraphNeighbor,
+  GraphNodePayload,
+  GraphResponse,
+  RelationshipType,
+} from "src/utils/types";
 
 @Injectable()
 export class RagService {
@@ -46,75 +53,6 @@ export class RagService {
         topN
       );
 
-    let graph: GraphResponse | undefined;
-
-    if (depth > 0 && relevantIdentifier.length > 0) {
-      // Multi‐source BFS: start from all seed IDs at once
-      const seedIds = relevantIdentifier.map(
-        (identifier) => identifier.identifier.id
-      );
-      const visited = new Set<string>(seedIds);
-      let frontier = [...seedIds];
-      const allEdges: CodeEdgeEntity[] = [];
-      const allNodeIds = new Set<string>(seedIds);
-
-      for (let level = 0; level < depth; level++) {
-        if (!frontier.length) break;
-
-        const edges = await this._edgeRepo.find({
-          where: [
-            { source: { id: In(frontier) } },
-            { target: { id: In(frontier) } },
-          ],
-          relations: ["source", "target"],
-        });
-
-        allEdges.push(...edges);
-
-        const nextFrontier: string[] = [];
-        for (const edge of edges) {
-          for (const neighbor of [edge.source, edge.target]) {
-            if (!visited.has(neighbor.id)) {
-              visited.add(neighbor.id);
-              nextFrontier.push(neighbor.id);
-              allNodeIds.add(neighbor.id);
-            }
-          }
-        }
-
-        frontier = nextFrontier;
-      }
-
-      // Load full node entities for everything we discovered
-      const nodes = await this._nodeRepo.find({
-        where: { id: In(Array.from(allNodeIds)) },
-      });
-
-      const payloadNodes: GraphNodePayload[] = nodes.map((node) => {
-        const rawDecl = node.context.declarationType;
-        const safeDecl = rawDecl === undefined ? null : rawDecl;
-
-        return {
-          title: node.identifier,
-          filePath: node.filePath,
-          declarationType: typeof safeDecl === "string" ? safeDecl : undefined,
-          context: {
-            declarationType: safeDecl,
-            codeSnippet: node.context.codeSnippet
-          },
-        };
-      });
-
-      const payloadEdges: GraphEdgePayload[] = allEdges.map(edge => ({
-        id: edge.id,
-        relType: edge.relType,
-        sourceId: edge.source.id,
-        targetId: edge.target.id,
-      }));
-
-      graph = { nodes: payloadNodes, edges: payloadEdges };
-    }
-
     const results = relevantIdentifier
       .filter((r) => r.similarity >= minSimilarity)
       .map((doc) => ({
@@ -132,55 +70,71 @@ export class RagService {
     return {
       time: elapsedMs,
       results,
-      ...(graph ? { graph } : {}),
     };
   }
 
   async retrieveNeighbors(nodeId: string, depth: number = 1) {
-    const visited = new Set<string>([nodeId]);
-    let frontier = [nodeId];
-    const allEdges: CodeEdgeEntity[] = [];
-    const allNodeIds = new Set<string>([nodeId]);
+    const visited = new Set<string>();
+    return this.buildGraph(nodeId, depth, visited);
+  }
 
-    for (let level = 0; level < depth; level++) {
-      if (frontier.length === 0) break;
-
-      // Find any edge where source or target is in our current frontier
-      const edges = await this._edgeRepo.find({
-        where: [
-          { source: { id: In(frontier) } },
-          { target: { id: In(frontier) } },
-        ],
-        relations: ["source", "target"],
-      });
-
-      allEdges.push(...edges);
-
-      // Collect the next wave of neighbors
-      const nextFrontier: string[] = [];
-      for (const edge of edges) {
-        const { source, target } = edge;
-        for (const neighbor of [source, target]) {
-          if (!visited.has(neighbor.id)) {
-            visited.add(neighbor.id);
-            nextFrontier.push(neighbor.id);
-            allNodeIds.add(neighbor.id);
-          }
-        }
-      }
-
-      frontier = nextFrontier;
+  async buildGraph(nodeId: string, depth: number, visited: Set<string>) {
+    // making sure you dont revisit the same node
+    if (visited.has(nodeId)) {
+      return null;
     }
+    visited.add(nodeId);
 
-    // Finally load all the nodes we’ve discovered
-    const nodes = await this._nodeRepo.find({
-      where: { id: In(Array.from(allNodeIds)) },
+    // find the node entity in question
+    const nodeEntity = await this._nodeRepo.findOne({
+      where: { id: nodeId },
     });
 
-    this._logger.log(
-      `retrieveNeighbors found ${nodes.length} nodes and ${allEdges.length} edges`
-    );
+    if (!nodeEntity) {
+      throw new Error(`Node with id ${nodeId} not found`);
+    }
 
-    return { nodes, edges: allEdges };
+    const payload: GraphNodePayload = {
+      title: nodeEntity.identifier,
+      filePath: nodeEntity.filePath,
+      declarationType: nodeEntity.context.declarationType,
+      context: nodeEntity.context,
+      neighbours: [],
+    };
+
+    if (depth <= 0) {
+      return payload;
+    }
+
+    // find edges where this node is source or target
+    const edges = await this._edgeRepo.find({
+      where: [{ source: { id: nodeId } }, { target: { id: nodeId } }],
+      relations: ["source", "target"],
+    });
+
+    for (const edge of edges) {
+      // pick the other end of the edge
+      const neighbourEntity =
+        edge.source.id === nodeId ? edge.target : edge.source;
+
+      if (visited.has(neighbourEntity.id)) {
+        continue;
+      }
+
+      // recursive
+      const neighbourPayload = await this.buildGraph(
+        neighbourEntity.id,
+        depth - 1,
+        visited
+      );
+      if (neighbourPayload) {
+        payload.neighbours.push({
+          relType: edge.relType as RelationshipType,
+          node: neighbourPayload,
+        } as GraphNeighbor);
+      }
+    }
+
+    return payload;
   }
 }
