@@ -5,7 +5,7 @@ import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
 import { v4 as uuidv4 } from "uuid";
 
-export function handleClassAndInterfaceAndEnumDeclaration(
+export function processClassEnum(
   node: ts.Node,
   folderPath: string,
   filePath: string

@@ -4,7 +4,7 @@ import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import {
-  handleClassAndInterfaceAndEnumDeclaration,
+  processClassEnum,
   handleFunctionAndMethodDeclaration,
 } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
@@ -41,7 +41,7 @@ export class CodeNodeExtractor {
 
       // Class declarations
       if (ts.isClassDeclaration(node)|| ts.isInterfaceDeclaration(node) || ts.isEnumDeclaration(node)) {
-        const { extractedIdentifiers, extractedEdges } = handleClassAndInterfaceAndEnumDeclaration(
+        const { extractedIdentifiers, extractedEdges } = processClassEnum(
           node,
           folderPath,
           filePath
