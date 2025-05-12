@@ -53,6 +53,7 @@ export class RagService {
         topN
       );
 
+    /*
     const results = relevantIdentifier
       .filter((r) => r.similarity >= minSimilarity)
       .map((doc) => ({
@@ -62,6 +63,18 @@ export class RagService {
         similarity: doc.similarity,
         context: doc.identifier.context,
       }));
+    */
+
+    const visited = new Set<string>();
+    const results: GraphNodePayload[] = [];
+
+    for (const hit of relevantIdentifier) {
+      const nodeId = hit.identifier.id;
+      const subgraph = await this.buildGraph(nodeId, depth, visited);
+      if (subgraph) {
+        results.push(subgraph);
+      }
+    }
 
     const [sec, ns] = process.hrtime(startTime);
     const elapsedMs = sec * 1e3 + ns / 1e6;
@@ -78,7 +91,11 @@ export class RagService {
     return this.buildGraph(nodeId, depth, visited);
   }
 
-  async buildGraph(nodeId: string, depth: number, visited: Set<string>) {
+  private async buildGraph(
+    nodeId: string,
+    depth: number,
+    visited: Set<string>
+  ) {
     // making sure you dont revisit the same node
     if (visited.has(nodeId)) {
       return null;
