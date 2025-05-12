@@ -33,7 +33,7 @@ export function processClassEnum(
         extractedIdentifiers.push(...extractedMethodIdentifiers);
         extractedEdges.push(...extractedMethodEdges);
 
-        // PROPERTY handling
+        // PROPERTY handling 
         if (
           (ts.isPropertyDeclaration(member) ||
             ts.isPropertySignature(member)) &&
@@ -171,7 +171,7 @@ function getDeclarationType(node: ts.Node): {
   const parentNode = node.parent;
   return {
     declarationType: ts.SyntaxKind[parentNode.kind],
-    codeSnippet: node.getFullText(),
+    codeSnippet: parentNode.getFullText(),
   };
 }
 
