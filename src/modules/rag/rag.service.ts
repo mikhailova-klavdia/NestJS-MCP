@@ -86,7 +86,7 @@ export class RagService {
     };
   }
 
-  async retrieveNeighbors(nodeId: string, depth: number = 1) {
+  async retrieveNeighbors(nodeId: string, depth: number = 0) {
     const visited = new Set<string>();
     return this.buildGraph(nodeId, depth, visited);
   }
