@@ -6,7 +6,7 @@ export type ContextV1 = {
   declarationType: Declaration | string | null;
   entryPoints?: EntryPoint[] | null;
   importRequirements?: string | null;
-  codeSnippet: string;
+  codeSnippet?: string;
 };
 
 export type EntryPoint = {
@@ -23,5 +23,17 @@ export enum RelationshipType {
 
 export type CodeGraph = {
   identifiers: CodeNodeEntity[];
+  edges: CodeEdgeEntity[];
+};
+
+export type GraphNodePayload = {
+  title: string;
+  filePath: string;
+  declarationType?: string;
+  context: ContextV1;
+};
+
+export type GraphResponse = {
+  nodes: GraphNodePayload[];
   edges: CodeEdgeEntity[];
 };

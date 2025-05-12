@@ -1,5 +1,12 @@
-import { IsString, IsOptional, IsInt, Min, Max, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+  IsNumber,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class RagQueryDto {
   @IsString()
@@ -18,4 +25,9 @@ export class RagQueryDto {
   @Min(0)
   @Max(1)
   minSimilarity?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @Min(0)
+  depth?: number;
 }

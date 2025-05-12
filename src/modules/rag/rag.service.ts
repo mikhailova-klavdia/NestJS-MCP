@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
+import { CodeGraph, GraphNodePayload, GraphResponse } from "src/utils/types";
 
 @Injectable()
 export class RagService {
@@ -45,7 +46,7 @@ export class RagService {
         topN
       );
 
-    let graph: { nodes: CodeNodeEntity[]; edges: CodeEdgeEntity[] } | undefined;
+    let graph: GraphResponse | undefined;
 
     if (depth > 0 && relevantIdentifier.length > 0) {
       // Multi‐source BFS: start from all seed IDs at once
@@ -89,7 +90,22 @@ export class RagService {
         where: { id: In(Array.from(allNodeIds)) },
       });
 
-      graph = { nodes, edges: allEdges };
+      const payloadNodes: GraphNodePayload[] = nodes.map((node) => {
+        const rawDecl = node.context.declarationType;
+        const safeDecl = rawDecl === undefined ? null : rawDecl;
+
+        return {
+          title: node.identifier,
+          filePath: node.filePath,
+          declarationType: typeof safeDecl === "string" ? safeDecl : undefined,
+          context: {
+            ...node.context,
+            declarationType: safeDecl,
+          },
+        };
+      });
+
+      graph = { nodes: payloadNodes, edges: allEdges };
     }
 
     const results = relevantIdentifier
@@ -106,7 +122,11 @@ export class RagService {
     const elapsedMs = sec * 1e3 + ns / 1e6;
     this._logger.log(`retrieveAndGenerate latency: ${elapsedMs.toFixed(2)}ms`);
 
-    return { time: elapsedMs, results, ...(graph ? { graph } : {}) };
+    return {
+      time: elapsedMs,
+      results,
+      ...(graph ? { graph } : {}),
+    };
   }
 
   async retrieveNeighbors(nodeId: string, depth: number = 1) {
