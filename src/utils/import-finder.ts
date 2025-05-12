@@ -1,4 +1,4 @@
-import { EntryPoint } from "./types";
+import { UsagePoint } from "./types";
 import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "./files";
@@ -10,8 +10,8 @@ export function findUsagePoints(
   identifier: string,
   folderPath: string,
   identifierDeclationFile: string
-): EntryPoint[] {
-  const entryPoints: EntryPoint[] = [];
+): UsagePoint[] {
+  const entryPoints: UsagePoint[] = [];
   const files = getAllFiles(folderPath, "ts");
 
   files.forEach((file) => {

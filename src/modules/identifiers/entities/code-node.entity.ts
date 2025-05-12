@@ -6,18 +6,7 @@ import {
   PrimaryColumn,
 } from "typeorm";
 import { ProjectEntity } from "../../project/project.entity";
-
-export type ContextV1 = {
-  declarationType?: string;
-  usages?: UsagePoint[] | null;
-  dependancies?: string | null;
-  codeSnippet: string;
-};
-
-export type UsagePoint = {
-  codeSnippet: string;
-  filepath: string;
-};
+import { ContextV1 } from "src/utils/types";
 
 @Entity()
 export class CodeNodeEntity {

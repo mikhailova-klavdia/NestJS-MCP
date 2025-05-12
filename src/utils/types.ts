@@ -1,15 +1,14 @@
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
-import { Declaration } from "typescript";
 
 export type ContextV1 = {
-  declarationType: Declaration | string | null;
-  entryPoints?: EntryPoint[] | null;
-  importRequirements?: string | null;
-  codeSnippet?: string;
+  declarationType?: string;
+  usages?: UsagePoint[] | null;
+  dependancies?: string | null;
+  codeSnippet: string;
 };
 
-export type EntryPoint = {
+export type UsagePoint = {
   codeSnippet: string;
   filepath: string;
 };
@@ -26,13 +25,6 @@ export type CodeGraph = {
   edges: CodeEdgeEntity[];
 };
 
-export type GraphNodePayload = {
-  title: string;
-  filePath: string;
-  declarationType?: string;
-  context: ContextV1;
-};
-
 export type GraphEdgePayload = {
   id: number;
   relType: RelationshipType;
@@ -43,4 +35,17 @@ export type GraphEdgePayload = {
 export type GraphResponse = {
   nodes: GraphNodePayload[];
   edges: GraphEdgePayload[];
+};
+
+type GraphNeighbor = {
+  relType: RelationshipType;
+  node: GraphNodePayload;
+};
+
+export type GraphNodePayload = {
+  title: string;
+  filePath: string;
+  declarationType?: string;
+  context: ContextV1;
+  neighbours: GraphNeighbor[];
 };
