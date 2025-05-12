@@ -33,7 +33,14 @@ export type GraphNodePayload = {
   context: ContextV1;
 };
 
+export type GraphEdgePayload = {
+  id: number;
+  relType: RelationshipType;
+  sourceId: string;
+  targetId: string;
+};
+
 export type GraphResponse = {
   nodes: GraphNodePayload[];
-  edges: CodeEdgeEntity[];
+  edges: GraphEdgePayload[];
 };

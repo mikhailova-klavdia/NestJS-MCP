@@ -5,7 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
-import { CodeGraph, GraphNodePayload, GraphResponse } from "src/utils/types";
+import { CodeGraph, GraphEdgePayload, GraphNodePayload, GraphResponse } from "src/utils/types";
 
 @Injectable()
 export class RagService {
@@ -99,13 +99,20 @@ export class RagService {
           filePath: node.filePath,
           declarationType: typeof safeDecl === "string" ? safeDecl : undefined,
           context: {
-            ...node.context,
             declarationType: safeDecl,
+            codeSnippet: node.context.codeSnippet
           },
         };
       });
 
-      graph = { nodes: payloadNodes, edges: allEdges };
+      const payloadEdges: GraphEdgePayload[] = allEdges.map(edge => ({
+        id: edge.id,
+        relType: edge.relType,
+        sourceId: edge.source.id,
+        targetId: edge.target.id,
+      }));
+
+      graph = { nodes: payloadNodes, edges: payloadEdges };
     }
 
     const results = relevantIdentifier
