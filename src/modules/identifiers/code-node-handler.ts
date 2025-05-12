@@ -1,5 +1,5 @@
 import * as ts from "typescript";
-import { findEntryPoints } from "src/utils/import-finder";
+import { findUsagePoints } from "src/utils/import-finder";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { RelationshipType } from "src/utils/types";
@@ -139,13 +139,13 @@ export function handleIdentifier(
     const codeNode = new CodeNodeEntity();
     // grab identifier context
     const nodeContext = getDeclarationType(node);
-    const entryPoints = findEntryPoints(node.text, folderPath, filePath);
+    const entryPoints = findUsagePoints(node.text, folderPath, filePath);
 
     codeNode.id = uuidv4();
     codeNode.identifier = node.text;
     codeNode.context = {
       codeSnippet: nodeContext.codeSnippet,
-      entryPoints: entryPoints,
+      usages: entryPoints,
       declarationType: nodeContext.declarationType
     };
     codeNode.filePath = filePath;

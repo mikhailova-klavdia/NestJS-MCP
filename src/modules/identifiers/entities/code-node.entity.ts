@@ -9,12 +9,12 @@ import { ProjectEntity } from "../../project/project.entity";
 
 export type ContextV1 = {
   declarationType?: string;
-  entryPoints?: EntryPoint[] | null;
+  usages?: UsagePoint[] | null;
   dependancies?: string | null;
   codeSnippet: string;
 };
 
-export type EntryPoint = {
+export type UsagePoint = {
   codeSnippet: string;
   filepath: string;
 };

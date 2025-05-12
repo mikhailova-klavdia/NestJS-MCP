@@ -6,7 +6,7 @@ import { Logger } from "@nestjs/common";
 
 const logger = new Logger("ImportFinder");
 
-export function findEntryPoints(
+export function findUsagePoints(
   identifier: string,
   folderPath: string,
   identifierDeclationFile: string
