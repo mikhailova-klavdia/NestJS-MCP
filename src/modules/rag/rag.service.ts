@@ -10,7 +10,7 @@ export class RagService {
     private readonly _embeddingConfig: EmbedConfig
   ) {}
 
-  async retrieveAndGenerate(
+  async retrieve(
     query: string,
     projectId: number,
     topN: number = 5,
@@ -47,6 +47,6 @@ export class RagService {
     const elapsedMs = sec * 1e3 + ns / 1e6;
     this._logger.log(`retrieveAndGenerate latency: ${elapsedMs.toFixed(2)}ms`);
 
-    return {time: elapsedMs, results};
+    return { time: elapsedMs, results };
   }
 }

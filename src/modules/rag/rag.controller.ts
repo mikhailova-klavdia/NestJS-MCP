@@ -14,7 +14,7 @@ export class RagController {
       throw new BadRequestException('Both `query` and `projectId` are required');
     }
 
-    return this.ragService.retrieveAndGenerate(
+    return this.ragService.retrieve(
       query,
       projectId,
       topN,

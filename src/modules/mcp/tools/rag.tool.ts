@@ -32,7 +32,7 @@ export class RagTool {
     context: Context
   ) {
     // run the RAG query
-    const results = await this._rag.retrieveAndGenerate(
+    const results = await this._rag.retrieve(
       query,
       projectId,
       topN,
