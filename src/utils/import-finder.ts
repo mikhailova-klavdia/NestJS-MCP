@@ -73,7 +73,7 @@ export function findUsagePoints(
   });
 
   logger.log(
-    `Found ${entryPoints.length} entry point(s) for identifier "${identifier}"`
+    `Found ${entryPoints.length} usages(s) for identifier "${identifier}"`
   );
   return entryPoints;
 }

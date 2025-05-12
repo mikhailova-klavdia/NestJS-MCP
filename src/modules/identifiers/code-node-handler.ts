@@ -139,19 +139,29 @@ export function handleIdentifier(
     const codeNode = new CodeNodeEntity();
     // grab identifier context
     const nodeContext = getDeclarationType(node);
-    const entryPoints = findUsagePoints(node.text, folderPath, filePath);
+    const isExported = isExportedIdentifier(node);
+    const usages = isExported ? findUsagePoints(node.text, folderPath, filePath) : [];
 
     codeNode.id = uuidv4();
     codeNode.identifier = node.text;
     codeNode.context = {
       codeSnippet: nodeContext.codeSnippet,
-      usages: entryPoints,
-      declarationType: nodeContext.declarationType
+      usages: usages,
+      declarationType: nodeContext.declarationType,
     };
     codeNode.filePath = filePath;
 
     return codeNode;
   }
+}
+
+function isExportedIdentifier(node: ts.Node) {
+  // the the declaration
+  const parent = node.parent as ts.Declaration;
+  const flags = ts.getCombinedModifierFlags(parent);
+  const isExported = Boolean(flags & ts.ModifierFlags.Export);
+
+  return isExported;
 }
 
 function getDeclarationType(node: ts.Node): {
