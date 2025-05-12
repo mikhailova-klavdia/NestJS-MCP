@@ -29,12 +29,7 @@ export function processClassEnum(
         const {
           extractedIdentifiers: extractedMethodIdentifiers,
           extractedEdges: extractedMethodEdges,
-        } = handleFunctionAndMethodDeclaration(
-          member,
-          folderPath,
-          filePath,
-          classIdentifier
-        );
+        } = handleFunctionMethod(member, folderPath, filePath, classIdentifier);
         extractedIdentifiers.push(...extractedMethodIdentifiers);
         extractedEdges.push(...extractedMethodEdges);
 
@@ -47,18 +42,30 @@ export function processClassEnum(
           const property = handleIdentifier(member.name, folderPath, filePath);
           if (property) {
             extractedIdentifiers.push(property);
-            const edge = createEdge(classIdentifier, property, RelationshipType.PROPERTY)
+            const edge = createEdge(
+              classIdentifier,
+              property,
+              RelationshipType.PROPERTY
+            );
             extractedEdges.push(edge);
           }
         }
 
         // ENUM MEMBER
         if (ts.isEnumMember(member)) {
-          const enumMember = handleIdentifier(member.name, folderPath, filePath) 
+          const enumMember = handleIdentifier(
+            member.name,
+            folderPath,
+            filePath
+          );
           if (enumMember) {
-            extractedIdentifiers.push(enumMember) 
-            const edge = createEdge(classIdentifier, enumMember, RelationshipType.ENUM_MEMBER)
-            extractedEdges.push(edge)
+            extractedIdentifiers.push(enumMember);
+            const edge = createEdge(
+              classIdentifier,
+              enumMember,
+              RelationshipType.ENUM_MEMBER
+            );
+            extractedEdges.push(edge);
           }
         }
       });
@@ -68,7 +75,7 @@ export function processClassEnum(
   return { extractedIdentifiers, extractedEdges };
 }
 
-export function handleFunctionAndMethodDeclaration(
+export function handleFunctionMethod(
   node: ts.Node,
   folderPath: string,
   filePath: string,
@@ -92,7 +99,11 @@ export function handleFunctionAndMethodDeclaration(
       extractedIdentifiers.push(functionIdentifier);
 
       if (source) {
-        const edge = createEdge(source, functionIdentifier, RelationshipType.METHOD)
+        const edge = createEdge(
+          source,
+          functionIdentifier,
+          RelationshipType.METHOD
+        );
         extractedEdges.push(edge);
       }
 
@@ -104,7 +115,11 @@ export function handleFunctionAndMethodDeclaration(
         );
 
         if (paramIdentifier) {
-          const edge = createEdge(functionIdentifier, paramIdentifier, RelationshipType.PARAMETER)
+          const edge = createEdge(
+            functionIdentifier,
+            paramIdentifier,
+            RelationshipType.PARAMETER
+          );
           extractedIdentifiers.push(paramIdentifier);
           extractedEdges.push(edge);
         }
@@ -126,10 +141,10 @@ export function handleIdentifier(
     const nodeContext = getDeclarationType(node);
     const entryPoints = findEntryPoints(node.text, folderPath, filePath);
 
-    codeNode.id = uuidv4()
+    codeNode.id = uuidv4();
     codeNode.identifier = node.text;
+    codeNode.declarationType = nodeContext.declarationType;
     codeNode.context = {
-      declarationType: nodeContext.declarationType,
       codeSnippet: nodeContext.codeSnippet,
       entryPoints: entryPoints,
       importRequirements: null,
@@ -144,32 +159,6 @@ function getDeclarationType(node: ts.Node): {
   declarationType: string;
   codeSnippet: string;
 } {
-  let currentNode: ts.Node | undefined = node;
-
-  while (currentNode) {
-    if (
-      ts.isClassDeclaration(currentNode) ||
-      ts.isFunctionDeclaration(currentNode) ||
-      ts.isVariableDeclaration(currentNode) ||
-      ts.isImportDeclaration(currentNode) ||
-      ts.isExportDeclaration(currentNode) ||
-      ts.isMethodDeclaration(currentNode) ||
-      ts.isPropertyDeclaration(currentNode) ||
-      ts.isConstructorDeclaration(currentNode) ||
-      ts.isParameter(currentNode) ||
-      ts.isInterfaceDeclaration(currentNode) ||
-      ts.isEnumDeclaration(currentNode) ||
-      ts.isTypeAliasDeclaration(currentNode) ||
-      ts.isModuleDeclaration(currentNode)
-    ) {
-      return {
-        declarationType: ts.SyntaxKind[currentNode.kind],
-        codeSnippet: currentNode.getFullText(),
-      };
-    }
-    currentNode = currentNode.parent;
-  }
-
   return {
     declarationType: ts.SyntaxKind[node.kind],
     codeSnippet: node.getFullText(),

@@ -5,7 +5,8 @@ import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import {
   processClassEnum,
-  handleFunctionAndMethodDeclaration,
+  handleFunctionMethod,
+  handleIdentifier,
 } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
@@ -40,7 +41,11 @@ export class CodeNodeExtractor {
       }
 
       // Class declarations
-      if (ts.isClassDeclaration(node)|| ts.isInterfaceDeclaration(node) || ts.isEnumDeclaration(node)) {
+      if (
+        ts.isClassDeclaration(node) ||
+        ts.isInterfaceDeclaration(node) ||
+        ts.isEnumDeclaration(node)
+      ) {
         const { extractedIdentifiers, extractedEdges } = processClassEnum(
           node,
           folderPath,
@@ -49,10 +54,20 @@ export class CodeNodeExtractor {
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
+      // Variables
+      else if (ts.isVariableDeclaration(node)) {
+        const variableIdentifier = handleIdentifier(node, folderPath, filePath);
+        if (variableIdentifier) {
+          identifiers.push(variableIdentifier);
+        }
+      }
       // Functions / Methods
       else if (ts.isFunctionDeclaration(node)) {
-        const { extractedIdentifiers, extractedEdges } =
-          handleFunctionAndMethodDeclaration(node, folderPath, filePath);
+        const { extractedIdentifiers, extractedEdges } = handleFunctionMethod(
+          node,
+          folderPath,
+          filePath
+        );
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }

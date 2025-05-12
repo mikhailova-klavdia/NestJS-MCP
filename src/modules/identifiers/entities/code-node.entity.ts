@@ -6,10 +6,8 @@ import {
   PrimaryColumn,
 } from "typeorm";
 import { ProjectEntity } from "../../project/project.entity";
-import { Declaration } from "typescript";
 
 export type ContextV1 = {
-  declarationType: Declaration | string | null;
   entryPoints?: EntryPoint[] | null;
   importRequirements?: string | null;
   codeSnippet: string;
@@ -27,6 +25,9 @@ export class CodeNodeEntity {
 
   @Column()
   identifier: string;
+
+  @Column({nullable: true})
+  declarationType: string;
 
   @Column({ type: "jsonb" })
   context: ContextV1;
