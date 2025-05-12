@@ -47,10 +47,7 @@ export function handleClassAndInterfaceAndEnumDeclaration(
           const property = handleIdentifier(member.name, folderPath, filePath);
           if (property) {
             extractedIdentifiers.push(property);
-            const edge = new CodeEdgeEntity();
-            edge.source = classIdentifier;
-            edge.target = property;
-            edge.relType = RelationshipType.PROPERTY;
+            const edge = createEdge(classIdentifier, property, RelationshipType.PROPERTY)
             extractedEdges.push(edge);
           }
         }
@@ -60,10 +57,7 @@ export function handleClassAndInterfaceAndEnumDeclaration(
           const enumMember = handleIdentifier(member.name, folderPath, filePath) 
           if (enumMember) {
             extractedIdentifiers.push(enumMember) 
-            const edge = new CodeEdgeEntity();
-            edge.source = classIdentifier;
-            edge.target = enumMember;
-            edge.relType = RelationshipType.ENUM_MEMBER
+            const edge = createEdge(classIdentifier, enumMember, RelationshipType.ENUM_MEMBER)
             extractedEdges.push(edge)
           }
         }
@@ -98,11 +92,7 @@ export function handleFunctionAndMethodDeclaration(
       extractedIdentifiers.push(functionIdentifier);
 
       if (source) {
-        const edge = new CodeEdgeEntity();
-        edge.relType = RelationshipType.METHOD;
-        edge.source = source;
-        edge.target = functionIdentifier;
-
+        const edge = createEdge(source, functionIdentifier, RelationshipType.METHOD)
         extractedEdges.push(edge);
       }
 
@@ -114,11 +104,7 @@ export function handleFunctionAndMethodDeclaration(
         );
 
         if (paramIdentifier) {
-          const edge = new CodeEdgeEntity();
-          edge.relType = RelationshipType.PARAMETER;
-          edge.source = functionIdentifier;
-          edge.target = paramIdentifier;
-
+          const edge = createEdge(functionIdentifier, paramIdentifier, RelationshipType.PARAMETER)
           extractedIdentifiers.push(paramIdentifier);
           extractedEdges.push(edge);
         }
@@ -188,4 +174,16 @@ function getDeclarationType(node: ts.Node): {
     declarationType: ts.SyntaxKind[node.kind],
     codeSnippet: node.getFullText(),
   };
+}
+
+function createEdge(
+  source: CodeNodeEntity,
+  target: CodeNodeEntity,
+  relType: RelationshipType
+): CodeEdgeEntity {
+  const edge = new CodeEdgeEntity();
+  edge.source = source;
+  edge.target = target;
+  edge.relType = relType;
+  return edge;
 }
