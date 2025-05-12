@@ -143,11 +143,10 @@ export function handleIdentifier(
 
     codeNode.id = uuidv4();
     codeNode.identifier = node.text;
-    codeNode.declarationType = nodeContext.declarationType;
     codeNode.context = {
       codeSnippet: nodeContext.codeSnippet,
       entryPoints: entryPoints,
-      importRequirements: null,
+      declarationType: nodeContext.declarationType
     };
     codeNode.filePath = filePath;
 
@@ -159,8 +158,9 @@ function getDeclarationType(node: ts.Node): {
   declarationType: string;
   codeSnippet: string;
 } {
+  const parentNode = node.parent;
   return {
-    declarationType: ts.SyntaxKind[node.kind],
+    declarationType: ts.SyntaxKind[parentNode.kind],
     codeSnippet: node.getFullText(),
   };
 }

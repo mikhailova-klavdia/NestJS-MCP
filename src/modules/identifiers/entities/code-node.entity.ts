@@ -8,8 +8,9 @@ import {
 import { ProjectEntity } from "../../project/project.entity";
 
 export type ContextV1 = {
+  declarationType?: string;
   entryPoints?: EntryPoint[] | null;
-  importRequirements?: string | null;
+  dependancies?: string | null;
   codeSnippet: string;
 };
 
@@ -25,9 +26,6 @@ export class CodeNodeEntity {
 
   @Column()
   identifier: string;
-
-  @Column({nullable: true})
-  declarationType: string;
 
   @Column({ type: "jsonb" })
   context: ContextV1;

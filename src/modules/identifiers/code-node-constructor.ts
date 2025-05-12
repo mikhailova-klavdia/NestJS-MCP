@@ -54,8 +54,11 @@ export class CodeNodeExtractor {
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
-      // Variables
-      else if (ts.isVariableDeclaration(node)) {
+      // Variables, types
+      else if (
+        ts.isVariableDeclaration(node) ||
+        ts.isTypeAliasDeclaration(node)
+      ) {
         const variableIdentifier = handleIdentifier(node, folderPath, filePath);
         if (variableIdentifier) {
           identifiers.push(variableIdentifier);
