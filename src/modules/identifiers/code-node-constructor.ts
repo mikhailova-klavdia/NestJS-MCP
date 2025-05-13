@@ -32,7 +32,8 @@ export class CodeNodeExtractor {
     const identifiers: CodeNodeEntity[] = [];
     const edges: CodeEdgeEntity[] = [];
 
-    const imports = findImports(sourceFile)
+    const imports = findImports(sourceFile);
+    console.log(imports);
 
     const visit = (node: ts.Node) => {
       // Class declarations

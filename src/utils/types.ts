@@ -41,7 +41,6 @@ export type GraphNodePayload = {
 
 export type ImportDeclarationInfo = {
   moduleName: string;
-  defaultImport: string | null;
   namedImports: string[];
-  raw: string;
+  codeSnippet: string;
 }

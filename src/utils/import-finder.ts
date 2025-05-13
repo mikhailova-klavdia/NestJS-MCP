@@ -109,8 +109,6 @@ export function findImports(
 
     const moduleName = (statement.moduleSpecifier as ts.StringLiteral).text;
     const clause = statement.importClause;
-    const defaultImport = clause?.name?.text ?? null;
-
     const bindings = clause?.namedBindings;
     const namedImports: string[] = [];
 
@@ -122,9 +120,8 @@ export function findImports(
 
     imports.push({
       moduleName,
-      defaultImport,
       namedImports,
-      raw: statement.getText().trim(),
+      codeSnippet: statement.getText().trim(),
     });
   });
 
