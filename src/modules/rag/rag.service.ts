@@ -6,6 +6,7 @@ import { Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import {
+  ContextV1,
   GraphNeighbor,
   GraphNodePayload,
   RelationshipType,
@@ -110,11 +111,15 @@ export class RagService {
       throw new Error(`Node with id ${nodeId} not found`);
     }
 
+    const context: ContextV1 = stripUsages
+    ? (({ usages, ...rest }) => rest)(nodeEntity.context)
+    : nodeEntity.context;
+
     const payload: GraphNodePayload = {
       title: nodeEntity.identifier,
       filePath: nodeEntity.filePath,
       declarationType: nodeEntity.context.declarationType,
-      context: nodeEntity.context,
+      context,
       neighbours: [],
     };
 
