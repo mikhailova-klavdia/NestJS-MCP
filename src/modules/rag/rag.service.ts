@@ -2,15 +2,12 @@ import { Injectable, Logger } from "@nestjs/common";
 import { EmbedConfig } from "../../embedding-config";
 import { IdentifierService } from "../identifiers/identifier.service";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
 import {
-  CodeGraph,
-  GraphEdgePayload,
   GraphNeighbor,
   GraphNodePayload,
-  GraphResponse,
   RelationshipType,
 } from "src/utils/types";
 
@@ -72,6 +69,7 @@ export class RagService {
       const nodeId = hit.identifier.id;
       const subgraph = await this.buildGraph(nodeId, depth, visited);
       if (subgraph) {
+        subgraph.similarity = hit.similarity;
         results.push(subgraph);
       }
     }

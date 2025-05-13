@@ -25,18 +25,6 @@ export type CodeGraph = {
   edges: CodeEdgeEntity[];
 };
 
-export type GraphEdgePayload = {
-  id: number;
-  relType: RelationshipType;
-  sourceId: string;
-  targetId: string;
-};
-
-export type GraphResponse = {
-  nodes: GraphNodePayload[];
-  edges: GraphEdgePayload[];
-};
-
 export type GraphNeighbor = {
   relType: RelationshipType;
   node: GraphNodePayload;
@@ -44,6 +32,7 @@ export type GraphNeighbor = {
 
 export type GraphNodePayload = {
   title: string;
+  similarity?: number;
   filePath: string;
   declarationType?: string;
   context: ContextV1;
