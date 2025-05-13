@@ -1,14 +1,15 @@
 import * as ts from "typescript";
-import { findUsagePoints } from "src/utils/import-finder";
+import { findDependenciesInNode, findUsagePoints } from "src/utils/import-finder";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeNodeEntity } from "./entities/code-node.entity";
-import { RelationshipType } from "src/utils/types";
+import { ImportDeclarationInfo, RelationshipType } from "src/utils/types";
 import { v4 as uuidv4 } from "uuid";
 
 export function processClassEnum(
   node: ts.Node,
   folderPath: string,
-  filePath: string
+  filePath: string,
+  fileImports: ImportDeclarationInfo[],
 ) {
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
@@ -22,6 +23,8 @@ export function processClassEnum(
     const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
     if (classIdentifier) {
+      classIdentifier.context.dependencies = findDependenciesInNode(node, fileImports);
+
       extractedIdentifiers.push(classIdentifier);
 
       node.members.forEach((member) => {
@@ -29,7 +32,7 @@ export function processClassEnum(
         const {
           extractedIdentifiers: extractedMethodIdentifiers,
           extractedEdges: extractedMethodEdges,
-        } = handleFunctionMethod(member, folderPath, filePath, classIdentifier);
+        } = handleFunctionMethod(member, folderPath, filePath, fileImports, classIdentifier);
         extractedIdentifiers.push(...extractedMethodIdentifiers);
         extractedEdges.push(...extractedMethodEdges);
 
@@ -79,6 +82,7 @@ export function handleFunctionMethod(
   node: ts.Node,
   folderPath: string,
   filePath: string,
+  fileImports: ImportDeclarationInfo[],
   source?: CodeNodeEntity
 ) {
   const extractedIdentifiers: CodeNodeEntity[] = [];
@@ -96,6 +100,8 @@ export function handleFunctionMethod(
       filePath
     );
     if (functionIdentifier) {
+      functionIdentifier.context.dependencies = findDependenciesInNode(node, fileImports);
+
       extractedIdentifiers.push(functionIdentifier);
 
       if (source) {

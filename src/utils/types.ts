@@ -4,7 +4,7 @@ import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entit
 export type ContextV1 = {
   declarationType?: string;
   usages?: UsagePoint[] | null;
-  dependancies?: string | null;
+  dependencies?: ImportDeclarationInfo[];
   codeSnippet: string;
 };
 

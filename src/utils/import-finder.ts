@@ -137,3 +137,24 @@ export function findImports(
 
   return imports;
 }
+
+export function findDependenciesInNode(
+  root: ts.Node,
+  fileImports: ImportDeclarationInfo[]
+): ImportDeclarationInfo[] {
+  const usedModules = new Set<ImportDeclarationInfo>();
+
+  function visit(node: ts.Node) {
+    if (ts.isIdentifier(node)) {
+      for (const importStatement of fileImports) {
+        if (importStatement.namedImports.includes(node.text)) {
+          usedModules.add(importStatement);
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(root);
+  return Array.from(usedModules);
+}

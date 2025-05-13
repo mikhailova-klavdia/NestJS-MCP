@@ -33,7 +33,6 @@ export class CodeNodeExtractor {
     const edges: CodeEdgeEntity[] = [];
 
     const imports = findImports(sourceFile);
-    console.log(imports);
 
     const visit = (node: ts.Node) => {
       // Class declarations
@@ -45,7 +44,8 @@ export class CodeNodeExtractor {
         const { extractedIdentifiers, extractedEdges } = processClassEnum(
           node,
           folderPath,
-          filePath
+          filePath,
+          imports
         );
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
@@ -65,7 +65,8 @@ export class CodeNodeExtractor {
         const { extractedIdentifiers, extractedEdges } = handleFunctionMethod(
           node,
           folderPath,
-          filePath
+          filePath,
+          imports
         );
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
