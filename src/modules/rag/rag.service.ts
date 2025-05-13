@@ -44,12 +44,9 @@ export class RagService {
       await this._identifierService.getIdentifiersByProject(projectId);
 
     // Step 3: Find the most relevant document (simple cosine similarity for baseline)
-    const relevantIdentifier =
-      this._identifierService.findTopNRelevantIdentifiers(
-        identifiers,
-        queryEmbedding,
-        topN
-      );
+    const relevantIdentifier = this._identifierService
+      .findTopNRelevantIdentifiers(identifiers, queryEmbedding, topN)
+      .filter((hit) => hit.similarity >= minSimilarity);
 
     /*
     const results = relevantIdentifier
@@ -94,7 +91,7 @@ export class RagService {
     nodeId: string,
     depth: number,
     visited: Set<string>,
-    stripUsages = false,
+    stripUsages = false
   ) {
     // making sure you dont revisit the same node
     if (visited.has(nodeId)) {
@@ -112,8 +109,8 @@ export class RagService {
     }
 
     const context: ContextV1 = stripUsages
-    ? (({ usages, ...rest }) => rest)(nodeEntity.context)
-    : nodeEntity.context;
+      ? (({ usages, ...rest }) => rest)(nodeEntity.context)
+      : nodeEntity.context;
 
     const payload: GraphNodePayload = {
       title: nodeEntity.identifier,
