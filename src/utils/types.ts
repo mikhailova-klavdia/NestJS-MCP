@@ -38,3 +38,10 @@ export type GraphNodePayload = {
   context: ContextV1;
   neighbours: GraphNeighbor[];
 };
+
+export type ImportDeclarationInfo = {
+  moduleName: string;
+  defaultImport: string | null;
+  namedImports: string[];
+  raw: string;
+}

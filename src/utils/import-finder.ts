@@ -1,4 +1,4 @@
-import { UsagePoint } from "./types";
+import { ImportDeclarationInfo, UsagePoint } from "./types";
 import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "./files";
@@ -97,4 +97,36 @@ function isInsideImport(node: ts.Node): boolean {
     current = current.parent;
   }
   return false;
+}
+
+export function findImports(sourceFile: ts.SourceFile): ImportDeclarationInfo[] {
+  const imports: ImportDeclarationInfo[] = [];
+
+  sourceFile.statements.forEach(stmt => {
+    if (!ts.isImportDeclaration(stmt)) return;
+
+    const moduleName = (stmt.moduleSpecifier as ts.StringLiteral).text;
+    const clause = stmt.importClause;
+    const defaultImport = clause?.name?.text ?? null;
+
+    // pull namedBindings into its own variable
+    const bindings = clause?.namedBindings;
+    const namedImports: string[] = [];
+
+    // guard against undefined, then narrow to NamedImports
+    if (bindings && ts.isNamedImports(bindings)) {
+      for (const element of bindings.elements) {
+        namedImports.push(element.name.text);
+      }
+    }
+
+    imports.push({
+      moduleName,
+      defaultImport,
+      namedImports,
+      raw: stmt.getText().trim(),
+    });
+  });
+
+  return imports;
 }

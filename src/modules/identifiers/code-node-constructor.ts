@@ -10,6 +10,7 @@ import {
 } from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
+import { findImports } from "src/utils/import-finder";
 
 @Injectable()
 export class CodeNodeExtractor {
@@ -31,15 +32,9 @@ export class CodeNodeExtractor {
     const identifiers: CodeNodeEntity[] = [];
     const edges: CodeEdgeEntity[] = [];
 
-    const visit = (node: ts.Node) => {
-      if (
-        ts.isImportDeclaration(node) ||
-        ts.isImportClause(node) ||
-        ts.isImportSpecifier(node)
-      ) {
-        return;
-      }
+    const imports = findImports(sourceFile)
 
+    const visit = (node: ts.Node) => {
       // Class declarations
       if (
         ts.isClassDeclaration(node) ||
