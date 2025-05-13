@@ -60,11 +60,14 @@ export function findUsagePoints(
 
     const visit = (node: ts.Node) => {
       if (ts.isIdentifier(node) && node.text === identifier) {
-        const stmt = findEnclosingStatement(node);
-        usages.push({
-          filepath: file,
-          codeSnippet: stmt.getText().trim(),
-        });
+        // skip import statement
+        if (!isInsideImport(node)) {
+          const stmt = findEnclosingStatement(node);
+          usages.push({
+            filepath: file,
+            codeSnippet: stmt.getText().trim(),
+          });
+        }
       }
       ts.forEachChild(node, visit);
     };
@@ -83,4 +86,15 @@ function findEnclosingStatement(node: ts.Node): ts.Node {
     current = current.parent;
   }
   return current ?? node;
+}
+
+function isInsideImport(node: ts.Node): boolean {
+  let current: ts.Node | undefined = node;
+  while (current) {
+    if (ts.isImportDeclaration(current)) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
 }
