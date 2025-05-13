@@ -109,12 +109,22 @@ export function findImports(
 
     const moduleName = (statement.moduleSpecifier as ts.StringLiteral).text;
     const clause = statement.importClause;
-    const bindings = clause?.namedBindings;
     const namedImports: string[] = [];
 
-    if (bindings && ts.isNamedImports(bindings)) {
-      for (const element of bindings.elements) {
-        namedImports.push(element.name.text);
+    if (clause) {
+      if (clause.name) {
+        namedImports.push(clause.name.text);
+      }
+
+      const bindings = clause.namedBindings;
+      if (bindings) {
+        if (ts.isNamedImports(bindings)) {
+          for (const element of bindings.elements) {
+            namedImports.push(element.name.text);
+          }
+        } else if (ts.isNamespaceImport(bindings)) {
+          namedImports.push(bindings.name.text);
+        }
       }
     }
 
