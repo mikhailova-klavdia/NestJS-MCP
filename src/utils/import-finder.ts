@@ -11,10 +11,15 @@ export function findUsagePoints(
   folderPath: string,
   identifierDeclationFile: string
 ): UsagePoint[] {
-  const entryPoints: UsagePoint[] = [];
+  const usages: UsagePoint[] = [];
   const files = getAllFiles(folderPath, "ts");
 
-  files.forEach((file) => {
+  for (const file of files) {
+    // skip the file in which the method/file is originally declared
+    if (file === identifierDeclationFile) {
+      continue;
+    }
+
     const content = fs.readFileSync(file, "utf8");
     const sourceFile = ts.createSourceFile(
       file,
@@ -23,57 +28,59 @@ export function findUsagePoints(
       true
     );
 
-    // skip the file in which the method/file is originally declared
-    if (file === identifierDeclationFile) {
-      return;
+    // traverse the AST to look for an import of the given identifier.
+    let imported = false;
+    ts.forEachChild(sourceFile, (node) => {
+      if (imported) return;
+
+      if (ts.isImportDeclaration(node) && node.importClause) {
+        const { name, namedBindings } = node.importClause;
+
+        // default import `import Foo from "…"`
+        if (name?.text === identifier) {
+          imported = true;
+          return;
+        }
+
+        // named imports `import { Foo, Bar } from "…"`
+        if (
+          namedBindings &&
+          ts.isNamedImports(namedBindings) &&
+          namedBindings.elements.some((e) => e.name.text === identifier)
+        ) {
+          imported = true;
+          return;
+        }
+      }
+    });
+
+    if (!imported) {
+      continue;
     }
 
-    // traverse the AST to look for an import of the given identifier.
-    let found = false;
     const visit = (node: ts.Node) => {
-      if (found) {
-        return;
-      }
-      if (ts.isImportDeclaration(node)) {
-        const importClause = node.importClause;
-        if (importClause) {
-          // check whether the file gets imported
-          if (importClause.name && importClause.name.text === identifier) {
-            found = true;
-            entryPoints.push({
-              codeSnippet: node.getFullText(),
-              filepath: file,
-            });
-            return;
-          }
-          // check for named imports like import { Item } from
-          if (
-            importClause.namedBindings &&
-            ts.isNamedImports(importClause.namedBindings)
-          ) {
-            const elements = importClause.namedBindings.elements;
-            for (const element of elements) {
-              if (element.name.text === identifier) {
-                found = true;
-                entryPoints.push({
-                  // add the full file content for the code snippet
-                  codeSnippet: content,
-                  filepath: file,
-                });
-                return;
-              }
-            }
-          }
-        }
+      if (ts.isIdentifier(node) && node.text === identifier) {
+        const stmt = findEnclosingStatement(node);
+        usages.push({
+          filepath: file,
+          codeSnippet: stmt.getText().trim(),
+        });
       }
       ts.forEachChild(node, visit);
     };
-
     visit(sourceFile);
-  });
 
-  logger.log(
-    `Found ${entryPoints.length} usages(s) for identifier "${identifier}"`
-  );
-  return entryPoints;
+    return usages;
+  }
+
+  logger.log(`Found ${usages.length} usages(s) for identifier "${identifier}"`);
+  return usages;
+}
+
+function findEnclosingStatement(node: ts.Node): ts.Node {
+  let current: ts.Node | undefined = node;
+  while (current && !ts.isStatement(current)) {
+    current = current.parent;
+  }
+  return current ?? node;
 }
