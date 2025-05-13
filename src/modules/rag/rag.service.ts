@@ -92,7 +92,8 @@ export class RagService {
   private async buildGraph(
     nodeId: string,
     depth: number,
-    visited: Set<string>
+    visited: Set<string>,
+    stripUsages = false,
   ) {
     // making sure you dont revisit the same node
     if (visited.has(nodeId)) {
@@ -140,7 +141,8 @@ export class RagService {
       const neighbourPayload = await this.buildGraph(
         neighbourEntity.id,
         depth - 1,
-        visited
+        visited,
+        true
       );
       if (neighbourPayload) {
         payload.neighbours.push({
