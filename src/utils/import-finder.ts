@@ -99,21 +99,21 @@ function isInsideImport(node: ts.Node): boolean {
   return false;
 }
 
-export function findImports(sourceFile: ts.SourceFile): ImportDeclarationInfo[] {
+export function findImports(
+  sourceFile: ts.SourceFile
+): ImportDeclarationInfo[] {
   const imports: ImportDeclarationInfo[] = [];
 
-  sourceFile.statements.forEach(stmt => {
-    if (!ts.isImportDeclaration(stmt)) return;
+  sourceFile.statements.forEach((statement) => {
+    if (!ts.isImportDeclaration(statement)) return;
 
-    const moduleName = (stmt.moduleSpecifier as ts.StringLiteral).text;
-    const clause = stmt.importClause;
+    const moduleName = (statement.moduleSpecifier as ts.StringLiteral).text;
+    const clause = statement.importClause;
     const defaultImport = clause?.name?.text ?? null;
 
-    // pull namedBindings into its own variable
     const bindings = clause?.namedBindings;
     const namedImports: string[] = [];
 
-    // guard against undefined, then narrow to NamedImports
     if (bindings && ts.isNamedImports(bindings)) {
       for (const element of bindings.elements) {
         namedImports.push(element.name.text);
@@ -124,7 +124,7 @@ export function findImports(sourceFile: ts.SourceFile): ImportDeclarationInfo[] 
       moduleName,
       defaultImport,
       namedImports,
-      raw: stmt.getText().trim(),
+      raw: statement.getText().trim(),
     });
   });
 
