@@ -6,17 +6,13 @@ import { findDependenciesInNode } from "./import-finder";
 import { createEdge, handleIdentifier } from "./code-node-handler";
 import { RelationshipType } from "../types/context";
 import { ImportDeclarationInfo, Extracted } from "../types/types";
-import { getRepository } from "typeorm";
 
-const nodeRepo = getRepository(CodeNodeEntity);
-const edgeRepo = getRepository(CodeEdgeEntity);
-
-export async function processClass(
+export function processClass(
   node: ts.ClassDeclaration | ts.InterfaceDeclaration,
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[]
-): Promise<Extracted> {
+): Extracted {
   let identifiers: CodeNodeEntity[] = [];
   let edges: CodeEdgeEntity[] = [];
 
@@ -70,9 +66,6 @@ export async function processClass(
     }
   });
 
-  identifiers = await nodeRepo.save(identifiers);
-  edges = await edgeRepo.save(edges);
-
   return { identifiers, edges };
 }
 
@@ -81,7 +74,7 @@ export function processEnum(
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[]
-) : Extracted {
+): Extracted {
   const identifiers: CodeNodeEntity[] = [];
   const edges: CodeEdgeEntity[] = [];
 
