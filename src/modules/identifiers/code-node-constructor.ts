@@ -7,7 +7,7 @@ import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
 import { findImports } from "src/utils/extractors/import-finder";
 import { handleIdentifier } from "src/utils/extractors/code-node-handler";
-import { processClassEnum } from "src/utils/extractors/handle-class-enums";
+import { processClass } from "src/utils/extractors/handle-class-enums";
 import { handleFunctionMethod } from "src/utils/extractors/handle-function";
 
 @Injectable()
@@ -39,7 +39,7 @@ export class CodeNodeExtractor {
         ts.isInterfaceDeclaration(node) ||
         ts.isEnumDeclaration(node)
       ) {
-        const { extractedIdentifiers, extractedEdges } = processClassEnum(
+        const { extractedIdentifiers, extractedEdges } = processClass(
           node,
           folderPath,
           filePath,
