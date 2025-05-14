@@ -12,10 +12,17 @@ import {
 } from "src/utils/extractors/handle-class-enums";
 import { handleFunctionMethod } from "src/utils/extractors/handle-function";
 import { CodeGraph } from "src/utils/types/types";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class CodeNodeExtractor {
   private readonly logger = new Logger(CodeNodeExtractor.name);
+
+  constructor(
+    @InjectRepository(CodeNodeEntity)
+    private readonly _nodeRepo: Repository<CodeNodeEntity>
+  ) {}
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
@@ -42,7 +49,13 @@ export class CodeNodeExtractor {
         node.name
       ) {
         const { identifiers: extractedIdentifiers, edges: extractedEdges } =
-          await processClass(node, folderPath, filePath, imports);
+          await processClass(
+            node,
+            folderPath,
+            filePath,
+            imports,
+            this._nodeRepo
+          );
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }

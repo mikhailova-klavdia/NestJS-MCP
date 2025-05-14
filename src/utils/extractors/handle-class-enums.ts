@@ -6,13 +6,15 @@ import { findDependenciesInNode } from "./import-finder";
 import { createEdge, handleIdentifier } from "./code-node-handler";
 import { RelationshipType } from "../types/context";
 import { ImportDeclarationInfo, Extracted } from "../types/types";
+import { Repository } from "typeorm";
 
-export function processClass(
+export async function processClass(
   node: ts.ClassDeclaration | ts.InterfaceDeclaration,
   folderPath: string,
   filePath: string,
-  fileImports: ImportDeclarationInfo[]
-): Extracted {
+  fileImports: ImportDeclarationInfo[],
+  nodeRepo: Repository<CodeNodeEntity>
+): Promise<Extracted> {
   let identifiers: CodeNodeEntity[] = [];
   let edges: CodeEdgeEntity[] = [];
 
@@ -29,6 +31,19 @@ export function processClass(
 
   identifiers.push(classIdentifier);
 
+  // heritage clause handling 
+  /*
+  if (node.heritageClauses) {
+    for (const clause of node.heritageClauses) {
+      const isExtends = clause.token === ts.SyntaxKind.ExtendsKeyword;
+      const isImplements = clause.token === ts.SyntaxKind.ImplementsKeyword;
+
+      for (const type of clause.types) {
+        console.log(type)
+      }
+    }
+  }*/
+  // member handling
   node.members.forEach((member) => {
     // METHOD handling
     if (
@@ -65,6 +80,8 @@ export function processClass(
       }
     }
   });
+
+  identifiers = await nodeRepo.save(identifiers);
 
   return { identifiers, edges };
 }

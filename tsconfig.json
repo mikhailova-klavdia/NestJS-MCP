@@ -18,5 +18,5 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
   },
-  "exclude": ["documents/code_base"]
+  "exclude": ["documents/", "dist"]
 }
