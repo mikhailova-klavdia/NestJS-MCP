@@ -38,9 +38,8 @@ export class CodeNodeExtractor {
     const visit = (node: ts.Node) => {
       // Class declarations
       if (
-        ts.isClassDeclaration(node) ||
-        ts.isInterfaceDeclaration(node) ||
-        ts.isEnumDeclaration(node)
+        (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
+        node.name
       ) {
         const { extractedIdentifiers, extractedEdges } = processClass(
           node,
@@ -52,7 +51,7 @@ export class CodeNodeExtractor {
         edges.push(...extractedEdges);
       }
       // enums
-      else if (ts.isEnumDeclaration(node)) {
+      else if (ts.isEnumDeclaration(node) && node.name) {
         const { extractedIdentifiers, extractedEdges } = processEnum(
           node,
           folderPath,
@@ -64,8 +63,8 @@ export class CodeNodeExtractor {
       }
       // Variables, types
       else if (
-        ts.isVariableDeclaration(node) ||
-        ts.isTypeAliasDeclaration(node)
+        (ts.isVariableDeclaration(node) || ts.isTypeAliasDeclaration(node)) &&
+        node.name
       ) {
         const variableIdentifier = handleIdentifier(node, folderPath, filePath);
         if (variableIdentifier) {

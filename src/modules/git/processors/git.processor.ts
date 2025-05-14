@@ -15,13 +15,17 @@ export class GitProcessor extends WorkerHost {
   }
 
   async process(job: Job<{ projectId: number }>) {
-    const { projectId } = job.data;
-    this._logger.log(`🔄 Starting indexing for project ${projectId}`);
+    try {
+      const { projectId } = job.data;
+      this._logger.log(`🔄 Starting indexing for project ${projectId}`);
 
-    const project = await this._gitService.findProjectById(projectId);
-    await this._gitService.processRepository(project);
+      const project = await this._gitService.findProjectById(projectId);
+      await this._gitService.processRepository(project);
 
-    this._logger.log(`✅ Finished indexing for project ${projectId}`);
+      this._logger.log(`✅ Finished indexing for project ${projectId}`);
+    } catch (err) {
+      this._logger.error(err);
+    }
   }
 
   @OnWorkerEvent("completed")

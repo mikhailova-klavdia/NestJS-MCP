@@ -7,7 +7,7 @@ import { findDependenciesInNode } from "./import-finder";
 import { createEdge, handleIdentifier } from "./code-node-handler";
 
 export function processClass(
-  node: ts.Node,
+  node: ts.ClassDeclaration | ts.InterfaceDeclaration,
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[]
@@ -15,23 +15,26 @@ export function processClass(
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
 
-  if (
-    (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
-    node.name
-  ) {
-    const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
+  if (!node.name) return { extractedIdentifiers, extractedEdges };
 
-    if (!classIdentifier) return { extractedIdentifiers, extractedEdges };
+  const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
-    classIdentifier.context.dependencies = findDependenciesInNode(
-      node,
-      fileImports
-    );
+  if (!classIdentifier) return { extractedIdentifiers, extractedEdges };
 
-    extractedIdentifiers.push(classIdentifier);
+  classIdentifier.context.dependencies = findDependenciesInNode(
+    node,
+    fileImports
+  );
 
-    node.members.forEach((member) => {
-      // METHOD handling
+  extractedIdentifiers.push(classIdentifier);
+
+  node.members.forEach((member) => {
+    // METHOD handling
+    if (
+      ts.isMethodDeclaration(member) ||
+      ts.isMethodSignature(member) ||
+      ts.isFunctionDeclaration(member)
+    ) {
       const {
         extractedIdentifiers: extractedMethodIdentifiers,
         extractedEdges: extractedMethodEdges,
@@ -44,31 +47,30 @@ export function processClass(
       );
       extractedIdentifiers.push(...extractedMethodIdentifiers);
       extractedEdges.push(...extractedMethodEdges);
+    }
 
-      // PROPERTY handling
-      if (
-        (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) &&
-        member.name
-      ) {
-        const property = handleIdentifier(member.name, folderPath, filePath);
-        if (property) {
-          extractedIdentifiers.push(property);
-          const edge = createEdge(
-            classIdentifier,
-            property,
-            RelationshipType.PROPERTY
-          );
-          extractedEdges.push(edge);
-        }
+    // PROPERTY handling
+    if (
+      (ts.isPropertyDeclaration(member) || ts.isPropertySignature(member)) &&
+      member.name
+    ) {
+      const property = handleIdentifier(member.name, folderPath, filePath);
+      if (property) {
+        extractedIdentifiers.push(property);
+        const edge = createEdge(
+          classIdentifier,
+          property,
+          RelationshipType.PROPERTY
+        );
+        extractedEdges.push(edge);
       }
-    });
-  }
-
+    }
+  });
   return { extractedIdentifiers, extractedEdges };
 }
 
 export function processEnum(
-  node: ts.Node,
+  node: ts.EnumDeclaration,
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[]
@@ -76,27 +78,25 @@ export function processEnum(
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
 
-  if (ts.isEnumDeclaration(node) && node.name) {
-    const enumId = handleIdentifier(node.name, folderPath, filePath);
+  const enumId = handleIdentifier(node.name, folderPath, filePath);
 
-    if (!enumId) return { extractedIdentifiers, extractedEdges };
+  if (!enumId) return { extractedIdentifiers, extractedEdges };
 
-    enumId.context.dependencies = findDependenciesInNode(node, fileImports);
+  enumId.context.dependencies = findDependenciesInNode(node, fileImports);
 
-    extractedIdentifiers.push(enumId);
+  extractedIdentifiers.push(enumId);
 
-    node.members.forEach((member) => {
-      if (ts.isEnumMember(member)) {
-        const memberId = handleIdentifier(member.name, folderPath, filePath);
-        if (memberId) {
-          extractedIdentifiers.push(memberId);
-          extractedEdges.push(
-            createEdge(enumId, memberId, RelationshipType.ENUM_MEMBER)
-          );
-        }
+  node.members.forEach((member) => {
+    if (ts.isEnumMember(member)) {
+      const memberId = handleIdentifier(member.name, folderPath, filePath);
+      if (memberId) {
+        extractedIdentifiers.push(memberId);
+        extractedEdges.push(
+          createEdge(enumId, memberId, RelationshipType.ENUM_MEMBER)
+        );
       }
-    });
-  }
+    }
+  });
 
   return { extractedIdentifiers, extractedEdges };
 }

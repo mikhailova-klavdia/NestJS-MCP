@@ -6,7 +6,7 @@ import { createEdge, handleIdentifier } from "./code-node-handler";
 import { findDependenciesInNode } from "./import-finder";
 
 export function handleFunctionMethod(
-  node: ts.Node,
+  node: ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature,
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[],
@@ -15,50 +15,40 @@ export function handleFunctionMethod(
   const extractedIdentifiers: CodeNodeEntity[] = [];
   const extractedEdges: CodeEdgeEntity[] = [];
 
-  if (
-    (ts.isFunctionDeclaration(node) ||
-      ts.isMethodDeclaration(node) ||
-      ts.isMethodSignature(node)) &&
-    node.name
-  ) {
-    const functionIdentifier = handleIdentifier(
-      node.name,
-      folderPath,
-      filePath
+  if (!node.name) return { extractedIdentifiers, extractedEdges };
+
+  const functionIdentifier = handleIdentifier(node.name, folderPath, filePath);
+
+  if (!functionIdentifier) return { extractedIdentifiers, extractedEdges };
+  functionIdentifier.context.dependencies = findDependenciesInNode(
+    node,
+    fileImports
+  );
+
+  extractedIdentifiers.push(functionIdentifier);
+
+  if (source) {
+    const edge = createEdge(
+      source,
+      functionIdentifier,
+      RelationshipType.METHOD
     );
-    if (functionIdentifier) {
-      functionIdentifier.context.dependencies = findDependenciesInNode(node, fileImports);
-
-      extractedIdentifiers.push(functionIdentifier);
-
-      if (source) {
-        const edge = createEdge(
-          source,
-          functionIdentifier,
-          RelationshipType.METHOD
-        );
-        extractedEdges.push(edge);
-      }
-
-      node.parameters.forEach((param) => {
-        const paramIdentifier = handleIdentifier(
-          param.name,
-          folderPath,
-          filePath
-        );
-
-        if (paramIdentifier) {
-          const edge = createEdge(
-            functionIdentifier,
-            paramIdentifier,
-            RelationshipType.PARAMETER
-          );
-          extractedIdentifiers.push(paramIdentifier);
-          extractedEdges.push(edge);
-        }
-      });
-    }
+    extractedEdges.push(edge);
   }
+
+  node.parameters.forEach((param) => {
+    const paramIdentifier = handleIdentifier(param.name, folderPath, filePath);
+
+    if (paramIdentifier) {
+      const edge = createEdge(
+        functionIdentifier,
+        paramIdentifier,
+        RelationshipType.PARAMETER
+      );
+      extractedIdentifiers.push(paramIdentifier);
+      extractedEdges.push(edge);
+    }
+  });
 
   return { extractedIdentifiers, extractedEdges };
 }
