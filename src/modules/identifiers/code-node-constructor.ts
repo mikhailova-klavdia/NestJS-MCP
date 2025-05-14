@@ -11,7 +11,7 @@ import {
   processEnum,
 } from "src/utils/extractors/handle-class-enums";
 import { handleFunctionMethod } from "src/utils/extractors/handle-function";
-import { CodeGraph } from "src/utils/types/types";
+import { CodeGraph, Extracted } from "src/utils/types/types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -37,25 +37,18 @@ export class CodeNodeExtractor {
       ts.ScriptTarget.Latest,
       true
     );
-    const identifiers: CodeNodeEntity[] = [];
-    const edges: CodeEdgeEntity[] = [];
-
     const imports = findImports(sourceFile);
 
-    const visit = (node: ts.Node) => {
+    const visit = async (node: ts.Node): Promise<Extracted> => {
+      const identifiers: CodeNodeEntity[] = [];
+      const edges: CodeEdgeEntity[] = [];
       // Class declarations
       if (
         (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
         node.name
       ) {
         const { identifiers: extractedIdentifiers, edges: extractedEdges } =
-          processClass(
-            node,
-            folderPath,
-            filePath,
-            imports
-            //this._nodeRepo
-          );
+          await processClass(node, folderPath, filePath, imports, this._nodeRepo);
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
@@ -84,10 +77,16 @@ export class CodeNodeExtractor {
         edges.push(...extractedEdges);
       }
 
-      ts.forEachChild(node, (child) => visit(child));
+      for (const child of node.getChildren()) {
+        const { identifiers: cIds, edges: cEs } = await visit(child);
+        identifiers.push(...cIds);
+        edges.push(...cEs);
+      }
+
+      return { identifiers, edges };
     };
 
-    await visit(sourceFile);
+    const { identifiers, edges } = await visit(sourceFile);
     return { identifiers, edges };
   }
 
