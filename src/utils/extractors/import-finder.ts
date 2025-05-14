@@ -4,6 +4,8 @@ import { Logger } from "@nestjs/common";
 import { getAllFiles } from "../files";
 import { UsagePoint } from "../types/context";
 import { ImportDeclarationInfo } from "../types/types";
+import { handleIdentifier } from "./code-node-handler";
+import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 
 const logger = new Logger("ImportFinder");
 
@@ -11,9 +13,9 @@ export function findUsagePoints(
   identifier: string,
   folderPath: string,
   identifierDeclationFile: string
-): UsagePoint[] {
+): { usages: UsagePoint[]; subClasses: CodeNodeEntity[] } {
   const usages: UsagePoint[] = [];
-  const subClasses: ts.Node[] = [];
+  const subClasses: CodeNodeEntity[] = [];
   const files = getAllFiles(folderPath, "ts");
 
   for (const file of files) {
@@ -76,17 +78,23 @@ export function findUsagePoints(
       if (ts.isClassDeclaration(node) && node.heritageClauses) {
         for (const clause of node.heritageClauses) {
           if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
-            if (
-              clause.types.some(
-                (t) =>
-                  ts.isIdentifier(t.expression) &&
-                  t.expression.text === identifier
-              )
-            ) {
-              // found the subclass 
-              console.log("SUBCLASS FOUND")
-              console.log(clause)
-              subClasses.push(clause)
+            for (const type of clause.types) {
+              if (
+                ts.isIdentifier(type.expression) &&
+                type.expression.text == identifier
+              ) {
+                // found the subclass
+                console.log("SUBCLASS FOUND");
+                const codeNode = handleIdentifier(
+                  type.expression,
+                  folderPath,
+                  file
+                );
+                if (codeNode) {
+                  subClasses.push(codeNode);
+                  console.log(codeNode);
+                }
+              }
             }
           }
         }
@@ -94,11 +102,11 @@ export function findUsagePoints(
     };
     visit(sourceFile);
 
-    return usages;
+    return { usages, subClasses };
   }
 
   logger.log(`Found ${usages.length} usages(s) for identifier "${identifier}"`);
-  return usages;
+  return { usages, subClasses };
 }
 
 export function findEnclosingStatement(node: ts.Node): ts.Node {

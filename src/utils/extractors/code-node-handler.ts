@@ -15,7 +15,12 @@ export function handleIdentifier(
     const codeNode = new CodeNodeEntity();
     const nodeContext = getDeclarationType(node);
     const isExported = isExportedIdentifier(node);
-    const usages = isExported ? findUsagePoints(node.text, folderPath, filePath) : [];
+
+    const usageResult = isExported
+      ? findUsagePoints(node.text, folderPath, filePath)
+      : { usages: [], subClasses: [] };
+
+    const { usages, subClasses } = usageResult;
 
     codeNode.id = uuidv4();
     codeNode.identifier = node.text;
@@ -51,7 +56,7 @@ function getDeclarationType(node: ts.Node): {
   };
 }
 
-// creates an edge 
+// creates an edge
 export function createEdge(
   source: CodeNodeEntity,
   target: CodeNodeEntity,
