@@ -6,7 +6,7 @@ import {
   Column,
 } from "typeorm";
 import { CodeNodeEntity } from "./code-node.entity";
-import { RelationshipType } from "src/utils/types";
+import { RelationshipType } from "src/utils/types/context";
 
 @Entity()
 export class CodeEdgeEntity {

@@ -1,14 +1,11 @@
 import * as ts from "typescript";
-import {
-  Extracted,
-  ImportDeclarationInfo,
-  RelationshipType,
-} from "src/utils/types";
 import { handleFunctionMethod } from "./handle-function";
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import { findDependenciesInNode } from "./import-finder";
 import { createEdge, handleIdentifier } from "./code-node-handler";
+import { RelationshipType } from "../types/context";
+import { ImportDeclarationInfo, Extracted } from "../types/types";
 
 export function processClass(
   node: ts.ClassDeclaration | ts.InterfaceDeclaration,

@@ -1,9 +1,9 @@
 import * as ts from "typescript";
-import { RelationshipType } from "src/utils/types";
 import { v4 as uuidv4 } from "uuid";
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import { findUsagePoints } from "./import-finder";
+import { RelationshipType } from "../types/context";
 
 // create a new identifier
 export function handleIdentifier(

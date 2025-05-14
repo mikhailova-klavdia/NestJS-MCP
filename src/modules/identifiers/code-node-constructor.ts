@@ -4,7 +4,6 @@ import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
-import { CodeGraph } from "src/utils/types";
 import { findImports } from "src/utils/extractors/import-finder";
 import { handleIdentifier } from "src/utils/extractors/code-node-handler";
 import {
@@ -12,6 +11,7 @@ import {
   processEnum,
 } from "src/utils/extractors/handle-class-enums";
 import { handleFunctionMethod } from "src/utils/extractors/handle-function";
+import { CodeGraph } from "src/utils/types/types";
 
 @Injectable()
 export class CodeNodeExtractor {

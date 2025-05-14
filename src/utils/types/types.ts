@@ -1,32 +1,15 @@
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
-
-export type ContextV1 = {
-  usages?: UsagePoint[] | null;
-  dependencies?: ImportDeclarationInfo[];
-  codeSnippet: string;
-};
-
-export type UsagePoint = {
-  codeSnippet: string;
-  filepath: string;
-};
-
-export enum RelationshipType {
-  PARAMETER = "PARAMETER",
-  METHOD = "METHOD",
-  PROPERTY = "PROPERTY",
-  ENUM_MEMBER = "ENUM_MEMBER",
-}
-
-export type CodeGraph = {
-  identifiers: CodeNodeEntity[];
-  edges: CodeEdgeEntity[];
-};
+import { ContextV1, RelationshipType } from "./context";
 
 export type GraphNeighbor = {
   relType: RelationshipType;
   node: GraphNodePayload;
+};
+
+export type CodeGraph = {
+  identifiers: CodeNodeEntity[];
+  edges: CodeEdgeEntity[];
 };
 
 export type GraphNodePayload = {
@@ -38,13 +21,13 @@ export type GraphNodePayload = {
   neighbours: GraphNeighbor[];
 };
 
+export type Extracted = {
+  identifiers: CodeNodeEntity[];
+  edges: CodeEdgeEntity[];
+};
+
 export type ImportDeclarationInfo = {
   moduleName: string;
   namedImports: string[];
   codeSnippet: string;
 }
-
-export type Extracted = {
-  identifiers: CodeNodeEntity[];
-  edges: CodeEdgeEntity[];
-};

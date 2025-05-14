@@ -5,12 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "../identifiers/entities/code-node.entity";
-import {
-  ContextV1,
-  GraphNeighbor,
-  GraphNodePayload,
-  RelationshipType,
-} from "src/utils/types";
+import { GraphNeighbor, GraphNodePayload } from "src/utils/types/types";
+import { ContextV1, RelationshipType } from "src/utils/types/context";
 
 @Injectable()
 export class RagService {

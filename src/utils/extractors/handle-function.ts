@@ -1,9 +1,10 @@
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import ts from "typescript";
-import { Extracted, ImportDeclarationInfo, RelationshipType } from "../types";
 import { createEdge, handleIdentifier } from "./code-node-handler";
 import { findDependenciesInNode } from "./import-finder";
+import { Extracted, ImportDeclarationInfo } from "../types/types";
+import { RelationshipType } from "../types/context";
 
 export function handleFunctionMethod(
   node: ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature,

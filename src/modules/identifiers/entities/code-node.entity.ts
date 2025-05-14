@@ -6,7 +6,7 @@ import {
   PrimaryColumn,
 } from "typeorm";
 import { ProjectEntity } from "../../project/project.entity";
-import { ContextV1 } from "src/utils/types";
+import { ContextV1 } from "src/utils/types/context";
 
 @Entity()
 export class CodeNodeEntity {

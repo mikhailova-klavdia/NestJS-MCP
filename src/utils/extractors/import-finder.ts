@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import { Logger } from "@nestjs/common";
 import { getAllFiles } from "../files";
-import { UsagePoint, ImportDeclarationInfo } from "../types";
+import { UsagePoint } from "../types/context";
+import { ImportDeclarationInfo } from "../types/types";
 
 const logger = new Logger("ImportFinder");
 
