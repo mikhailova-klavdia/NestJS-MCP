@@ -75,25 +75,22 @@ export function findUsagePoints(
       }
       ts.forEachChild(node, visit);
 
-      if (ts.isClassDeclaration(node) && node.heritageClauses) {
+      if (ts.isClassDeclaration(node) && node.heritageClauses && node.name) {
         for (const clause of node.heritageClauses) {
           if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
-            for (const type of clause.types) {
-              if (
-                ts.isIdentifier(type.expression) &&
-                type.expression.text == identifier
-              ) {
-                // found the subclass
-                console.log("SUBCLASS FOUND");
-                const codeNode = handleIdentifier(
-                  type.expression,
-                  folderPath,
-                  file
-                );
-                if (codeNode) {
-                  subClasses.push(codeNode);
-                  console.log(codeNode);
-                }
+            if (
+              clause.types.some(
+                (t) =>
+                  ts.isIdentifier(t.expression) &&
+                  t.expression.text === identifier
+              )
+            ) {
+              // found the subclass
+              console.log("SUBCLASS FOUND");
+              const codeNode = handleIdentifier(node.name, folderPath, file);
+              if (codeNode) {
+                subClasses.push(codeNode);
+                console.log(codeNode);
               }
             }
           }
