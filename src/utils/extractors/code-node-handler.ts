@@ -5,6 +5,7 @@ import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entit
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import { findUsagePoints } from "./import-finder";
 
+// create a new identifier
 export function handleIdentifier(
   node: ts.Node,
   folderPath: string,
@@ -12,7 +13,6 @@ export function handleIdentifier(
 ) {
   if (ts.isIdentifier(node)) {
     const codeNode = new CodeNodeEntity();
-    // grab identifier context
     const nodeContext = getDeclarationType(node);
     const isExported = isExportedIdentifier(node);
     const usages = isExported ? findUsagePoints(node.text, folderPath, filePath) : [];
@@ -30,8 +30,9 @@ export function handleIdentifier(
   }
 }
 
+// checks for export flags
 function isExportedIdentifier(node: ts.Node) {
-  // the the declaration
+  // parent node - since this is the identifier node
   const parent = node.parent as ts.Declaration;
   const flags = ts.getCombinedModifierFlags(parent);
   const isExported = Boolean(flags & ts.ModifierFlags.Export);
@@ -50,6 +51,7 @@ function getDeclarationType(node: ts.Node): {
   };
 }
 
+// creates an edge 
 export function createEdge(
   source: CodeNodeEntity,
   target: CodeNodeEntity,

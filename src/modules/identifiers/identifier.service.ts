@@ -12,52 +12,7 @@ export class IdentifierService {
     private readonly _identifierRepository: Repository<CodeNodeEntity>,
     private readonly _embeddingService: EmbedConfig
   ) {}
-
-  async getAllIdentifiers(): Promise<CodeNodeEntity[]> {
-    const identifiers = await this._identifierRepository.find();
-
-    // ensure each identifier has an embedding
-    for (const ident of identifiers) {
-      if (!ident.embedding) {
-        ident.embedding = await this._embeddingService.embed(ident.identifier);
-        await this._identifierRepository.save(ident);
-      }
-    }
-
-    return identifiers;
-  }
-
-  async saveIdentifier(
-    identifier: string,
-    codeSnippet: string
-  ): Promise<CodeNodeEntity> {
-    const entity = new CodeNodeEntity();
-    entity.identifier = identifier;
-    entity.filePath = "manual";
-    entity.embedding = await this._embeddingService.embed(codeSnippet);
-    return this._identifierRepository.save(entity);
-  }
-
-  findMostRelevantIdentifier(
-    identifiers: CodeNodeEntity[],
-    queryEmbedding: number[]
-  ): CodeNodeEntity | null {
-    let maxSimilarity = -1;
-    let relevant: CodeNodeEntity | null = null;
-
-    for (const ident of identifiers) {
-      if (ident.embedding) {
-        const similarity = cosineSimilarity(queryEmbedding, ident.embedding);
-        if (similarity > maxSimilarity) {
-          maxSimilarity = similarity;
-          relevant = ident;
-        }
-      }
-    }
-
-    return relevant;
-  }
-
+  
   findTopNRelevantIdentifiers(
     identifiers: CodeNodeEntity[],
     queryEmbedding: number[],
