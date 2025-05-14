@@ -31,26 +31,6 @@ export async function processClass(
 
   identifiers.push(classIdentifier);
 
-  // heritage clause handling
-  if (node.heritageClauses) {
-    for (const clause of node.heritageClauses) {
-      const isExtends = clause.token === ts.SyntaxKind.ExtendsKeyword;
-      const isImplements = clause.token === ts.SyntaxKind.ImplementsKeyword;
-
-      for (const type of clause.types) {
-        const heritageName = type.expression.getText();
-        // check whether the class/interface was imported
-        let importDeclaration = fileImports.find((decl) =>
-          decl.namedImports.includes(heritageName)
-        );
-
-        if (!importDeclaration) {
-          // search for the node within the same file
-        }
-      }
-    }
-  }
-
   // member handling
   node.members.forEach((member) => {
     // METHOD handling
