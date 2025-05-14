@@ -1,8 +1,8 @@
-import { ImportDeclarationInfo, UsagePoint } from "./types";
 import * as fs from "fs";
 import * as ts from "typescript";
-import { getAllFiles } from "./files";
 import { Logger } from "@nestjs/common";
+import { getAllFiles } from "../files";
+import { UsagePoint, ImportDeclarationInfo } from "../types";
 
 const logger = new Logger("ImportFinder");
 
@@ -80,7 +80,7 @@ export function findUsagePoints(
   return usages;
 }
 
-function findEnclosingStatement(node: ts.Node): ts.Node {
+export function findEnclosingStatement(node: ts.Node): ts.Node {
   let current: ts.Node | undefined = node;
   while (current && !ts.isStatement(current)) {
     current = current.parent;
@@ -88,7 +88,7 @@ function findEnclosingStatement(node: ts.Node): ts.Node {
   return current ?? node;
 }
 
-function isInsideImport(node: ts.Node): boolean {
+export function isInsideImport(node: ts.Node): boolean {
   let current: ts.Node | undefined = node;
   while (current) {
     if (ts.isImportDeclaration(current)) {

@@ -3,14 +3,12 @@ import * as fs from "fs";
 import * as ts from "typescript";
 import { getAllFiles } from "src/utils/files";
 import { CodeNodeEntity } from "./entities/code-node.entity";
-import {
-  processClassEnum,
-  handleFunctionMethod,
-  handleIdentifier,
-} from "./code-node-handler";
 import { CodeEdgeEntity } from "./entities/code-edge.entity";
 import { CodeGraph } from "src/utils/types";
-import { findImports } from "src/utils/import-finder";
+import { findImports } from "src/utils/extractors/import-finder";
+import { handleIdentifier } from "src/utils/extractors/code-node-handler";
+import { processClassEnum } from "src/utils/extractors/handle-class-enums";
+import { handleFunctionMethod } from "src/utils/extractors/handle-function";
 
 @Injectable()
 export class CodeNodeExtractor {

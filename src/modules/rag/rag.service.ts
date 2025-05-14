@@ -103,7 +103,7 @@ export class RagService {
     const payload: GraphNodePayload = {
       title: nodeEntity.identifier,
       filePath: nodeEntity.filePath,
-      declarationType: nodeEntity.context.declarationType,
+      declarationType: nodeEntity.declarationType,
       context,
       neighbours: [],
     };
