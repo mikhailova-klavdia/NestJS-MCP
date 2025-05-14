@@ -48,18 +48,6 @@ export class RagService {
       .findTopNRelevantIdentifiers(identifiers, queryEmbedding, topN)
       .filter((hit) => hit.similarity >= minSimilarity);
 
-    /*
-    const results = relevantIdentifier
-      .filter((r) => r.similarity >= minSimilarity)
-      .map((doc) => ({
-        title: doc.identifier.identifier,
-        filePath: doc.identifier.filePath,
-        declarationType: doc.identifier.context.declarationType,
-        similarity: doc.similarity,
-        context: doc.identifier.context,
-      }));
-    */
-
     const visited = new Set<string>();
     const results: GraphNodePayload[] = [];
 

@@ -11,34 +11,30 @@ export class RagTool {
 
   @Tool({
     name: "rag",
-    description: "RAG tool for retrieving related identifiers",
+    description:
+      "RAG tool for retrieving related identifiers and their graph structure",
     parameters: z.object({
       query: z.string().nonempty(),
-      projectId: z.string().uuid(),
+      projectId: z.number().int().positive(),
       topN: z.number().int().positive().default(5),
       minSimilarity: z.number().min(0).max(1).default(0.0),
       depth: z.number().int().min(0).default(0),
     }),
   })
-  async retrieveRelatedIdentifiers({
-    query,
-    projectId,
-    topN,
-    minSimilarity,
-    depth,
-  }: {
+  async retrieveRelatedIdentifiers(params: {
     query: string;
     projectId: number;
     topN?: number;
     minSimilarity?: number;
     depth?: number;
   }) {
+    const { query, projectId, topN, minSimilarity, depth } = params;
     this._logger.log(
       `Running RAG query for project=${projectId}, topN=${topN}, minSimilarity=${minSimilarity}, depth=${depth}`
     );
 
-    // run the RAG query
-    const results = await this._rag.retrieve(
+    // Retrieve the subgraph payloads
+    const payload = await this._rag.retrieve(
       query,
       projectId,
       topN,
@@ -46,7 +42,16 @@ export class RagTool {
       depth
     );
 
-    // report progress
-    return { results };
+    // Stringify the full results payload for inspection
+    const jsonText = JSON.stringify(payload, null, 2);
+
+    const content = [
+      {
+        type: "text" as const,
+        text: jsonText,
+      },
+    ];
+
+    return { content };
   }
 }
