@@ -42,19 +42,19 @@ export class CodeNodeExtractor {
 
     const imports = findImports(sourceFile);
 
-    const visit = async (node: ts.Node) => {
+    const visit = (node: ts.Node) => {
       // Class declarations
       if (
         (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
         node.name
       ) {
         const { identifiers: extractedIdentifiers, edges: extractedEdges } =
-          await processClass(
+          processClass(
             node,
             folderPath,
             filePath,
-            imports,
-            this._nodeRepo
+            imports
+            //this._nodeRepo
           );
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
