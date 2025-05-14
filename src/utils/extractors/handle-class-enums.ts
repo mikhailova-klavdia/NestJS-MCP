@@ -1,5 +1,9 @@
 import * as ts from "typescript";
-import { ImportDeclarationInfo, RelationshipType } from "src/utils/types";
+import {
+  Extracted,
+  ImportDeclarationInfo,
+  RelationshipType,
+} from "src/utils/types";
 import { handleFunctionMethod } from "./handle-function";
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
@@ -11,22 +15,22 @@ export function processClass(
   folderPath: string,
   filePath: string,
   fileImports: ImportDeclarationInfo[]
-) {
-  const extractedIdentifiers: CodeNodeEntity[] = [];
-  const extractedEdges: CodeEdgeEntity[] = [];
+): Extracted {
+  const identifiers: CodeNodeEntity[] = [];
+  const edges: CodeEdgeEntity[] = [];
 
-  if (!node.name) return { extractedIdentifiers, extractedEdges };
+  if (!node.name) return { identifiers, edges };
 
   const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
-  if (!classIdentifier) return { extractedIdentifiers, extractedEdges };
+  if (!classIdentifier) return { identifiers, edges };
 
   classIdentifier.context.dependencies = findDependenciesInNode(
     node,
     fileImports
   );
 
-  extractedIdentifiers.push(classIdentifier);
+  identifiers.push(classIdentifier);
 
   node.members.forEach((member) => {
     // METHOD handling
@@ -35,18 +39,16 @@ export function processClass(
       ts.isMethodSignature(member) ||
       ts.isFunctionDeclaration(member)
     ) {
-      const {
-        extractedIdentifiers: extractedMethodIdentifiers,
-        extractedEdges: extractedMethodEdges,
-      } = handleFunctionMethod(
-        member,
-        folderPath,
-        filePath,
-        fileImports,
-        classIdentifier
-      );
-      extractedIdentifiers.push(...extractedMethodIdentifiers);
-      extractedEdges.push(...extractedMethodEdges);
+      const { identifiers: extractedIdentifiers, edges: extractedEdges } =
+        handleFunctionMethod(
+          member,
+          folderPath,
+          filePath,
+          fileImports,
+          classIdentifier
+        );
+      identifiers.push(...extractedIdentifiers);
+      edges.push(...extractedEdges);
     }
 
     // PROPERTY handling
@@ -56,17 +58,17 @@ export function processClass(
     ) {
       const property = handleIdentifier(member.name, folderPath, filePath);
       if (property) {
-        extractedIdentifiers.push(property);
+        identifiers.push(property);
         const edge = createEdge(
           classIdentifier,
           property,
           RelationshipType.PROPERTY
         );
-        extractedEdges.push(edge);
+        edges.push(edge);
       }
     }
   });
-  return { extractedIdentifiers, extractedEdges };
+  return { identifiers, edges };
 }
 
 export function processEnum(
@@ -75,28 +77,26 @@ export function processEnum(
   filePath: string,
   fileImports: ImportDeclarationInfo[]
 ) {
-  const extractedIdentifiers: CodeNodeEntity[] = [];
-  const extractedEdges: CodeEdgeEntity[] = [];
+  const identifiers: CodeNodeEntity[] = [];
+  const edges: CodeEdgeEntity[] = [];
 
   const enumId = handleIdentifier(node.name, folderPath, filePath);
 
-  if (!enumId) return { extractedIdentifiers, extractedEdges };
+  if (!enumId) return { identifiers, edges };
 
   enumId.context.dependencies = findDependenciesInNode(node, fileImports);
 
-  extractedIdentifiers.push(enumId);
+  identifiers.push(enumId);
 
   node.members.forEach((member) => {
     if (ts.isEnumMember(member)) {
       const memberId = handleIdentifier(member.name, folderPath, filePath);
       if (memberId) {
-        extractedIdentifiers.push(memberId);
-        extractedEdges.push(
-          createEdge(enumId, memberId, RelationshipType.ENUM_MEMBER)
-        );
+        identifiers.push(memberId);
+        edges.push(createEdge(enumId, memberId, RelationshipType.ENUM_MEMBER));
       }
     }
   });
 
-  return { extractedIdentifiers, extractedEdges };
+  return { identifiers, edges };
 }

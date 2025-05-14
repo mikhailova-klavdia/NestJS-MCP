@@ -1,7 +1,7 @@
 import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entity";
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import ts from "typescript";
-import { ImportDeclarationInfo, RelationshipType } from "../types";
+import { Extracted, ImportDeclarationInfo, RelationshipType } from "../types";
 import { createEdge, handleIdentifier } from "./code-node-handler";
 import { findDependenciesInNode } from "./import-finder";
 
@@ -11,21 +11,21 @@ export function handleFunctionMethod(
   filePath: string,
   fileImports: ImportDeclarationInfo[],
   source?: CodeNodeEntity
-) {
-  const extractedIdentifiers: CodeNodeEntity[] = [];
-  const extractedEdges: CodeEdgeEntity[] = [];
+) : Extracted {
+  const identifiers: CodeNodeEntity[] = [];
+  const edges: CodeEdgeEntity[] = [];
 
-  if (!node.name) return { extractedIdentifiers, extractedEdges };
+  if (!node.name) return { identifiers, edges };
 
   const functionIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
-  if (!functionIdentifier) return { extractedIdentifiers, extractedEdges };
+  if (!functionIdentifier) return { identifiers, edges };
   functionIdentifier.context.dependencies = findDependenciesInNode(
     node,
     fileImports
   );
 
-  extractedIdentifiers.push(functionIdentifier);
+  identifiers.push(functionIdentifier);
 
   if (source) {
     const edge = createEdge(
@@ -33,7 +33,7 @@ export function handleFunctionMethod(
       functionIdentifier,
       RelationshipType.METHOD
     );
-    extractedEdges.push(edge);
+    edges.push(edge);
   }
 
   node.parameters.forEach((param) => {
@@ -45,10 +45,10 @@ export function handleFunctionMethod(
         paramIdentifier,
         RelationshipType.PARAMETER
       );
-      extractedIdentifiers.push(paramIdentifier);
-      extractedEdges.push(edge);
+      identifiers.push(paramIdentifier);
+      edges.push(edge);
     }
   });
 
-  return { extractedIdentifiers, extractedEdges };
+  return { identifiers, edges };
 }

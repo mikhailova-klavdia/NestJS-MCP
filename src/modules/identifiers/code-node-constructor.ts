@@ -41,23 +41,15 @@ export class CodeNodeExtractor {
         (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
         node.name
       ) {
-        const { extractedIdentifiers, extractedEdges } = processClass(
-          node,
-          folderPath,
-          filePath,
-          imports
-        );
+        const { identifiers: extractedIdentifiers, edges: extractedEdges } =
+          processClass(node, folderPath, filePath, imports);
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
       // enums
       else if (ts.isEnumDeclaration(node) && node.name) {
-        const { extractedIdentifiers, extractedEdges } = processEnum(
-          node,
-          folderPath,
-          filePath,
-          imports
-        );
+        const { identifiers: extractedIdentifiers, edges: extractedEdges } =
+          processEnum(node, folderPath, filePath, imports);
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
@@ -73,12 +65,8 @@ export class CodeNodeExtractor {
       }
       // Functions / Methods
       else if (ts.isFunctionDeclaration(node)) {
-        const { extractedIdentifiers, extractedEdges } = handleFunctionMethod(
-          node,
-          folderPath,
-          filePath,
-          imports
-        );
+        const { identifiers: extractedIdentifiers, edges: extractedEdges } =
+          handleFunctionMethod(node, folderPath, filePath, imports);
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }

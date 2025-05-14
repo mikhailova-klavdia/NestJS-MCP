@@ -43,3 +43,8 @@ export type ImportDeclarationInfo = {
   namedImports: string[];
   codeSnippet: string;
 }
+
+export type Extracted = {
+  identifiers: CodeNodeEntity[];
+  edges: CodeEdgeEntity[];
+};
