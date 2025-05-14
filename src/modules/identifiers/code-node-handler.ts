@@ -150,10 +150,10 @@ export function handleIdentifier(
 
     codeNode.id = uuidv4();
     codeNode.identifier = node.text;
+    codeNode.declarationType = nodeContext.declarationType;
     codeNode.context = {
       codeSnippet: nodeContext.codeSnippet,
       usages: usages,
-      declarationType: nodeContext.declarationType,
     };
     codeNode.filePath = filePath;
 

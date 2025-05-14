@@ -16,6 +16,9 @@ export class CodeNodeEntity {
   @Column()
   identifier: string;
 
+  @Column()
+  declarationType?: string;
+
   @Column({ type: "jsonb" })
   context: ContextV1;
 

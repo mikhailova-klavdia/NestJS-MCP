@@ -2,7 +2,6 @@ import { CodeEdgeEntity } from "src/modules/identifiers/entities/code-edge.entit
 import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 
 export type ContextV1 = {
-  declarationType?: string;
   usages?: UsagePoint[] | null;
   dependencies?: ImportDeclarationInfo[];
   codeSnippet: string;
