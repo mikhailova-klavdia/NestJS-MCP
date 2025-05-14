@@ -185,7 +185,7 @@ export class GitService {
       await this._nodeRepo.delete({ project, filePath: relPath });
 
       const { identifiers, edges } =
-        this._extractor.getIdentifiersFromFolder(absPath);
+        await this._extractor.getIdentifiersFromFolder(absPath);
 
       const batchSize = 50;
 
@@ -200,6 +200,20 @@ export class GitService {
 
         console.log(
           `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
+        );
+      }
+
+      for (let i = 0; i < edges.length; i += batchSize) {
+        const batch = edges.slice(i, i + batchSize);
+
+        await this._edgeQueue.add(
+          "save-edge-batch",
+          { batch },
+          { removeOnComplete: true }
+        );
+
+        console.log(
+          `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
         );
       }
     }

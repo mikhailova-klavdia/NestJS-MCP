@@ -19,10 +19,10 @@ export class CodeNodeExtractor {
   /**
    * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
    */
-  private extractIdentifiersFromFile(
+  private async extractIdentifiersFromFile(
     filePath: string,
     folderPath: string
-  ): CodeGraph {
+  ): Promise<CodeGraph> {
     const content = fs.readFileSync(filePath, "utf8");
     const sourceFile = ts.createSourceFile(
       filePath,
@@ -35,14 +35,14 @@ export class CodeNodeExtractor {
 
     const imports = findImports(sourceFile);
 
-    const visit = (node: ts.Node) => {
+    const visit = async (node: ts.Node) => {
       // Class declarations
       if (
         (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
         node.name
       ) {
         const { identifiers: extractedIdentifiers, edges: extractedEdges } =
-          processClass(node, folderPath, filePath, imports);
+          await processClass(node, folderPath, filePath, imports);
         identifiers.push(...extractedIdentifiers);
         edges.push(...extractedEdges);
       }
@@ -71,10 +71,10 @@ export class CodeNodeExtractor {
         edges.push(...extractedEdges);
       }
 
-      ts.forEachChild(node, visit);
+      ts.forEachChild(node, (child) => visit(child));
     };
 
-    visit(sourceFile);
+    await visit(sourceFile);
     return { identifiers, edges };
   }
 
@@ -82,7 +82,7 @@ export class CodeNodeExtractor {
    * Scans the given folder recursively, reads all `.ts` files,
    * extracts identifiers from each, and returns a list of identifier data.
    */
-  getIdentifiersFromFolder(folderPath: string): CodeGraph {
+  async getIdentifiersFromFolder(folderPath: string): Promise<CodeGraph> {
     const tsFiles = getAllFiles(folderPath, ".ts");
     this.logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
@@ -96,7 +96,7 @@ export class CodeNodeExtractor {
     for (const file of tsFiles) {
       // pull out each file’s nodes + edges
       const { identifiers: fileIds, edges: fileEdges } =
-        this.extractIdentifiersFromFile(file, folderPath);
+        await this.extractIdentifiersFromFile(file, folderPath);
 
       // merge into our accumulators
       identifiers.push(...fileIds);
