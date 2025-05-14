@@ -1,22 +1,4 @@
-// AI GENERATED VIA CHATGPT
-// 1. Define an interface
-interface Flyer {
-  maximumAltitude: number;
-  fly(): void;
-}
-
-// 2. Base class
-class Animal {
-  protected name: string;
-
-  constructor(name: string) {
-    this.name = name;
-  }
-
-  public eat(food: string): void {
-    console.log(`${this.name} is eating ${food}.`);
-  }
-}
+import { Animal, Flyer } from "./inheritance2";
 
 // 3. Derived class: extends Animal and implements Flyer
 class Eagle extends Animal implements Flyer {

@@ -13,6 +13,7 @@ export function findUsagePoints(
   identifierDeclationFile: string
 ): UsagePoint[] {
   const usages: UsagePoint[] = [];
+  const subClasses: ts.Node[] = [];
   const files = getAllFiles(folderPath, "ts");
 
   for (const file of files) {
@@ -71,6 +72,25 @@ export function findUsagePoints(
         }
       }
       ts.forEachChild(node, visit);
+
+      if (ts.isClassDeclaration(node) && node.heritageClauses) {
+        for (const clause of node.heritageClauses) {
+          if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
+            if (
+              clause.types.some(
+                (t) =>
+                  ts.isIdentifier(t.expression) &&
+                  t.expression.text === identifier
+              )
+            ) {
+              // found the subclass 
+              console.log("SUBCLASS FOUND")
+              console.log(clause)
+              subClasses.push(clause)
+            }
+          }
+        }
+      }
     };
     visit(sourceFile);
 
