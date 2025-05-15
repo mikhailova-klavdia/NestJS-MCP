@@ -20,9 +20,36 @@ export async function processClass(
 
   if (!node.name) return { identifiers, edges };
 
-  const classIdentifier = handleIdentifier(node.name, folderPath, filePath);
+  let classIdentifier = handleIdentifier(node.name, folderPath, filePath);
 
   if (!classIdentifier) return { identifiers, edges };
+
+  // check whether the class is already in database
+  const dbClassCheck = await nodeRepo.findOne({
+    where: {
+      identifier: classIdentifier?.identifier,
+      filePath: classIdentifier?.filePath,
+      declarationType: classIdentifier.declarationType,
+    },
+  });
+
+  if (dbClassCheck) {
+    classIdentifier = dbClassCheck;
+  }
+
+  const usages = classIdentifier.context.usages ?? [];
+
+  // check for subclasses
+  for (const usage of usages) {
+    if (usage.subclass) {
+      const subclass = await nodeRepo.save(usage.subclass);
+      identifiers.push(subclass);
+
+      edges.push(
+        createEdge(classIdentifier, subclass, RelationshipType.SUBCLASS)
+      );
+    }
+  }
 
   classIdentifier.context.dependencies = findDependenciesInNode(
     node,

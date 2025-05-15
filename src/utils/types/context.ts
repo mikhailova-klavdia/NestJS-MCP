@@ -1,3 +1,4 @@
+import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entity";
 import { ImportDeclarationInfo } from "./types";
 
 export type ContextV1 = {
@@ -9,6 +10,7 @@ export type ContextV1 = {
 export type UsagePoint = {
   codeSnippet: string;
   filepath: string;
+  subclass?: CodeNodeEntity;
 };
 
 export enum RelationshipType {
@@ -16,4 +18,5 @@ export enum RelationshipType {
   METHOD = "METHOD",
   PROPERTY = "PROPERTY",
   ENUM_MEMBER = "ENUM_MEMBER",
+  SUBCLASS = "SUBCLASS",
 }

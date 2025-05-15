@@ -90,8 +90,11 @@ export function findUsagePoints(
               console.log("SUBCLASS FOUND");
               const codeNode = handleIdentifier(node.name, folderPath, file);
               if (codeNode) {
-                subClasses.push(codeNode);
-                console.log(codeNode);
+                usages.push({
+                  filepath: file,
+                  codeSnippet: codeNode.context.codeSnippet,
+                  subclass: codeNode,
+                });
               }
             }
           }
