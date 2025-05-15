@@ -75,6 +75,7 @@ export function findUsagePoints(
       }
       ts.forEachChild(node, visit);
 
+      // search for subclasses
       if (ts.isClassDeclaration(node) && node.heritageClauses && node.name) {
         for (const clause of node.heritageClauses) {
           if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
