@@ -87,7 +87,6 @@ export function findUsagePoints(
               )
             ) {
               // found the subclass
-              console.log("SUBCLASS FOUND");
               const codeNode = handleIdentifier(node.name, folderPath, file);
               if (codeNode) {
                 usages.push({
