@@ -62,5 +62,5 @@ OLLAMA_HOST=http://localhost:11434
 
 | Module  | Method | Path         | Description                                 |
 | ------- | ------ | ------------ | ------------------------------------------- |
-| Git     | POST   | `/git/clone` | Clone a Git repo and index files            |
-| RAG     | POST   | `/rag/query` | Query documents with context                |
+| Git     | POST   | `/api/git/clone` | Clone a Git repo and index files            |
+| RAG     | POST   | `/api/rag/query` | Query documents with context                |
