@@ -25,7 +25,7 @@ The application uses `@nestjs/config`. Required environment variables:
 ```dotenv
 # postgres
 POSTGRES_HOST=
-POSTGRES_PORT=5432
+POSTGRES_PORT=5433
 POSTGRES_USER=
 POSTGRES_PASSWORD=
 POSTGRES_DB=
