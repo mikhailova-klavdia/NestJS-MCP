@@ -124,18 +124,15 @@ export class GitService {
     batch: CodeNodeEntity[],
     project: ProjectEntity
   ) {
-    const embeddedBatch = await Promise.all(
-      batch.map(async (codeNode) => {
-        const embedding = await this._embeddingService.embed(
-          codeNode.identifier
-        );
-
-        codeNode.embedding = embedding;
-        codeNode.project = project;
-
-        return codeNode;
-      })
+    const embeddings = await this._embeddingService.embedBatch(
+      batch.map((node) => node.identifier)
     );
+
+    const embeddedBatch = batch.map((codeNode, idx) => {
+      codeNode.embedding = embeddings[idx];
+      codeNode.project = project;
+      return codeNode;
+    });
 
     await this._nodeRepo.save(embeddedBatch);
   }

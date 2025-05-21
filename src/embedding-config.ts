@@ -32,4 +32,11 @@ export class EmbedConfig {
     }
     return this.embeddings.embedQuery(text);
   }
+
+  async embedBatch(texts: string[]): Promise<number[][]> {
+  if (!Array.isArray(texts) || texts.some(t => typeof t !== 'string')) {
+    throw new Error('Invalid input: texts must be an array of strings');
+  }
+  return this.embeddings.embedDocuments(texts);
+}
 }

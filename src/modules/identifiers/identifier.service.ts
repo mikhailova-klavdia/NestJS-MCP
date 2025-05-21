@@ -12,7 +12,7 @@ export class IdentifierService {
     private readonly _identifierRepository: Repository<CodeNodeEntity>,
     private readonly _embeddingService: EmbedConfig
   ) {}
-  
+
   findTopNRelevantIdentifiers(
     identifiers: CodeNodeEntity[],
     queryEmbedding: number[],
@@ -45,12 +45,20 @@ export class IdentifierService {
       where: { project: { id: projectId } },
     });
 
-    for (const node of nodes) {
-      if (!node.embedding?.length) {
-        node.embedding = await this._embeddingService.embed(node.identifier);
-        await this._identifierRepository.save(node);
+    const nodesWithoutEmbedding = nodes.filter((n) => !n.embedding?.length);
+
+    if (nodesWithoutEmbedding.length > 0) {
+      const embeddings = await this._embeddingService.embedBatch(
+        nodesWithoutEmbedding.map((n) => n.identifier)
+      );
+
+      for (let i = 0; i < nodesWithoutEmbedding.length; i++) {
+        nodesWithoutEmbedding[i].embedding = embeddings[i];
       }
+
+      await this._identifierRepository.save(nodesWithoutEmbedding);
     }
+
     return nodes;
   }
 }
