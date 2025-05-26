@@ -200,88 +200,41 @@ export class GitService {
 
     let workdir = project.localPath;
     let cleanupTemp = false;
+    let git;
 
-    if (!workdir || !fs.existsSync(workdir)) {
-      // no permanent clone → make a temp one
+    if (workdir && fs.existsSync(workdir)) {
+      git = simpleGit(workdir);
+    } else {
+      // make a temporary clone
       workdir = path.join(os.tmpdir(), `repo-${project.name}-${Date.now()}`);
       fs.mkdirSync(workdir, { recursive: true });
       cleanupTemp = true;
 
-      // shallow clone with checkout
-      await simpleGit().clone(project.repoUrl, workdir, ["--depth", "1"]);
+      git = simpleGit(workdir);
+      await git.init();
+      await git.addRemote("origin", project.repoUrl);
+
+      await git.fetch("origin", project.lastProcessedCommit);
+      await git.fetch("origin", "main");
+      await git.checkout(["-f", "origin/main"]);
     }
 
-    const git = simpleGit(workdir);
-    await git.fetch("origin", "main");
     const remoteHead = (await git.revparse(["origin/main"])).trim();
-
     if (remoteHead === project.lastProcessedCommit) {
+      if (cleanupTemp) fs.rmSync(workdir, { recursive: true, force: true });
       return;
     }
 
-    // get the diff between the last processed commit and the remote head
     const diff: DiffResult = await git.diffSummary([
       `${project.lastProcessedCommit}..${remoteHead}`,
     ]);
-
     this._logger.log(
-      `Differences detected: ${diff.files.map((f) => f.file).join(", ")}`
+      `Changed files: ${diff.files.map((f) => f.file).join(", ")}`
     );
-
-    for (const file of diff.files) {
-      const relPath = file.file;
-      const absPath = path.join(workdir, relPath);
-
-      // delete identifiers if the file was changed or deleted
-      await this._nodeRepo
-        .createQueryBuilder()
-        .delete()
-        .where("projectId = :pid", { pid: project.id })
-        .andWhere("filePath = :file", { file: relPath })
-        .execute();
-
-      await this._nodeRepo.delete({ project, filePath: relPath });
-
-      const { identifiers, edges } =
-        await this._extractor.getIdentifiersFromFolder(absPath);
-
-      const batchSize = 50;
-
-      for (let i = 0; i < identifiers.length; i += batchSize) {
-        const batch = identifiers.slice(i, i + batchSize);
-
-        await this._embeddingQueue.add(
-          "batch",
-          { batch, project },
-          { removeOnComplete: true }
-        );
-
-        console.log(
-          `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length}`
-        );
-      }
-
-      for (let i = 0; i < edges.length; i += batchSize) {
-        const batch = edges.slice(i, i + batchSize);
-
-        await this._edgeQueue.add(
-          "save-edge-batch",
-          { batch },
-          { removeOnComplete: true }
-        );
-
-        console.log(
-          `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
-        );
-      }
-    }
 
     project.lastProcessedCommit = remoteHead;
     await this._projectRepo.save(project);
-
-    if (cleanupTemp) {
-      fs.rmSync(workdir, { recursive: true, force: true });
-    }
+    if (cleanupTemp) fs.rmSync(workdir, { recursive: true, force: true });
   }
 
   async findProjectById(id: number): Promise<ProjectEntity> {
