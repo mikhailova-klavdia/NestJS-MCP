@@ -18,6 +18,29 @@ export class GitController {
     @InjectQueue("code-indexing") private readonly _indexQueue: Queue
   ) {}
 
+  @Post("process")
+  async processRepo(@Body() body: CloneDto) {
+    const { repoUrl, projectName, sshKey } = body;
+    if (!repoUrl || !projectName) {
+      throw new BadRequestException("repoUrl and projectName are required");
+    }
+
+    try {
+      const project = await this._gitService.extractProjectIdentifiers(
+        repoUrl,
+        projectName,
+        sshKey
+      );
+      // no need for a second queue here, it's all enqueued in enqueueBatches()
+      return {
+        message: "Repository streamed & processed successfully",
+        project,
+      };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
+  }
+
   @Post("clone")
   async cloneRepo(@Body() body: CloneDto) {
     const { repoUrl, projectName } = body;
@@ -33,7 +56,7 @@ export class GitController {
       );
 
       await this._indexQueue.add("index", { projectId: project.id });
-      
+
       return {
         message: "Repository cloned & processed successfully",
         project,
