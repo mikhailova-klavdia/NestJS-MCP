@@ -311,7 +311,4 @@ export class GitService {
     }
   }
 
-  testEmbed(id: number) {
-    console.log("boop")
-  }
 }
