@@ -19,11 +19,15 @@ export class CodeEdgeEntity {
   })
   relType: RelationshipType;
 
-  @ManyToOne(() => CodeNodeEntity)
+  @ManyToOne(() => CodeNodeEntity, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "sourceId" })
   source: CodeNodeEntity;
 
-  @ManyToOne(() => CodeNodeEntity)
+  @ManyToOne(() => CodeNodeEntity, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "targetId" })
   target: CodeNodeEntity;
 }
