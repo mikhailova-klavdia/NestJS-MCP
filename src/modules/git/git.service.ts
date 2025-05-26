@@ -232,12 +232,12 @@ export class GitService {
       `Changed files: ${diff.files.map((f) => f.file).join(", ")}`
     );
 
-    // 4️⃣ For each changed file or folder...
+    // For each changed file or folder...
     for (const file of diff.files) {
       const relPath = file.file;
       const absPath = path.join(workdir, relPath);
 
-      // a) Remove any old nodes for this path
+      // Remove any old nodes for this path
       await this._nodeRepo
         .createQueryBuilder()
         .delete()
@@ -245,7 +245,7 @@ export class GitService {
         .andWhere("filePath = :file", { file: relPath })
         .execute();
 
-      // b) Re-extract identifiers & edges
+      // Re-extract identifiers & edges
       let identifiers: CodeNodeEntity[] = [];
       let edges: CodeEdgeEntity[] = [];
 
@@ -261,33 +261,8 @@ export class GitService {
         // deleted path: nothing to extract
         continue;
       }
-
-      console.log(identifiers, edges);
-
-      // c) Enqueue them in batches
-      const batchSize = 50;
-      for (let i = 0; i < identifiers.length; i += batchSize) {
-        const batch = identifiers.slice(i, i + batchSize);
-        await this._embeddingQueue.add(
-          "batch",
-          { batch, project },
-          { removeOnComplete: true }
-        );
-        this._logger.log(
-          `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length} identifiers`
-        );
-      }
-      for (let i = 0; i < edges.length; i += batchSize) {
-        const batch = edges.slice(i, i + batchSize);
-        await this._edgeQueue.add(
-          "save-edge-batch",
-          { batch },
-          { removeOnComplete: true }
-        );
-        this._logger.log(
-          `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
-        );
-      }
+      // Enqueue them in batches
+      await this.enqueueBatches(identifiers, edges, project);
     }
 
     project.lastProcessedCommit = remoteHead;
