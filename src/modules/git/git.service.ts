@@ -232,6 +232,64 @@ export class GitService {
       `Changed files: ${diff.files.map((f) => f.file).join(", ")}`
     );
 
+    // 4️⃣ For each changed file or folder...
+    for (const file of diff.files) {
+      const relPath = file.file;
+      const absPath = path.join(workdir, relPath);
+
+      // a) Remove any old nodes for this path
+      await this._nodeRepo
+        .createQueryBuilder()
+        .delete()
+        .where("projectId = :pid", { pid: project.id })
+        .andWhere("filePath = :file", { file: relPath })
+        .execute();
+
+      // b) Re-extract identifiers & edges
+      let identifiers: CodeNodeEntity[] = [];
+      let edges: CodeEdgeEntity[] = [];
+
+      if (fs.existsSync(absPath) && fs.statSync(absPath).isFile()) {
+        // if it’s a file, pull identifiers from its content
+        ({ identifiers, edges } =
+          await this._extractor.getIdentifiersFromFolder(relPath));
+      } else if (fs.existsSync(absPath) && fs.statSync(absPath).isDirectory()) {
+        // if it’s a directory, scan all .ts files under it
+        ({ identifiers, edges } =
+          await this._extractor.getIdentifiersFromFolder(absPath));
+      } else {
+        // deleted path: nothing to extract
+        continue;
+      }
+
+      console.log(identifiers, edges);
+
+      // c) Enqueue them in batches
+      const batchSize = 50;
+      for (let i = 0; i < identifiers.length; i += batchSize) {
+        const batch = identifiers.slice(i, i + batchSize);
+        await this._embeddingQueue.add(
+          "batch",
+          { batch, project },
+          { removeOnComplete: true }
+        );
+        this._logger.log(
+          `🔄 Enqueued ${Math.min(i + batchSize, identifiers.length)} / ${identifiers.length} identifiers`
+        );
+      }
+      for (let i = 0; i < edges.length; i += batchSize) {
+        const batch = edges.slice(i, i + batchSize);
+        await this._edgeQueue.add(
+          "save-edge-batch",
+          { batch },
+          { removeOnComplete: true }
+        );
+        this._logger.log(
+          `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
+        );
+      }
+    }
+
     project.lastProcessedCommit = remoteHead;
     await this._projectRepo.save(project);
     if (cleanupTemp) fs.rmSync(workdir, { recursive: true, force: true });
@@ -276,5 +334,9 @@ export class GitService {
         `🔄 Enqueued ${Math.min(i + batchSize, edges.length)} / ${edges.length} edges`
       );
     }
+  }
+
+  private async testPolling() {
+    console.log("boop");
   }
 }
