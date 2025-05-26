@@ -53,7 +53,10 @@ export class GitService {
     projectName: string,
     sshKey?: string
   ) {
-    const projectPath = path.join(this._basePath, `${projectName}.git-${Date.now()}`);
+    const projectPath = path.join(
+      this._basePath,
+      `${projectName}.git-${Date.now()}`
+    );
     const tmpDir = path.join(os.tmpdir(), projectPath);
     fs.mkdirSync(tmpDir, { recursive: true });
     const git = simpleGit(tmpDir);
@@ -195,13 +198,21 @@ export class GitService {
       throw new NotFoundException("Project not found");
     }
 
-    if (!project.localPath) {
-      throw new BadRequestException("No local clone");
+    let workdir = project.localPath;
+    let cleanupTemp = false;
+
+    if (!workdir || !fs.existsSync(workdir)) {
+      // no permanent clone → make a temp one
+      workdir = path.join(os.tmpdir(), `repo-${project.name}-${Date.now()}`);
+      fs.mkdirSync(workdir, { recursive: true });
+      cleanupTemp = true;
+
+      // shallow clone with checkout
+      await simpleGit().clone(project.repoUrl, workdir, ["--depth", "1"]);
     }
-    const git = simpleGit(project.localPath);
 
+    const git = simpleGit(workdir);
     await git.fetch("origin", "main");
-
     const remoteHead = (await git.revparse(["origin/main"])).trim();
 
     if (remoteHead === project.lastProcessedCommit) {
@@ -213,11 +224,13 @@ export class GitService {
       `${project.lastProcessedCommit}..${remoteHead}`,
     ]);
 
-    console.log("Differences:", diff);
+    this._logger.log(
+      `Differences detected: ${diff.files.map((f) => f.file).join(", ")}`
+    );
 
     for (const file of diff.files) {
       const relPath = file.file;
-      const absPath = path.join(project.localPath, relPath);
+      const absPath = path.join(workdir, relPath);
 
       // delete identifiers if the file was changed or deleted
       await this._nodeRepo
@@ -265,6 +278,10 @@ export class GitService {
 
     project.lastProcessedCommit = remoteHead;
     await this._projectRepo.save(project);
+
+    if (cleanupTemp) {
+      fs.rmSync(workdir, { recursive: true, force: true });
+    }
   }
 
   async findProjectById(id: number): Promise<ProjectEntity> {
