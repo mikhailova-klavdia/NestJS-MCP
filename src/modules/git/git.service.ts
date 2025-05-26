@@ -53,7 +53,8 @@ export class GitService {
     projectName: string,
     sshKey?: string
   ) {
-    const tmpDir = path.join(os.tmpdir(), `repo-${projectName}-${Date.now()}`);
+    const projectPath = path.join(this._basePath, `${projectName}.git-${Date.now()}`);
+    const tmpDir = path.join(os.tmpdir(), projectPath);
     fs.mkdirSync(tmpDir, { recursive: true });
     const git = simpleGit(tmpDir);
 
