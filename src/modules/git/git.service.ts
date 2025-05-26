@@ -335,8 +335,4 @@ export class GitService {
       );
     }
   }
-
-  private async testPolling() {
-    console.log("boop");
-  }
 }
