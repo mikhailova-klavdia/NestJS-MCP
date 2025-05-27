@@ -9,6 +9,13 @@ import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entit
 
 const logger = new Logger("ImportFinder");
 
+/**
+ * find all usage points of a given identifier in a folder
+ * @param identifier - the identifier to search for
+ * @param folderPath - the folder path where to search for the identifier
+ * @param identifierDeclationFile - the file in which the identifier is originally declared
+ * @returns { usages: UsagePoint[]; subClasses: CodeNodeEntity[] }
+ */
 export function findUsagePoints(
   identifier: string,
   folderPath: string,
@@ -109,6 +116,11 @@ export function findUsagePoints(
   return { usages, subClasses };
 }
 
+/**
+ * Finds the enclosing statement for a given TypeScript node
+ * @param node - The TypeScript node to find the enclosing statement for
+ * @returns The enclosing statement node, or the original node if no statement is found
+ */
 export function findEnclosingStatement(node: ts.Node): ts.Node {
   let current: ts.Node | undefined = node;
   while (current && !ts.isStatement(current)) {
@@ -117,6 +129,11 @@ export function findEnclosingStatement(node: ts.Node): ts.Node {
   return current ?? node;
 }
 
+/**
+ * Checks if a given TypeScript node is inside an import declaration
+ * @param node - The TypeScript node 
+ * @returns True if the node is inside an import declaration, false otherwise
+ */
 export function isInsideImport(node: ts.Node): boolean {
   let current: ts.Node | undefined = node;
   while (current) {
@@ -128,6 +145,11 @@ export function isInsideImport(node: ts.Node): boolean {
   return false;
 }
 
+/**
+ * Finds all import declarations in a TypeScript source file
+ * @param sourceFile - The TypeScript source file to search for import declarations
+ * @returns An array of import declaration information, including module name, named imports, and code snippet
+ */
 export function findImports(
   sourceFile: ts.SourceFile
 ): ImportDeclarationInfo[] {
@@ -167,6 +189,12 @@ export function findImports(
   return imports;
 }
 
+/**
+ *  Finds all dependencies (imported modules) used in a TypeScript node
+ * @param root - The root node of the TypeScript AST to search for dependencies
+ * @param fileImports - An array of import declarations found in the file
+ * @returns An array of import declaration information for the dependencies used by the node
+ */
 export function findDependenciesInNode(
   root: ts.Node,
   fileImports: ImportDeclarationInfo[]

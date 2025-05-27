@@ -8,6 +8,17 @@ import { RelationshipType } from "../types/context";
 import { ImportDeclarationInfo, Extracted } from "../types/types";
 import { Repository } from "typeorm";
 
+/**
+ * Processes a TypeScript class or interface declaration, extracting identifiers and edges.
+ * 
+ * @param node - The TypeScript class or interface declaration node.
+ * @param folderPath - The folder path where the file is located.
+ * @param filePath - The file path of the TypeScript file.
+ * @param fileImports - The imports found in the file.
+ * @param nodeRepo - The repository for CodeNodeEntity.
+ * 
+ * @returns An object containing extracted identifiers and edges.
+ */
 export async function processClass(
   node: ts.ClassDeclaration | ts.InterfaceDeclaration,
   folderPath: string,
@@ -101,6 +112,16 @@ export async function processClass(
   return { identifiers, edges };
 }
 
+/**
+ * processes a TypeScript enum declaration, extracting identifiers and edges.
+ * 
+ * @param node - The TypeScript enum declaration node.
+ * @param folderPath - The folder path where the file is located.
+ * @param filePath - The file path of the TypeScript file.
+ * @param fileImports - The imports found in the file.
+ * 
+ * @returns An object containing extracted identifiers and edges.
+ */
 export function processEnum(
   node: ts.EnumDeclaration,
   folderPath: string,

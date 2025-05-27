@@ -13,6 +13,7 @@ export class IdentifierService {
     private readonly _embeddingService: EmbedConfig
   ) {}
 
+  // find most relevant identifiers based on a query embedding
   findTopNRelevantIdentifiers(
     identifiers: CodeNodeEntity[],
     queryEmbedding: number[],
@@ -40,6 +41,7 @@ export class IdentifierService {
     return relevant.sort((a, b) => b.similarity - a.similarity);
   }
 
+  // get identifiers by project ID and ensure embeddings are generated
   async getIdentifiersByProject(projectId: number): Promise<CodeNodeEntity[]> {
     const nodes = await this._identifierRepository.find({
       where: { project: { id: projectId } },

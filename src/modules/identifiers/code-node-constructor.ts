@@ -23,8 +23,9 @@ export class CodeNodeExtractor {
     @InjectRepository(CodeNodeEntity)
     private readonly _nodeRepo: Repository<CodeNodeEntity>
   ) {}
+
   /**
-   * Extracts all identifier tokens from a given TypeScript file, excluding identifiers from import declarations.
+   * Extracts all identifier tokens from a given TypeScript file.
    */
   private async extractIdentifiersFromFile(
     filePath: string,
@@ -91,7 +92,7 @@ export class CodeNodeExtractor {
   }
 
   /**
-   * Scans the given folder recursively, reads all `.ts` files,
+   * Scans the given folder recursively, reads all typescript files,
    * extracts identifiers from each, and returns a list of identifier data.
    */
   async getIdentifiersFromFolder(folderPath: string): Promise<CodeGraph> {

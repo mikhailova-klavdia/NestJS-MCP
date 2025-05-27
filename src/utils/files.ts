@@ -1,6 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
 
+/**
+ * Recursively retrieves all files with a specific extension from a directory.
+ * @param dir - the directory to search in
+ * @param extension - the file extension to look for 
+ * @param files - an array to store the found files  
+ * @returns string[] - an array of file paths with the specified extension
+ */
 export function getAllFiles(
   dir: string,
   extension: string,

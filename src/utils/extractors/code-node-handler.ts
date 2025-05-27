@@ -5,7 +5,13 @@ import { CodeNodeEntity } from "src/modules/identifiers/entities/code-node.entit
 import { findUsagePoints } from "./import-finder";
 import { RelationshipType } from "../types/context";
 
-// create a new identifier
+/**
+ * create a new identifier
+ * @param node - the TypeScript AST node
+ * @param folderPath - the folder path where the file is located
+ * @param filePath - the file path of the TypeScript file
+ * @returns CodeNodeEntity | undefined
+ */
 export function handleIdentifier(
   node: ts.Node,
   folderPath: string,
@@ -35,7 +41,11 @@ export function handleIdentifier(
   }
 }
 
-// checks for export flags
+/**
+ * check if the identifier is exported
+ * @param node - the TypeScript AST node
+ * @returns boolean - true if the identifier is exported, false otherwise
+ */
 function isExportedIdentifier(node: ts.Node) {
   // parent node - since this is the identifier node
   const parent = node.parent as ts.Declaration;
@@ -45,6 +55,12 @@ function isExportedIdentifier(node: ts.Node) {
   return isExported;
 }
 
+/**
+ * get the declaration type and code snippet of a node
+ * @param node - the TypeScript AST node
+ * @returns { declarationType: string; codeSnippet: string; } 
+ *            - an object containing the declaration type and code snippet
+ */
 function getDeclarationType(node: ts.Node): {
   declarationType: string;
   codeSnippet: string;
@@ -56,7 +72,14 @@ function getDeclarationType(node: ts.Node): {
   };
 }
 
-// creates an edge
+/**
+ * creates an edge
+ * 
+ * @param source - the source CodeNodeEntity 
+ * @param target - the target CodeNodeEntity
+ * @param relType - between the two nodes RelationshipType
+ * @returns  CodeEdgeEntity - the created edge entity
+ */
 export function createEdge(
   source: CodeNodeEntity,
   target: CodeNodeEntity,

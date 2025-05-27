@@ -48,6 +48,15 @@ export class GitService {
     }
   }
 
+  /**
+   * Extracts project identifiers from a Git repository URL.
+   *
+   * @param repoUrl - URL of the Git repository
+   * @param projectName  - Name of the project to be created
+   * @param sshKey - Optional SSH key for authentication
+   *
+   * @returns {ProjectEntity} - The created project entity with identifiers extracted
+   */
   async extractProjectIdentifiers(
     repoUrl: string,
     projectName: string,
@@ -69,7 +78,7 @@ export class GitService {
       process.env.GIT_SSH_COMMAND = `ssh -i ${keyPath} -o StrictHostKeyChecking=no`;
     }
 
-    //this will populate tmpDir with files (depth=1 for minimal history)
+    // this will populate tmpDir with files
     await git.clone(repoUrl, tmpDir);
 
     // grab the commit SHA
@@ -96,6 +105,15 @@ export class GitService {
     return project;
   }
 
+  /**
+   * clones a Git repository to the local filesystem.
+   *
+   * @param repoUrl - URL of the Git repository to clone
+   * @param projectName - Name of the project to be created
+   * @param sshKey - Optional SSH key for authentication
+   *
+   * @returns {ProjectEntity} - The created project entity with the cloned repository
+   */
   async cloneRepository(repoUrl: string, projectName: string, sshKey?: string) {
     const projectPath = path.join(this._basePath, `${projectName}.git`);
     const git = simpleGit();
@@ -132,6 +150,14 @@ export class GitService {
     return project;
   }
 
+  /**
+   * Processes a Git repository by extracting identifiers and edges from its files.
+   *
+   * @param project - The project entity to process
+   * @param folderPathOverride - Optional override for the folder path to scan
+   *
+   * @returns {ProjectEntity} - The processed project entity with identifiers and edges saved
+   */
   async processRepository(project: ProjectEntity, folderPathOverride?: string) {
     const folder = folderPathOverride ?? project.localPath;
     if (!folder) {
@@ -171,6 +197,12 @@ export class GitService {
     return project;
   }
 
+  /**
+   * Processes a batch of code nodes by embedding their identifiers and saving them.
+   *
+   * @param batch - Array of CodeNodeEntity to process
+   * @param project - The project entity to associate with the nodes
+   */
   async processBatchOfCodeNodes(
     batch: CodeNodeEntity[],
     project: ProjectEntity
@@ -188,10 +220,20 @@ export class GitService {
     await this._nodeRepo.save(embeddedBatch);
   }
 
+  /**
+   * Saves a batch of code edges to the database.
+   *
+   * @param batch - Array of CodeEdgeEntity to save
+   */
   async saveBatchOfEdges(batch: CodeEdgeEntity[]) {
     await this._edgeRepo.save(batch);
   }
 
+  /**
+   * polls a Git repository for changes and processes any new commits.
+   *
+   * @param projectId - ID of the project to poll
+   */
   async pollProject(projectId: number) {
     const project = await this._projectRepo.findOneBy({ id: projectId });
     if (!project) {
@@ -225,6 +267,7 @@ export class GitService {
       return;
     }
 
+    // retrieve the diff summary between the last processed commit and the current HEAD
     const diff: DiffResult = await git.diffSummary([
       `${project.lastProcessedCommit}..${remoteHead}`,
     ]);
@@ -232,7 +275,7 @@ export class GitService {
       `Changed files: ${diff.files.map((f) => f.file).join(", ")}`
     );
 
-    // For each changed file or folder...
+    // for each changed file, we need to re-extract identifiers and edges
     for (const file of diff.files) {
       const relPath = file.file;
       const absPath = path.join(workdir, relPath);
@@ -250,17 +293,15 @@ export class GitService {
       let edges: CodeEdgeEntity[] = [];
 
       if (fs.existsSync(absPath) && fs.statSync(absPath).isFile()) {
-        // if it’s a file, pull identifiers from its content
         ({ identifiers, edges } =
           await this._extractor.getIdentifiersFromFolder(relPath));
       } else if (fs.existsSync(absPath) && fs.statSync(absPath).isDirectory()) {
-        // if it’s a directory, scan all .ts files under it
         ({ identifiers, edges } =
           await this._extractor.getIdentifiersFromFolder(absPath));
       } else {
-        // deleted path: nothing to extract
         continue;
       }
+
       // Enqueue them in batches
       await this.enqueueBatches(identifiers, edges, project);
     }
@@ -270,6 +311,13 @@ export class GitService {
     if (cleanupTemp) fs.rmSync(workdir, { recursive: true, force: true });
   }
 
+  /**
+   * finds a project by its ID.
+   *
+   * @param id  - ID of the project to find
+   *
+   * @returns  {ProjectEntity} - The found project entity
+   */
   async findProjectById(id: number): Promise<ProjectEntity> {
     const project = await this._projectRepo.findOneBy({ id });
     if (!project) {
@@ -278,6 +326,13 @@ export class GitService {
     return project;
   }
 
+  /**
+   * Enqueues batches of code nodes and edges for processing.
+   *
+   * @param identifiers - Array of CodeNodeEntity to process
+   * @param edges - Array of CodeEdgeEntity to process
+   * @param project - The project entity to associate with the nodes and edges
+   */
   private async enqueueBatches(
     identifiers: CodeNodeEntity[],
     edges: CodeEdgeEntity[],
@@ -310,5 +365,4 @@ export class GitService {
       );
     }
   }
-
 }
