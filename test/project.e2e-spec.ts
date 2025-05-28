@@ -1,47 +1,37 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication, ValidationPipe, ParseIntPipe } from "@nestjs/common";
+import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { ProjectModule } from "../src/modules/project/project.module";
 import { ProjectEntity } from "../src/modules/project/project.entity";
-import { DataSource } from "typeorm";
-
-jest.setTimeout(30000);
+import { DataSource, Repository } from "typeorm";
+import { AppModule } from "src/app.module";
+import { getRepositoryToken } from "@nestjs/typeorm";
 
 describe("ProjectController (e2e)", () => {
   let app: INestApplication;
-  let projectId: number;
   let dataSource: DataSource;
+  let projectRepo: Repository<ProjectEntity>;
+  let projectId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: "postgres",
-          host: process.env.POSTGRES_HOST || "localhost",
-          port: +(process.env.POSTGRES_PORT || 5433),
-          username: process.env.POSTGRES_USER || "root",
-          password: process.env.POSTGRES_PASSWORD || "root",
-          database: process.env.POSTGRES_DB || "test",
-          entities: [ProjectEntity],
-          synchronize: true,
-          logging: false,
-        }),
-        TypeOrmModule.forFeature([ProjectEntity]),
-        ProjectModule,
-      ],
+      imports: [AppModule],
     }).compile();
-
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.init();
 
     dataSource = app.get<DataSource>(DataSource);
+
+    await dataSource.dropDatabase();
+    await dataSource.runMigrations();
+
+    projectRepo = app.get<Repository<ProjectEntity>>(
+      getRepositoryToken(ProjectEntity)
+    );
   });
 
   afterAll(async () => {
-    if (dataSource.isInitialized) {
-      await dataSource.dropDatabase();
+    if (dataSource && dataSource.isInitialized) {
       await dataSource.destroy();
     }
     await app.close();
