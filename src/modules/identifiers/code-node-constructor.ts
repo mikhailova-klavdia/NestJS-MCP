@@ -17,7 +17,7 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class CodeNodeExtractor {
-  private readonly logger = new Logger(CodeNodeExtractor.name);
+  private readonly _logger = new Logger(CodeNodeExtractor.name);
 
   constructor(
     @InjectRepository(CodeNodeEntity)
@@ -27,7 +27,7 @@ export class CodeNodeExtractor {
   /**
    * Extracts all identifier tokens from a given TypeScript file.
    */
-  private async extractIdentifiersFromFile(
+  private async _extractIdentifiersFromFile(
     filePath: string,
     folderPath: string
   ): Promise<CodeGraph> {
@@ -97,7 +97,7 @@ export class CodeNodeExtractor {
    */
   async getIdentifiersFromFolder(folderPath: string): Promise<CodeGraph> {
     const tsFiles = getAllFiles(folderPath, ".ts");
-    this.logger.log(
+    this._logger.log(
       `Extracting identifiers from ${tsFiles.length} TypeScript files in ${folderPath}`
     );
 
@@ -109,16 +109,16 @@ export class CodeNodeExtractor {
     for (const file of tsFiles) {
       // pull out each file’s nodes + edges
       const { identifiers: fileIds, edges: fileEdges } =
-        await this.extractIdentifiersFromFile(file, folderPath);
+        await this._extractIdentifiersFromFile(file, folderPath);
 
       // merge into our accumulators
       identifiers.push(...fileIds);
       edges.push(...fileEdges);
 
-      this.logger.log(`Processed ${++count} / ${tsFiles.length} files`);
+      this._logger.log(`Processed ${++count} / ${tsFiles.length} files`);
     }
 
-    this.logger.log(
+    this._logger.log(
       `✅ Finished extracting ${identifiers.length} identifiers from ${tsFiles.length} files.`
     );
 

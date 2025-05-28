@@ -14,21 +14,21 @@ import {
   
   @Controller('projects')
   export class ProjectController {
-    constructor(private readonly projects: ProjectService) {}
+    constructor(private readonly _projects: ProjectService) {}
   
     @Post()
     create(@Body() dto: ProjectDto) {
-      return this.projects.create(dto);
+      return this._projects.create(dto);
     }
   
     @Get()
     findAll() {
-      return this.projects.findAll();
+      return this._projects.findAll();
     }
   
     @Get(':id')
     findOne(@Param('id') id: number) {
-      return this.projects.findOne(id);
+      return this._projects.findOne(id);
     }
   
     @Patch(':id')
@@ -36,12 +36,12 @@ import {
       @Param('id') id: number,
       @Body() dto: Partial<ProjectDto>,
     ) {
-      return this.projects.update(id, dto);
+      return this._projects.update(id, dto);
     }
   
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     delete(@Param('id') id: number) {
-      return this.projects.delete(id);
+      return this._projects.delete(id);
     }
   }

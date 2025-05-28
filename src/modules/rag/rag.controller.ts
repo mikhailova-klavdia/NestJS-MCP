@@ -4,7 +4,7 @@ import { RagQueryDto } from "./dto/rag-query.dto";
 
 @Controller("rag")
 export class RagController {
-  constructor(private readonly ragService: RagService) {}
+  constructor(private readonly _ragService: RagService) {}
 
   @Post("query")
   async query(@Body() dto: RagQueryDto) {
@@ -16,6 +16,6 @@ export class RagController {
       );
     }
 
-    return this.ragService.retrieve(query, projectId, topN, minSimilarity, depth);
+    return this._ragService.retrieve(query, projectId, topN, minSimilarity, depth);
   }
 }

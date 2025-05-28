@@ -49,7 +49,7 @@ export class RagService {
 
     for (const hit of relevantIdentifier) {
       const nodeId = hit.identifier.id;
-      const subgraph = await this.buildGraph(nodeId, depth, visited);
+      const subgraph = await this._buildGraph(nodeId, depth, visited);
       if (subgraph) {
         subgraph.similarity = hit.similarity;
         results.push(subgraph);
@@ -68,10 +68,10 @@ export class RagService {
 
   async retrieveNeighbors(nodeId: string, depth: number = 0) {
     const visited = new Set<string>();
-    return this.buildGraph(nodeId, depth, visited);
+    return this._buildGraph(nodeId, depth, visited);
   }
 
-  private async buildGraph(
+  private async _buildGraph(
     nodeId: string,
     depth: number,
     visited: Set<string>,
@@ -124,7 +124,7 @@ export class RagService {
       }
 
       // recursive
-      const neighbourPayload = await this.buildGraph(
+      const neighbourPayload = await this._buildGraph(
         neighbourEntity.id,
         depth - 1,
         visited,
