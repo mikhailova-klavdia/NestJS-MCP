@@ -30,9 +30,29 @@ describe("RagController (e2e)", () => {
     await app.init();
   });
 
-  it("/POST rag/query - missing parameters should return 400", () => {});
+  it("/POST rag/query - missing parameters should return 400 with validation errors", () => {
+    return request(app.getHttpServer())
+      .post("/rag/query")
+      .send({})
+      .expect(400)
+      .expect((res) => {
+        expect(Array.isArray(res.body.message)).toBe(true);
+        expect(res.body.message).toEqual(
+          expect.arrayContaining([
+            "query must be a string",
+            "projectId must be a number conforming to the specified constraints",
+          ])
+        );
+      });
+  });
 
-  it("/POST rag/query - valid request returns results", () => {});
+  it("/POST rag/query - valid request returns results", () => {
+    return request(app.getHttpServer())
+      .post("/rag/query")
+      .send({ query: "test", projectId: 1 })
+      .expect(201)
+      .expect(mockResult);
+  });
 
   afterAll(async () => {
     await app.close();
