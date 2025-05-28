@@ -9,6 +9,7 @@ import { ChatService } from "./modules/chat/chat.service";
 import { GitModule } from "./modules/git/git.module";
 import { IdentifierModule } from "./modules/identifiers/identifier.module";
 import { McpModule } from "./modules/mcp/mcp.module";
+import { ProjectModule } from "./modules/project/project.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { McpModule } from "./modules/mcp/mcp.module";
     IdentifierModule,
     McpModule,
     AppModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatService],

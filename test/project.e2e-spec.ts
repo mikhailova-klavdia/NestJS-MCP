@@ -12,18 +12,18 @@ describe("ProjectController (e2e)", () => {
   let projectRepo: Repository<ProjectEntity>;
   let projectId: number;
 
+  const API = "/projects";
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.init();
 
     dataSource = app.get<DataSource>(DataSource);
 
-    await dataSource.dropDatabase();
-    await dataSource.runMigrations();
+    await dataSource.synchronize(true);
 
     projectRepo = app.get<Repository<ProjectEntity>>(
       getRepositoryToken(ProjectEntity)
@@ -31,18 +31,18 @@ describe("ProjectController (e2e)", () => {
   });
 
   afterAll(async () => {
-    if (dataSource && dataSource.isInitialized) {
+    if (dataSource?.isInitialized) {
       await dataSource.destroy();
     }
     await app.close();
   });
 
-  it("GET /projects -> empty array", () =>
-    request(app.getHttpServer()).get("/projects").expect(200).expect([]));
+  it("GET /api/projects -> empty array", () =>
+    request(app.getHttpServer()).get(API).expect(200).expect([]));
 
-  it("POST /projects -> create one", () =>
+  it("POST /api/projects -> create one", () =>
     request(app.getHttpServer())
-      .post("/projects")
+      .post(API)
       .send({
         name: "Test",
         description: "Desc",
@@ -59,9 +59,9 @@ describe("ProjectController (e2e)", () => {
         projectId = res.body.id;
       }));
 
-  it("GET /projects -> [one project]", () =>
+  it("GET /api/projects -> [one project]", () =>
     request(app.getHttpServer())
-      .get("/projects")
+      .get(API)
       .expect(200)
       .then((res) => {
         expect(Array.isArray(res.body)).toBe(true);
@@ -69,27 +69,27 @@ describe("ProjectController (e2e)", () => {
         expect(res.body[0].id).toBe(projectId);
       }));
 
-  it("GET /projects/:id -> single project", () =>
+  it("GET /api/projects/:id -> single project", () =>
     request(app.getHttpServer())
-      .get(`/projects/${projectId}`)
+      .get(`${API}/${projectId}`)
       .expect(200)
       .then((res) => {
         expect(res.body.id).toBe(projectId);
         expect(res.body.name).toBe("Test");
       }));
 
-  it("PATCH /projects/:id -> update name", () =>
+  it("PATCH /api/projects/:id -> update name", () =>
     request(app.getHttpServer())
-      .patch(`/projects/${projectId}`)
+      .patch(`${API}/${projectId}`)
       .send({ name: "Updated" })
       .expect(200)
       .then((res) => {
         expect(res.body.name).toBe("Updated");
       }));
 
-  it("DELETE /projects/:id -> 204", () =>
-    request(app.getHttpServer()).delete(`/projects/${projectId}`).expect(204));
+  it("DELETE /api/projects/:id -> 204", () =>
+    request(app.getHttpServer()).delete(`${API}/${projectId}`).expect(204));
 
-  it("GET /projects/:id after delete -> 404", () =>
-    request(app.getHttpServer()).get(`/projects/${projectId}`).expect(404));
+  it("GET /api/projects/:id after delete -> 404", () =>
+    request(app.getHttpServer()).get(`${API}/${projectId}`).expect(404));
 });
