@@ -25,6 +25,14 @@ export class GitController {
       throw new BadRequestException("repoUrl and projectName are required");
     }
 
+    // check if the repository is in db
+    const existing = await this._gitService.findByUrl(repoUrl);
+    if (existing) {
+      throw new BadRequestException(
+        `A project with URL "${repoUrl}" already exists (id=${existing.id}).`
+      );
+    }
+
     try {
       const project = await this._gitService.extractProjectIdentifiers(
         repoUrl,
@@ -47,6 +55,13 @@ export class GitController {
 
     if (!repoUrl || !projectName) {
       throw new BadRequestException("repoUrl and projectName are required");
+    }
+
+    const existing = await this._gitService.findByUrl(repoUrl);
+    if (existing) {
+      throw new BadRequestException(
+        `A project with URL "${repoUrl}" already exists (id=${existing.id}).`
+      );
     }
 
     try {

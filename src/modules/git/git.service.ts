@@ -365,4 +365,8 @@ export class GitService {
       );
     }
   }
+
+  async findByUrl(repoUrl: string): Promise<ProjectEntity | null> {
+    return this._projectRepo.findOne({ where: { repoUrl } });
+  }
 }

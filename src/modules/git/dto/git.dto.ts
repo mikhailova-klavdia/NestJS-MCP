@@ -1,13 +1,18 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { normalizeUrl } from 'src/utils/url-normalizer';
 
 export class CloneDto {
   @IsString()
+  @IsNotEmpty()
+  @IsUrl()
+  @Transform(({ value }) => normalizeUrl(value), { toClassOnly: true })
   repoUrl: string;
 
   @IsString()
+  @IsNotEmpty()
   projectName: string;
 
-  @IsOptional()
   @IsString()
   sshKey?: string;
 }
