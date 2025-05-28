@@ -1,111 +1,143 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
-import { GitController } from '../src/modules/git/git.controller';
-import { GitService } from '../src/modules/git/git.service';
-import { getQueueToken } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Test, TestingModule } from "@nestjs/testing";
+import { INestApplication, ValidationPipe } from "@nestjs/common";
+import * as request from "supertest";
+import { GitService } from "../src/modules/git/git.service";
+import { getQueueToken } from "@nestjs/bullmq";
+import { AppModule } from "src/app.module";
+import { DataSource } from "typeorm";
 
-describe('GitController (e2e)', () => {
+jest.mock("bullmq", () => {
+  const actual = jest.requireActual("bullmq");
+  return {
+    ...actual,
+    Worker: class {
+      constructor() {}
+      on(event: string, listener: (...args: any[]) => void) {}
+      close(): Promise<void> {
+        return Promise.resolve();
+      }
+    },
+  };
+});
+
+describe("GitController (e2e)", () => {
   let app: INestApplication;
-  let gitService: GitService;
-  let indexQueue: Queue;
+  let gitService: jest.Mocked<GitService>;
+  let indexQueue: { add: jest.Mock };
+  let dataSource: DataSource;
 
   const fakeProject = {
     id: 123,
-    name: 'my-proj',
-    repoUrl: 'https://git.example.com/foo.git',
-    localPath: '/tmp/foo',
-    lastProcessedCommit: 'abcdef',
+    name: "my-proj",
+    repoUrl: "https://git.example.com/foo.git",
+    localPath: "/tmp/foo",
+    lastProcessedCommit: "abcdef",
   };
 
   beforeAll(async () => {
+    const extractSpy = jest.fn().mockResolvedValue(fakeProject);
+    const cloneSpy = jest.fn().mockResolvedValue(fakeProject);
+    const pollSpy = jest.fn().mockResolvedValue(undefined);
+    const queueMock = { add: jest.fn() };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [GitController],
-      providers: [
-        {
-          provide: GitService,
-          useValue: {
-            extractProjectIdentifiers: jest.fn().mockResolvedValue(fakeProject),
-            cloneRepository: jest.fn().mockResolvedValue(fakeProject),
-            pollProject: jest.fn().mockResolvedValue(undefined),
-          },
-        },
-        {
-          provide: getQueueToken('code-indexing'),
-          useValue: { add: jest.fn() } as Partial<Queue>,
-        },
-      ],
-    }).compile();
+      imports: [AppModule],
+    })
+      .overrideProvider(GitService)
+      .useValue({
+        extractProjectIdentifiers: extractSpy,
+        cloneRepository: cloneSpy,
+        pollProject: pollSpy,
+      })
+      .overrideProvider(getQueueToken("code-indexing"))
+      .useValue(queueMock)
+      .compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true })
+    );
     await app.init();
 
-    gitService = moduleFixture.get(GitService);
-    indexQueue = moduleFixture.get<Queue>(getQueueToken('code-indexing'));
+    gitService = moduleFixture.get(GitService) as jest.Mocked<GitService>;
+    indexQueue = moduleFixture.get(getQueueToken("code-indexing"));
+    dataSource = app.get<DataSource>(DataSource);
+
+    await dataSource.synchronize(true);
   });
 
   afterAll(async () => {
+    if (dataSource?.isInitialized) {
+      await dataSource.destroy();
+    }
     await app.close();
   });
 
-  describe('/git/process (POST)', () => {
-    it('400 when missing required fields', () => {
+  describe("POST /git/process", () => {
+    it("400 when missing required fields", () => {
       return request(app.getHttpServer())
-        .post('/git/process')
+        .post("/git/process")
         .send({})
         .expect(400);
     });
 
-    it('201 and returns message + project on success', () => {
+    it("201 and returns message + project on success", () => {
       return request(app.getHttpServer())
-        .post('/git/process')
-        .send({ repoUrl: 'https://git.example.com/foo.git', projectName: 'my-proj', sshKey: 'KEYDATA' })
+        .post("/git/process")
+        .send({
+          repoUrl: fakeProject.repoUrl,
+          projectName: fakeProject.name,
+          sshKey: "KEYDATA",
+        })
         .expect(201)
-        .expect(res => {
+        .expect((res) => {
           expect(gitService.extractProjectIdentifiers).toHaveBeenCalledWith(
-            'https://git.example.com/foo.git',
-            'my-proj',
-            'KEYDATA'
+            fakeProject.repoUrl,
+            fakeProject.name,
+            "KEYDATA"
           );
           expect(res.body).toEqual({
-            message: 'Repository streamed & processed successfully',
+            message: "Repository streamed & processed successfully",
             project: fakeProject,
           });
         });
     });
   });
 
-  describe('/git/clone (POST)', () => {
-    it('400 when missing required fields', () => {
+  describe("POST /git/clone", () => {
+    it("400 when missing required fields", () => {
       return request(app.getHttpServer())
-        .post('/git/clone')
-        .send({ repoUrl: 'https://git.example.com/foo.git' })
+        .post("/git/clone")
+        .send({ repoUrl: fakeProject.repoUrl })
         .expect(400);
     });
 
-    it('201, enqueues and returns project on success', () => {
+    it("201, enqueues and returns project on success", () => {
       return request(app.getHttpServer())
-        .post('/git/clone')
-        .send({ repoUrl: 'https://git.example.com/foo.git', projectName: 'my-proj' })
+        .post("/git/clone")
+        .send({
+          repoUrl: fakeProject.repoUrl,
+          projectName: fakeProject.name,
+        })
         .expect(201)
-        .expect(res => {
+        .expect((res) => {
           expect(gitService.cloneRepository).toHaveBeenCalledWith(
-            'https://git.example.com/foo.git',
-            'my-proj'
+            fakeProject.repoUrl,
+            fakeProject.name
           );
-          expect(indexQueue.add).toHaveBeenCalledWith('index', { projectId: fakeProject.id });
+          expect(indexQueue.add).toHaveBeenCalledWith("index", {
+            projectId: fakeProject.id,
+          });
           expect(res.body).toEqual({
-            message: 'Repository cloned & processed successfully',
+            message: "Repository cloned & processed successfully",
             project: fakeProject,
           });
         });
     });
   });
 
-  describe('/git/:projectId/poll (PATCH)', () => {
-    it('200 when polling existing project', () => {
+  describe("PATCH /git/:projectId/poll", () => {
+    it("200 when polling existing project", () => {
       return request(app.getHttpServer())
         .patch(`/git/${fakeProject.id}/poll`)
         .expect(200)
