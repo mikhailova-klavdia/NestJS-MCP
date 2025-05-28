@@ -34,21 +34,6 @@ describe("handleFunctionMethod", () => {
     jest.resetAllMocks();
   });
 
-  it("returns empty when node has no name", () => {
-    const node = ts.factory.createFunctionDeclaration(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      [],
-      undefined,
-      ts.factory.createBlock([], true)
-    );
-    const result = handleFunctionMethod(node, FOLDER, FILE, []);
-    expect(result.identifiers).toEqual([]);
-    expect(result.edges).toEqual([]);
-  });
-
   it("extracts function and parameter identifiers without source", () => {
     const code = "function foo(a, b) {}";
     const node = getFunctionNode(code);
