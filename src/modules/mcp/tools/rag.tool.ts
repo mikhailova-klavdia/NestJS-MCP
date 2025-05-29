@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Tool, Context } from "@rekog/mcp-nest";
+import { Tool } from "@rekog/mcp-nest";
 import { z } from "zod";
 import { RagService } from "src/modules/rag/rag.service";
 
@@ -25,12 +25,11 @@ export class RagTool {
     query: string;
     projectId: number;
     topN?: number;
-    minSimilarity?: number;
     depth?: number;
   }) {
-    const { query, projectId, topN, minSimilarity, depth } = params;
+    const { query, projectId, topN, depth } = params;
     this._logger.log(
-      `Running RAG query for project=${projectId}, topN=${topN}, minSimilarity=${minSimilarity}, depth=${depth}`
+      `Running RAG query for project=${projectId}, topN=${topN}, depth=${depth}`
     );
 
     // Retrieve the subgraph payloads
@@ -38,7 +37,6 @@ export class RagTool {
       query,
       projectId,
       topN,
-      minSimilarity,
       depth
     );
 

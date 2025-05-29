@@ -8,7 +8,7 @@ export class RagController {
 
   @Post("query")
   async query(@Body() dto: RagQueryDto) {
-    const { query, projectId, topN = 5, minSimilarity = 0.0, depth = 0 } = dto;
+    const { query, projectId, topN = 5, depth = 0 } = dto;
 
     if (!query || !projectId) {
       throw new BadRequestException(
@@ -16,6 +16,6 @@ export class RagController {
       );
     }
 
-    return this._ragService.retrieve(query, projectId, topN, minSimilarity, depth);
+    return this._ragService.retrieve(query, projectId, topN, depth);
   }
 }

@@ -1,5 +1,5 @@
-import { OllamaEmbeddings } from '@langchain/ollama';
-import { Logger } from '@nestjs/common';
+import { OllamaEmbeddings } from "@langchain/ollama";
+import { Logger } from "@nestjs/common";
 
 export class EmbedConfig {
   private _embeddings: OllamaEmbeddings;
@@ -15,7 +15,7 @@ export class EmbedConfig {
 
   async onModuleInit() {
     try {
-      await this._embeddings.embedQuery('healthcheck');
+      await this._embeddings.embedQuery("healthcheck");
       this.isConnected = true;
       this._logger.log(`✅ Connected to Ollama at ${process.env.OLLAMA_HOST}`);
     } catch (err: any) {
@@ -27,16 +27,16 @@ export class EmbedConfig {
   }
 
   async embed(text: string): Promise<number[]> {
-    if (!text || typeof text !== 'string') {
-      throw new Error('Invalid input: text must be a non-empty string');
+    if (!text || typeof text !== "string") {
+      throw new Error("Invalid input: text must be a non-empty string");
     }
     return this._embeddings.embedQuery(text);
   }
 
   async embedBatch(texts: string[]): Promise<number[][]> {
-  if (!Array.isArray(texts) || texts.some(t => typeof t !== 'string')) {
-    throw new Error('Invalid input: texts must be an array of strings');
+    if (!Array.isArray(texts) || texts.some((t) => typeof t !== "string")) {
+      throw new Error("Invalid input: texts must be an array of strings");
+    }
+    return this._embeddings.embedDocuments(texts);
   }
-  return this._embeddings.embedDocuments(texts);
-}
 }

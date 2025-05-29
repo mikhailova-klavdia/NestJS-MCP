@@ -14,7 +14,7 @@ export type CodeGraph = {
 
 export type GraphNodePayload = {
   title: string;
-  similarity?: number;
+  score?: number;
   filePath: string;
   declarationType?: string;
   context: ContextV1;

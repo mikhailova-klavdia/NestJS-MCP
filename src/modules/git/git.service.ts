@@ -7,7 +7,7 @@ import {
 import { simpleGit, DiffResult } from "simple-git";
 import * as path from "path";
 import * as fs from "fs";
-import { Repository } from "typeorm";
+import { Raw, Repository } from "typeorm";
 import { ProjectEntity } from "../project/project.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EmbedConfig } from "../../embedding-config";
@@ -17,6 +17,7 @@ import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import * as os from "os";
+import e from "express";
 
 @Injectable()
 export class GitService {
@@ -208,16 +209,25 @@ export class GitService {
     project: ProjectEntity
   ) {
     const embeddings = await this._embeddingService.embedBatch(
-      batch.map((node) => node.identifier)
+      batch.map((n) => n.identifier)
     );
 
-    const embeddedBatch = batch.map((codeNode, idx) => {
-      codeNode.embedding = embeddings[idx];
-      codeNode.project = project;
-      return codeNode;
-    });
+    for (let i = 0; i < batch.length; i++) {
+      const node = batch[i];
+      const vec = embeddings[i];
+      const literal = `[${vec.join(",")}]`; // e.g. "[0.0128,-0.0254,…]"
 
-    await this._nodeRepo.save(embeddedBatch);
+      await this._nodeRepo
+        .createQueryBuilder()
+        .update(CodeNodeEntity)
+        .set({
+          project: project,
+          // here we inline the pgvector literal directly:
+          embedding: () => `'${literal}'::vector`,
+        })
+        .where("id = :id", { id: node.id })
+        .execute();
+    }
   }
 
   /**

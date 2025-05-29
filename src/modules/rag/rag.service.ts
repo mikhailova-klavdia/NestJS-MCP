@@ -27,7 +27,6 @@ export class RagService {
     query: string,
     projectId: number,
     topN: number = 5,
-    minSimilarity: number = 0.0,
     depth: number = 0
   ): Promise<any> {
     const startTime = process.hrtime();
@@ -35,24 +34,21 @@ export class RagService {
     // Step 1: Generate embedding for the query
     const queryEmbedding = await this._embeddingConfig.embed(query);
 
-    // Step 2: Retrieve relevant documents (you can implement a similarity search here)
-    const identifiers =
-      await this._identifierService.getIdentifiersByProject(projectId);
-
-    // Step 3: Find the most relevant document (simple cosine similarity for baseline)
-    const relevantIdentifier = this._identifierService
-      .findTopNRelevantIdentifiers(identifiers, queryEmbedding, topN)
-      .filter((hit) => hit.similarity >= minSimilarity);
+    // Step 2: perform k-NN search to find top N relevant identifiers
+    const hits = await this._identifierService.findTopNRelevantIdentifiers(
+      projectId,
+      queryEmbedding,
+      topN
+    );
 
     const visited = new Set<string>();
     const results: GraphNodePayload[] = [];
 
-    for (const hit of relevantIdentifier) {
-      const nodeId = hit.identifier.id;
-      const subgraph = await this._buildGraph(nodeId, depth, visited);
-      if (subgraph) {
-        subgraph.similarity = hit.similarity;
-        results.push(subgraph);
+    for (const { node, score } of hits) {
+      const sub = await this._buildGraph(node.id, depth, visited);
+      if (sub) {
+        sub.score = score;
+        results.push(sub);
       }
     }
 
