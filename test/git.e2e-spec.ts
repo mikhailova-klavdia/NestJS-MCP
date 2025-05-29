@@ -38,7 +38,6 @@ describe("GitController (e2e)", () => {
     const extractSpy = jest.fn().mockResolvedValue(fakeProject);
     const cloneSpy = jest.fn().mockResolvedValue(fakeProject);
     const pollSpy = jest.fn().mockResolvedValue(undefined);
-    // ← you must stub out findByUrl so it always returns “no project”
     const findByUrlSpy = jest.fn().mockResolvedValue(null);
     const queueMock = { add: jest.fn() };
 
