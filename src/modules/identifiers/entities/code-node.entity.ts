@@ -4,6 +4,7 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryColumn,
+  Index,
 } from "typeorm";
 import { ProjectEntity } from "../../project/project.entity";
 import { ContextV1 } from "src/utils/types/context";
@@ -13,6 +14,7 @@ export class CodeNodeEntity {
   @PrimaryColumn("uuid")
   id: string;
 
+  @Index()
   @Column()
   identifier: string;
 
@@ -28,6 +30,7 @@ export class CodeNodeEntity {
   @Column("simple-array", { nullable: true })
   embedding?: number[];
 
+  @Index()
   @ManyToOne(() => ProjectEntity)
   @JoinColumn({ name: "projectId" })
   project?: ProjectEntity;

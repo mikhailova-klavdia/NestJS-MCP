@@ -19,6 +19,7 @@ import { ColumnType, DataSource, DataSourceOptions } from "typeorm";
         database: process.env.POSTGRES_DB,
         autoLoadEntities: true,
         synchronize: true,
+        dropSchema: true
       }),
       dataSourceFactory: async (options) => {
         const ds = new DataSource(options as DataSourceOptions);
