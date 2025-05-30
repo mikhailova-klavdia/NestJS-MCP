@@ -28,7 +28,6 @@ export class CodeNodeEntity {
   @Column()
   filePath: string;
 
-  @Index()
   @Column({
     type: "vector" as ColumnType,
     nullable: true,
