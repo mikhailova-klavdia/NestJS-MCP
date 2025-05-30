@@ -15,7 +15,7 @@ export class CodeNodeEntity {
   @PrimaryColumn("uuid")
   id: string;
 
-  //@Index()
+  @Index()
   @Column()
   identifier: string;
 
@@ -28,13 +28,14 @@ export class CodeNodeEntity {
   @Column()
   filePath: string;
 
+  @Index()
   @Column({
     type: "vector" as ColumnType,
     nullable: true,
   })
   embedding?: number[];
 
-  //@Index()
+  @Index()
   @ManyToOne(() => ProjectEntity)
   @JoinColumn({ name: "projectId" })
   project?: ProjectEntity;
