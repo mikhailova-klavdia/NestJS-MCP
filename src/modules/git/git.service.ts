@@ -17,7 +17,6 @@ import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
 import { CodeEdgeEntity } from "../identifiers/entities/code-edge.entity";
 import * as os from "os";
-import e from "express";
 
 @Injectable()
 export class GitService {
