@@ -12,18 +12,13 @@ import { RagModule } from "../rag/rag.module";
     RekogMcpModule.forRoot({
       name: "mcp-server",
       version: "1.0.0",
-      transport: [
-        McpTransportType.STREAMABLE_HTTP,
-        McpTransportType.SSE,
-      ],
-      
+      transport: [McpTransportType.STREAMABLE_HTTP, McpTransportType.SSE],
+
       streamableHttp: {
         enableJsonResponse: true,
-        sessionIdGenerator: () => "1", //() => crypto.randomUUID(),
+        sessionIdGenerator: () => crypto.randomUUID(),
         statelessMode: false,
       },
-      
-
     }),
     GitModule,
     RagModule,
