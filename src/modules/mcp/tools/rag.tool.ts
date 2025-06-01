@@ -17,7 +17,6 @@ export class RagTool {
       query: z.string().nonempty(),
       projectId: z.number().int().positive(),
       topN: z.number().int().positive().default(5),
-      minSimilarity: z.number().min(0).max(1).default(0.0),
       depth: z.number().int().min(0).default(0),
     }),
   })
@@ -33,12 +32,7 @@ export class RagTool {
     );
 
     // Retrieve the subgraph payloads
-    const payload = await this._rag.retrieve(
-      query,
-      projectId,
-      topN,
-      depth
-    );
+    const payload = await this._rag.retrieve(query, projectId, topN, depth);
 
     // Stringify the full results payload for inspection
     const jsonText = JSON.stringify(payload, null, 2);

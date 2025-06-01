@@ -131,7 +131,7 @@ export function findEnclosingStatement(node: ts.Node): ts.Node {
 
 /**
  * Checks if a given TypeScript node is inside an import declaration
- * @param node - The TypeScript node 
+ * @param node - The TypeScript node
  * @returns True if the node is inside an import declaration, false otherwise
  */
 export function isInsideImport(node: ts.Node): boolean {
