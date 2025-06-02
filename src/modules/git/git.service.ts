@@ -113,6 +113,12 @@ export class GitService {
     const duration = Date.now() - methodStart;
     this._logger.log(`extractProjectIdentifiers took ${duration}ms`);
 
+    const report = {
+      cloneTimeMs: cloneDuration,
+      processTimeMs: processDuration,
+      totalTimeMs: duration,
+    };
+
     return project;
   }
 
