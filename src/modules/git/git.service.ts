@@ -62,6 +62,7 @@ export class GitService {
     projectName: string,
     sshKey?: string
   ) {
+    const methodStart = Date.now();
     const projectPath = path.join(
       this._basePath,
       `${projectName}.git-${Date.now()}`
@@ -79,7 +80,10 @@ export class GitService {
     }
 
     // this will populate tmpDir with files
+    const cloneStart = Date.now();
     await git.clone(repoUrl, tmpDir);
+    const cloneDuration = Date.now() - cloneStart;
+    this._logger.log(`git.clone took ${cloneDuration}ms`);
 
     // grab the commit SHA
     const head = (await simpleGit(tmpDir).revparse(["HEAD"])).trim();
@@ -92,7 +96,11 @@ export class GitService {
     project.lastProcessedCommit = head;
     await this._projectRepo.save(project);
 
+    const processStart = Date.now();
     await this.processRepository(project, tmpDir);
+    const processDuration = Date.now() - processStart;
+    this._logger.log(`processRepository took ${processDuration}ms`);
+
     if (keyPath) {
       delete process.env.GIT_SSH_COMMAND;
       fs.unlinkSync(keyPath);
@@ -101,6 +109,9 @@ export class GitService {
 
     project.localPath = undefined;
     await this._projectRepo.save(project);
+
+    const duration = Date.now() - methodStart;
+    this._logger.log(`extractProjectIdentifiers took ${duration}ms`);
 
     return project;
   }
