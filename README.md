@@ -57,7 +57,7 @@ PORT=3000              # NestJS server port (default: 3000)
 - **Development mode** with hot reload:
 
   ```bash
-  npm run start:dev
+  pnpm start:dev
   ```
 
 ## Testing the App
