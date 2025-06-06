@@ -35,7 +35,7 @@ describe("GitController (e2e)", () => {
   };
 
   beforeAll(async () => {
-    const extractSpy = jest.fn().mockResolvedValue(fakeProject);
+    const extractSpy = jest.fn().mockResolvedValue({project: fakeProject});
     const cloneSpy = jest.fn().mockResolvedValue(fakeProject);
     const pollSpy = jest.fn().mockResolvedValue(undefined);
     const findByUrlSpy = jest.fn().mockResolvedValue(null);
