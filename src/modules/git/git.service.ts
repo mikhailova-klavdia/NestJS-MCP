@@ -119,7 +119,7 @@ export class GitService {
       totalTimeMs: duration,
     };
 
-    return project;
+    return {project, report};
   }
 
   /**

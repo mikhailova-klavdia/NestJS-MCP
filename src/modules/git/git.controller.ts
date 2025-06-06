@@ -34,7 +34,7 @@ export class GitController {
     }
 
     try {
-      const project = await this._gitService.extractProjectIdentifiers(
+      const {project, report} = await this._gitService.extractProjectIdentifiers(
         repoUrl,
         projectName,
         sshKey
@@ -43,6 +43,7 @@ export class GitController {
       return {
         message: "Repository streamed & processed successfully",
         project,
+        report
       };
     } catch (err) {
       throw new BadRequestException(err.message);
