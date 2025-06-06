@@ -42,6 +42,11 @@ PORT=3000              # NestJS server port (default: 3000)
 
 ## Running the App
 
+- **Install all packages**:
+
+  ```bash
+  npm install
+  ```
 
 - **Run the docker-compose**:
 
