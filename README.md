@@ -21,25 +21,33 @@ A modular NestJS application demonstrating integration with LLMs (via LangChain 
 The application uses `@nestjs/config`. Required environment variables:
 
 ```dotenv
-# postgres
-POSTGRES_HOST=
-POSTGRES_PORT=5433
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-POSTGRES_DB=
+# ───────── PostgreSQL (TypeORM) ─────────
+POSTGRES_HOST=         # e.g. "localhost" or "postgres" (in Docker)
+POSTGRES_PORT=5433     # default mapped port (see docker-compose.yml)
+POSTGRES_USER=root     # database username
+POSTGRES_PASSWORD=root # database password
+POSTGRES_DB=test       # database name
 
-# redis
-REDIS_HOST=
-REDIS_PORT=6379
+# ─────────── Redis (BullMQ) ────────────
+REDIS_HOST=            # e.g. "localhost" or "redis" (in Docker)
+REDIS_PORT=6379        # default Redis port
 
-# LLM Provider configuration
-MODEL_NAME=
-OLLAMA_HOST=http://localhost:11434
+# ─── LLM Provider (Ollama / LangChain) ──
+MODEL_NAME=            # any ollama embedding model
+OLLAMA_HOST=http://localhost:11434   # Ollama server URL (default)
 
-
+# ─────────── App Settings ───────────────
+PORT=3000              # NestJS server port (default: 3000)
 ```
 
 ## Running the App
+
+
+- **Run the docker-compose**:
+
+  ```bash
+  docker-compose up -d
+  ```
 
 - **Development mode** with hot reload:
 
@@ -64,14 +72,6 @@ npm run test:e2e
 ```
 
 Executes the E2E test suite against your running application. Ensure Redis and PostgreSQL are up (e.g., via `docker-compose up -d`) before running.
-
-**Run all tests (unit + E2E)**
-
-```bash
-npm run test
-```
-
-Runs both unit and end-to-end tests in a single command. Make sure any required Docker services are running.
 
 **Generate coverage report for e2e test**
 
