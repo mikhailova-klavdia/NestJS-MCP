@@ -49,6 +49,42 @@ OLLAMA_HOST=http://localhost:11434
   npm run start:dev
   ```
 
+
+## Testing the App
+
+**Run unit tests**
+
+```bash
+npm run test:unit
+```
+
+Executes Jest’s suite of utility and service-level tests. No external services (Redis, Postgres) are required.
+
+**Run end-to-end tests**
+
+```bash
+npm run test:e2e
+```
+
+Executes the E2E test suite against your running application. Ensure Redis and PostgreSQL are up (e.g., via `docker-compose up -d`) before running.
+
+**Run all tests (unit + E2E)**
+
+```bash
+npm run test
+```
+
+Runs both unit and end-to-end tests in a single command. Make sure any required Docker services are running.
+
+**Generate coverage report**
+
+```bash
+npm run test:cov
+```
+
+Produces a coverage report in the `coverage/` directory.
+
+
 ## Modules Overview
 
 * **Git Module** (`src/modules/git`): `GitController` and `GitService` for cloning and processing repos.
