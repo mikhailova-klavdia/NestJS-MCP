@@ -115,3 +115,35 @@ Below is a summary of the main REST endpoints. All paths assume the server is ru
 | **Project** | DELETE | `/api/projects/:id`        | Delete a project by ID. Returns HTTP 204 No Content.                                                          |
 | **RAG**     | POST   | `/api/rag/query`           | Run a similarity search over stored embeddings for a given project and return a context-aware LLM response.   |
 
+
+### Example: Clone a Repository
+
+**Request**
+
+```bash
+curl -X POST http://localhost:3000/api/git/clone \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repoUrl": "https://github.com/example/somerepo.git",
+    "name": "MyRepo",
+  }'
+```
+
+
+---
+
+### Example: RAG Query
+
+**Request**
+
+```bash
+curl -X POST http://localhost:3000/api/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "Explain the authentication flow in this codebase.",
+    "projectId": 42,
+    "topN": 5,
+    "depth": 0
+  }'
+```
+
